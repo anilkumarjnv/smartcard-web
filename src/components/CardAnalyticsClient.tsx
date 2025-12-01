@@ -3,8 +3,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import TimelineChart from "./TimelineChart";
 import RecentViews from "./RecentViews";
-import SummaryCards from "./summaryCards";
-// import SummaryCards from "./SummaryCards";
+import { SummaryCards } from "@/components/analytics/SummaryCards";
 
 type Analytics = {
   total_views: number;
@@ -50,7 +49,7 @@ export default function CardAnalyticsClient({ cardId }: { cardId: string }) {
 
   return (
     <div className="space-y-6 p-4">
-      <SummaryCards total={data.total_views} unique={data.unique_views} />
+      <SummaryCards totalViews={data.total_views} uniqueViews={data.unique_views} />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2">
           <div className="bg-white shadow rounded p-4">

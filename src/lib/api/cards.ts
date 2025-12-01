@@ -1,8 +1,9 @@
 // src/lib/api/cards.ts
-import { supabaseServer } from "../supabaseServer"; // your server supabase client
+import { createClient } from "../supabaseServer";
 
 export async function getCardBySlug(slug: string) {
-  const { data, error } = await supabaseServer
+  const supabase = await createClient();
+  const { data, error } = await supabase
     .from("cards")
     .select("*")
     .eq("slug", slug)

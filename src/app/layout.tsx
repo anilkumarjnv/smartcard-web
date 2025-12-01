@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Inter, Roboto, Poppins, Montserrat, Lato, Raleway, Playfair_Display, Merriweather, Outfit, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -11,6 +11,18 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+// Card theme fonts
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+const roboto = Roboto({ weight: ["300", "400", "500", "700"], subsets: ["latin"], variable: "--font-roboto", display: "swap" });
+const poppins = Poppins({ weight: ["300", "400", "500", "600", "700"], subsets: ["latin"], variable: "--font-poppins", display: "swap" });
+const montserrat = Montserrat({ weight: ["300", "400", "500", "600", "700"], subsets: ["latin"], variable: "--font-montserrat", display: "swap" });
+const lato = Lato({ weight: ["300", "400", "700"], subsets: ["latin"], variable: "--font-lato", display: "swap" });
+const raleway = Raleway({ weight: ["300", "400", "500", "600", "700"], subsets: ["latin"], variable: "--font-raleway", display: "swap" });
+const playfair = Playfair_Display({ weight: ["400", "500", "600", "700"], subsets: ["latin"], variable: "--font-playfair", display: "swap" });
+const merriweather = Merriweather({ weight: ["300", "400", "700"], subsets: ["latin"], variable: "--font-merriweather", display: "swap" });
+const outfit = Outfit({ weight: ["300", "400", "500", "600", "700"], subsets: ["latin"], variable: "--font-outfit", display: "swap" });
+const spaceGrotesk = Space_Grotesk({ weight: ["300", "400", "500", "600", "700"], subsets: ["latin"], variable: "--font-space-grotesk", display: "swap" });
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -25,7 +37,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${roboto.variable} ${poppins.variable} ${montserrat.variable} ${lato.variable} ${raleway.variable} ${playfair.variable} ${merriweather.variable} ${outfit.variable} ${spaceGrotesk.variable} antialiased`}
       >
         {children}
       </body>

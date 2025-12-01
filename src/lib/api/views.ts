@@ -1,6 +1,8 @@
 export async function recordView({ slug, referrer, rate_seconds = 60 } : {slug?: string, referrer?: string, rate_seconds?: number}) {
     try {
-      const url = `${process.env.NEXT_PUBLIC_API_URL}/api/record-view`;
+      // Use v1 endpoint, fallback to legacy endpoint
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8080";
+      const url = `${baseUrl}/api/v1/views/record`;
       const res = await fetch(url, {
         method: "POST",
         headers: {

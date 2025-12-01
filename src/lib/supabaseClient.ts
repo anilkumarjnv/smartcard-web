@@ -1,16 +1,18 @@
 // src/lib/supabaseClient.ts
-import { createClient } from '@supabase/supabase-js';
+/**
+ * Supabase Client (Browser)
+ * 
+ * Creates a Supabase client for browser-side authentication and queries.
+ * SECURITY: Only uses NEXT_PUBLIC_SUPABASE_ANON_KEY - never the service role key.
+ * 
+ * The anon key is safe to expose in the browser and is restricted by RLS policies.
+ */
 
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+import { createBrowserClient } from '@supabase/ssr';
 
-if (!url || !anonKey) {
-  throw new Error('Missing NEXT_PUBLIC_SUPABASE_* env variables');
+export function createClient() {
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
 }
-
-// Singleton client (prevents multiple clients in dev HMR)
-export const supabase = createClient(url, anonKey, {
-  auth: {
-    // configure if you want cookies/session to work with SSR
-  }
-});
