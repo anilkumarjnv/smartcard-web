@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import useSWR, { mutate } from 'swr';
 import Link from 'next/link';
+import { BarChart3 } from 'lucide-react';
 import { apiClient } from '@/lib/apiClient';
 import { Container } from '@/components/ui/Container';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
@@ -121,6 +122,12 @@ export default function MyCardsPage() {
                                         </Button>
                                         <Link href={`/dashboard/card/${card.id}/edit`}>
                                             <Button variant="primary" size="sm">Edit</Button>
+                                        </Link>
+                                        <Link href={`/dashboard/card/${card.id}/analytics`}>
+                                            <Button variant="secondary" size="sm">
+                                                <BarChart3 className="w-4 h-4 mr-1" />
+                                                Analytics
+                                            </Button>
                                         </Link>
                                         {card.is_published && (
                                             <a href={`/${card.slug}`} target="_blank" rel="noopener noreferrer">

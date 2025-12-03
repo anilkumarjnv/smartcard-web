@@ -32,14 +32,14 @@ const COLORS = {
 };
 
 export function DeviceBreakdown({ data }: DeviceBreakdownProps) {
-    if (!data) return null;
-
-    const chartData = [
+    const chartData = data ? [
         { name: 'Mobile', value: data.mobile, color: COLORS.mobile },
         { name: 'Desktop', value: data.desktop, color: COLORS.desktop },
         { name: 'Tablet', value: data.tablet, color: COLORS.tablet },
         { name: 'Other', value: data.unknown, color: COLORS.unknown },
-    ].filter(item => item.value > 0);
+    ].filter(item => item.value > 0) : [];
+
+    const hasData = chartData.length > 0;
 
     return (
         <Card className="h-full">
@@ -48,7 +48,8 @@ export function DeviceBreakdown({ data }: DeviceBreakdownProps) {
             </CardHeader>
             <CardBody>
                 <div className="h-[300px] w-full">
-                    <ResponsiveContainer width="100%" height="100%">
+                    {hasData ? (
+                        <ResponsiveContainer width="100%" height="100%">
                         <BarChart
                             data={chartData}
                             layout="vertical"
@@ -79,6 +80,14 @@ export function DeviceBreakdown({ data }: DeviceBreakdownProps) {
                             </Bar>
                         </BarChart>
                     </ResponsiveContainer>
+                    ) : (
+                        <div className="flex items-center justify-center h-full text-gray-400">
+                            <div className="text-center">
+                                <p className="text-lg font-medium">No data available</p>
+                                <p className="text-sm mt-1">Device data will appear here once your card is accessed</p>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </CardBody>
         </Card>

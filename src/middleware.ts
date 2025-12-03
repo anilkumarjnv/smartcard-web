@@ -38,18 +38,20 @@ export async function middleware(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     // Protected routes
-    if (request.nextUrl.pathname.startsWith('/dashboard')) {
+    if (request.nextUrl.pathname.startsWith('/mycards') ||
+        request.nextUrl.pathname.startsWith('/settings') ||
+        request.nextUrl.pathname.startsWith('/leads')) {
         if (!user) {
             return NextResponse.redirect(new URL('/login', request.url));
         }
     }
 
-    // Auth routes (redirect to dashboard if already logged in)
-    if (request.nextUrl.pathname.startsWith('/login') || 
-        request.nextUrl.pathname.startsWith('/signup') || 
+    // Auth routes (redirect to mycards if already logged in)
+    if (request.nextUrl.pathname.startsWith('/login') ||
+        request.nextUrl.pathname.startsWith('/signup') ||
         request.nextUrl.pathname.startsWith('/register')) {
         if (user) {
-            return NextResponse.redirect(new URL('/dashboard', request.url));
+            return NextResponse.redirect(new URL('/mycards', request.url));
         }
     }
 

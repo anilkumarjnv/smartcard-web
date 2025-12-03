@@ -1,17 +1,13 @@
-// src/app/dashboard/layout.tsx
+// src/app/mycards/layout.tsx
 /**
- * Dashboard Layout
- * 
- * Wraps all dashboard pages with:
- * 1. AuthGuard - ensures user is logged in
- * 2. Sidebar - main navigation sidebar
- * 3. Container - consistent spacing
+ * MyCards Layout
+ * Wraps mycards pages with AuthGuard and Sidebar
  */
 
 import { AuthGuard } from '@/components/auth/AuthGuard';
 import { Sidebar } from '@/components/layout/Sidebar';
 
-export default function DashboardLayout({
+export default function MyCardsLayout({
     children,
 }: {
     children: React.ReactNode;

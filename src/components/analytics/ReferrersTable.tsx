@@ -10,10 +10,12 @@ import { formatUrl } from '@/utils/formatters';
 import type { Referrer } from '@/lib/api/types';
 
 interface ReferrersTableProps {
-    data: Referrer[];
+    data?: Referrer[];
 }
 
 export function ReferrersTable({ data }: ReferrersTableProps) {
+    const hasData = data && data.length > 0;
+
     return (
         <Card className="h-full">
             <CardHeader>
@@ -33,7 +35,7 @@ export function ReferrersTable({ data }: ReferrersTableProps) {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {data.length === 0 ? (
+                            {!hasData ? (
                                 <tr>
                                     <td colSpan={2} className="px-6 py-4 text-center text-sm text-gray-500">
                                         No data available

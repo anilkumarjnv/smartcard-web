@@ -1,202 +1,151 @@
-// src/app/signup/page.tsx
-/**
- * Sign Up Page
- * 
- * Email and password registration form.
- */
-
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import React, { useState } from 'react';
+import { Mail, Lock, User, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import { signUpWithEmail, isAuthenticated } from '@/lib/auth';
-import { Card, CardBody } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Alert } from '@/components/ui/Alert';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/molecules/Button';
+import { Input } from '@/components/molecules/Input';
+import { createClient } from '@/lib/supabaseClient';
 
-export default function SignUpPage() {
-    const router = useRouter();
-    const searchParams = useSearchParams();
-    const returnTo = searchParams.get('returnTo') || '/dashboard';
-    const prefillEmail = searchParams.get('email') || '';
-    const fromLogin = searchParams.get('from') === 'login';
+export default function SignupPage() {
+  const router = useRouter();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
-    const [email, setEmail] = useState(prefillEmail);
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState(false);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
 
-    // Redirect if already logged in
-    useEffect(() => {
-        async function checkAuth() {
-            const isAuth = await isAuthenticated();
-            if (isAuth) {
-                router.replace(returnTo);
-            }
-        }
-        checkAuth();
-    }, [router, returnTo]);
+    if (!agreedToTerms) {
+      setError('Please agree to the Terms of Service and Privacy Policy');
+      return;
+    }
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsLoading(true);
-        setError(null);
-        setSuccess(false);
+    setLoading(true);
 
-        // Validation
-        if (password.length < 6) {
-            setError('Password must be at least 6 characters long');
-            setIsLoading(false);
-            return;
-        }
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: name,
+          },
+        },
+      });
 
-        if (password !== confirmPassword) {
-            setError('Passwords do not match');
-            setIsLoading(false);
-            return;
-        }
+      if (error) throw error;
 
-        try {
-            const { error: signUpError, user } = await signUpWithEmail(email, password);
+      if (data.user) {
+        router.push('/mycards');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to create account');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-            if (signUpError) {
-                throw signUpError;
-            }
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-6 py-12">
+      <div className="w-full max-w-md">
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-8 transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back
+        </Link>
 
-            if (user) {
-                setSuccess(true);
-                // Redirect to dashboard after a short delay
-                setTimeout(() => {
-                    router.push(returnTo);
-                }, 2000);
-            }
-        } catch (err) {
-            if (err instanceof Error) {
-                setError(err.message);
-            } else {
-                setError('Failed to create account. Please try again.');
-            }
-        } finally {
-            setIsLoading(false);
-        }
-    };
+        <div className="bg-white rounded-3xl shadow-xl p-8 md:p-10">
+          <div className="flex items-center gap-2 mb-8">
+            <div className="w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center">
+              <span className="text-white text-xl font-bold">S</span>
+            </div>
+            <span className="text-2xl font-semibold">SmartShare</span>
+          </div>
 
-    return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-            <div className="sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="flex justify-center mb-6">
-                    <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl shadow-lg flex items-center justify-center">
-                        <span className="text-2xl font-bold text-white">SC</span>
-                    </div>
-                </div>
-                <h2 className="text-center text-3xl font-extrabold text-gray-900 mb-2">
-                    Create your account
-                </h2>
-                <p className="text-center text-sm text-gray-600">
-                    Start building your digital business cards
-                </p>
+          <h2 className="mb-2">Create your account</h2>
+          <p className="text-gray-600 mb-8">Start building your digital presence today</p>
+
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl">
+              <p className="text-sm text-red-600">{error}</p>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <Input
+              type="text"
+              placeholder="Full Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              icon={<User className="w-5 h-5" />}
+              required
+            />
+
+            <Input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              icon={<Mail className="w-5 h-5" />}
+              required
+            />
+
+            <Input
+              type="password"
+              placeholder="Password (min. 6 characters)"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              icon={<Lock className="w-5 h-5" />}
+              required
+              minLength={6}
+            />
+
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                className="w-5 h-5 mt-0.5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                checked={agreedToTerms}
+                onChange={(e) => setAgreedToTerms(e.target.checked)}
+              />
+              <span className="text-sm text-gray-600">
+                I agree to the <Link href="/terms" className="text-indigo-600 hover:text-indigo-700">Terms of Service</Link> and{' '}
+                <Link href="/privacy" className="text-indigo-600 hover:text-indigo-700">Privacy Policy</Link>
+              </span>
+            </label>
+
+            <Button type="submit" fullWidth size="lg" disabled={loading}>
+              {loading ? 'Creating account...' : 'Create Account'}
+            </Button>
+
+            <div className="relative my-8">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-4 bg-white text-gray-500">or</span>
+              </div>
             </div>
 
-            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-                <Card>
-                    <CardBody className="py-8 px-6 sm:px-10">
-                        {fromLogin && (
-                            <Alert variant="error" className="mb-6">
-                                <p className="text-sm">
-                                    Account not found. Create a new account to get started.
-                                </p>
-                            </Alert>
-                        )}
-                        {success ? (
-                            <div className="text-center">
-                                <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
-                                    <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                </div>
-                                <h3 className="text-lg font-medium text-gray-900">Account created!</h3>
-                                <p className="mt-2 text-sm text-gray-500">
-                                    Redirecting you to your dashboard...
-                                </p>
-                            </div>
-                        ) : (
-                            <form className="space-y-6" onSubmit={handleSubmit}>
-                                {error && (
-                                    <Alert variant="error">
-                                        {error}
-                                    </Alert>
-                                )}
-
-                                <Input
-                                    label="Email address"
-                                    type="email"
-                                    autoComplete="email"
-                                    required
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    placeholder="you@example.com"
-                                />
-
-                                <Input
-                                    label="Password"
-                                    type="password"
-                                    autoComplete="new-password"
-                                    required
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="At least 6 characters"
-                                    helperText="Must be at least 6 characters"
-                                />
-
-                                <Input
-                                    label="Confirm Password"
-                                    type="password"
-                                    autoComplete="new-password"
-                                    required
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                    placeholder="Re-enter your password"
-                                />
-
-                                <Button
-                                    type="submit"
-                                    className="w-full"
-                                    isLoading={isLoading}
-                                    size="lg"
-                                >
-                                    Create Account
-                                </Button>
-
-                                <div className="text-center">
-                                    <p className="text-sm text-gray-600">
-                                        Already have an account?{' '}
-                                        <Link
-                                            href="/login"
-                                            className="font-medium text-blue-600 hover:text-blue-500"
-                                        >
-                                            Sign in
-                                        </Link>
-                                    </p>
-                                </div>
-                            </form>
-                        )}
-                    </CardBody>
-                </Card>
-
-                <div className="mt-6 text-center">
-                    <Link
-                        href="/"
-                        className="text-sm text-gray-600 hover:text-gray-900"
-                    >
-                        ← Back to homepage
-                    </Link>
-                </div>
+            <div className="text-center">
+              <p className="text-gray-600">
+                Already have an account?{' '}
+                <Link href="/login" className="text-indigo-600 hover:text-indigo-700 font-medium transition-colors">
+                  Sign in
+                </Link>
+              </p>
             </div>
+          </form>
         </div>
-    );
+      </div>
+    </div>
+  );
 }
-

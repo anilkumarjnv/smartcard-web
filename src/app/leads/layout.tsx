@@ -1,17 +1,13 @@
-// src/app/dashboard/layout.tsx
+// src/app/leads/layout.tsx
 /**
- * Dashboard Layout
- * 
- * Wraps all dashboard pages with:
- * 1. AuthGuard - ensures user is logged in
- * 2. Sidebar - main navigation sidebar
- * 3. Container - consistent spacing
+ * Leads Layout
+ * Wraps leads pages with AuthGuard and Sidebar
  */
 
 import { AuthGuard } from '@/components/auth/AuthGuard';
 import { Sidebar } from '@/components/layout/Sidebar';
 
-export default function DashboardLayout({
+export default function LeadsLayout({
     children,
 }: {
     children: React.ReactNode;
@@ -27,3 +23,4 @@ export default function DashboardLayout({
         </AuthGuard>
     );
 }
+

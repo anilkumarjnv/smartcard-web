@@ -1,169 +1,128 @@
-// src/app/login/page.tsx
-/**
- * Login Page
- * 
- * Email and password login form.
- * Redirects to signup if user not found.
- */
-
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import React, { useState } from 'react';
+import { Mail, Lock, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import { signInWithEmail, isAuthenticated } from '@/lib/auth';
-import { Card, CardBody } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Alert } from '@/components/ui/Alert';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/molecules/Button';
+import { Input } from '@/components/molecules/Input';
+import { createClient } from '@/lib/supabaseClient';
 
 export default function LoginPage() {
-    const router = useRouter();
-    const searchParams = useSearchParams();
-    const returnTo = searchParams.get('returnTo') || '/dashboard';
+  const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
 
-    // Redirect if already logged in
-    useEffect(() => {
-        async function checkAuth() {
-            const isAuth = await isAuthenticated();
-            if (isAuth) {
-                router.replace(returnTo);
-            }
-        }
-        checkAuth();
-    }, [router, returnTo]);
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsLoading(true);
-        setError(null);
+      if (error) throw error;
 
-        try {
-            const { error: signInError, user } = await signInWithEmail(email, password);
+      if (data.user) {
+        router.push('/mycards');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to sign in');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-            if (signInError) {
-                // Check if user doesn't exist - redirect to signup
-                // Supabase returns "Invalid login credentials" for both wrong password and user not found
-                // We'll redirect to signup to let them create an account if needed
-                if (signInError.message.includes('Invalid login credentials') || 
-                    signInError.message.includes('User not found') ||
-                    signInError.message.toLowerCase().includes('email') && signInError.message.toLowerCase().includes('not')) {
-                    // Redirect to signup with email pre-filled
-                    router.push(`/signup?email=${encodeURIComponent(email)}&from=login`);
-                    return;
-                }
-                throw signInError;
-            }
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-6 py-12">
+      <div className="w-full max-w-md">
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-8 transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back
+        </Link>
 
-            if (user) {
-                // Successfully logged in - redirect to dashboard
-                router.push(returnTo);
-            }
-        } catch (err) {
-            if (err instanceof Error) {
-                setError(err.message);
-            } else {
-                setError('Failed to sign in. Please try again.');
-            }
-        } finally {
-            setIsLoading(false);
-        }
-    };
+        <div className="bg-white rounded-3xl shadow-xl p-8 md:p-10">
+          <div className="flex items-center gap-2 mb-8">
+            <div className="w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center">
+              <span className="text-white text-xl font-bold">S</span>
+            </div>
+            <span className="text-2xl font-semibold">SmartShare</span>
+          </div>
 
-    return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-            <div className="sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="flex justify-center mb-6">
-                    <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl shadow-lg flex items-center justify-center">
-                        <span className="text-2xl font-bold text-white">SC</span>
-                    </div>
-                </div>
-                <h2 className="text-center text-3xl font-extrabold text-gray-900 mb-2">
-                    Welcome back
-                </h2>
-                <p className="text-center text-sm text-gray-600">
-                    Sign in to your SmartCard account
-                </p>
+          <h2 className="mb-2">Welcome back</h2>
+          <p className="text-gray-600 mb-8">Sign in to your account to continue</p>
+
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl">
+              <p className="text-sm text-red-600">{error}</p>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <Input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              icon={<Mail className="w-5 h-5" />}
+              required
+            />
+
+            <Input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              icon={<Lock className="w-5 h-5" />}
+              required
+            />
+
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600" />
+                <span className="text-sm text-gray-600">Remember me</span>
+              </label>
+              <Link
+                href="/forgot-password"
+                className="text-sm text-indigo-600 hover:text-indigo-700 transition-colors"
+              >
+                Forgot password?
+              </Link>
             </div>
 
-            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-                <Card>
-                    <CardBody className="py-8 px-6 sm:px-10">
-                        <form className="space-y-6" onSubmit={handleSubmit}>
-                            {error && (
-                                <Alert variant="error">
-                                    {error}
-                                </Alert>
-                            )}
+            <Button type="submit" fullWidth size="lg" disabled={loading}>
+              {loading ? 'Signing in...' : 'Sign In'}
+            </Button>
 
-                            <Input
-                                label="Email address"
-                                type="email"
-                                autoComplete="email"
-                                required
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                placeholder="you@example.com"
-                            />
-
-                            <div>
-                                <Input
-                                    label="Password"
-                                    type="password"
-                                    autoComplete="current-password"
-                                    required
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="Enter your password"
-                                />
-                                <div className="mt-2 text-right">
-                                    <Link
-                                        href="/forgot-password"
-                                        className="text-sm text-blue-600 hover:text-blue-500"
-                                    >
-                                        Forgot password?
-                                    </Link>
-                                </div>
-                            </div>
-
-                            <Button
-                                type="submit"
-                                className="w-full"
-                                isLoading={isLoading}
-                                size="lg"
-                            >
-                                Sign In
-                            </Button>
-
-                            <div className="text-center">
-                                <p className="text-sm text-gray-600">
-                                    Don&apos;t have an account?{' '}
-                                    <Link
-                                        href="/signup"
-                                        className="font-medium text-blue-600 hover:text-blue-500"
-                                    >
-                                        Sign up
-                                    </Link>
-                                </p>
-                            </div>
-                        </form>
-                    </CardBody>
-                </Card>
-
-                <div className="mt-6 text-center">
-                    <Link
-                        href="/"
-                        className="text-sm text-gray-600 hover:text-gray-900"
-                    >
-                        ← Back to homepage
-                    </Link>
-                </div>
+            <div className="relative my-8">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-4 bg-white text-gray-500">or</span>
+              </div>
             </div>
+
+            <div className="text-center">
+              <p className="text-gray-600">
+                Don't have an account?{' '}
+                <Link href="/signup" className="text-indigo-600 hover:text-indigo-700 font-medium transition-colors">
+                  Sign up
+                </Link>
+              </p>
+            </div>
+          </form>
         </div>
-    );
+      </div>
+    </div>
+  );
 }

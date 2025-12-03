@@ -52,17 +52,8 @@ export function Nav() {
                         {user ? (
                             <>
                                 <Link
-                                    href="/dashboard"
-                                    className={`text-sm font-medium transition-colors ${pathname.startsWith('/dashboard')
-                                        ? 'text-blue-600'
-                                        : 'text-gray-700 hover:text-blue-600'
-                                        }`}
-                                >
-                                    Dashboard
-                                </Link>
-                                <Link
-                                    href="/dashboard/cards"
-                                    className={`text-sm font-medium transition-colors ${pathname.startsWith('/dashboard/cards')
+                                    href="/mycards"
+                                    className={`text-sm font-medium transition-colors ${pathname.startsWith('/mycards')
                                         ? 'text-blue-600'
                                         : 'text-gray-700 hover:text-blue-600'
                                         }`}
@@ -70,8 +61,8 @@ export function Nav() {
                                     My Cards
                                 </Link>
                                 <Link
-                                    href="/dashboard/leads"
-                                    className={`text-sm font-medium transition-colors ${pathname.startsWith('/dashboard/leads')
+                                    href="/leads"
+                                    className={`text-sm font-medium transition-colors ${pathname.startsWith('/leads')
                                         ? 'text-blue-600'
                                         : 'text-gray-700 hover:text-blue-600'
                                         }`}
@@ -103,7 +94,7 @@ export function Nav() {
                             <div className="w-8 h-8 animate-pulse bg-gray-200 rounded-full" />
                         ) : user ? (
                             <div className="flex items-center space-x-3">
-                                <Link href="/dashboard">
+                                <Link href="/mycards">
                                     <Avatar src={user.avatar_url as string} name={user.email} size="sm" />
                                 </Link>
                                 <Button variant="ghost" size="sm" onClick={handleSignOut}>
