@@ -68,9 +68,35 @@ export function CardEditorTab({ cardId, mode, onCardUpdate, onFormChange }: Card
   const [saveMessage, setSaveMessage] = useState('');
   const [imagePreview, setImagePreview] = useState<string>('');
 
-  // Initialize form data when card loads
+  // Initialize form data when card loads or when entering create mode
   useEffect(() => {
-    if (currentCard) {
+    if (mode === 'create') {
+      // Clear form data for create mode
+      const emptyData = {
+        name: '',
+        title: '',
+        company: '',
+        about: '',
+        phone: '',
+        email: '',
+        website: '',
+        photo_url: '',
+        social_links: {
+          linkedin: '',
+          instagram: '',
+          twitter: '',
+          github: '',
+          whatsapp: ''
+        }
+      };
+      setFormData(emptyData);
+      setImagePreview('');
+      
+      // Notify parent of empty data
+      if (onFormChange) {
+        onFormChange(emptyData);
+      }
+    } else if (currentCard) {
       const initialData = {
         name: currentCard.name || '',
         title: currentCard.title || '',
@@ -97,7 +123,7 @@ export function CardEditorTab({ cardId, mode, onCardUpdate, onFormChange }: Card
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentCard]);
+  }, [currentCard, mode]);
 
   // Helper function to update form data and notify parent
   const handleFormChange = (updates: Partial<typeof formData>) => {

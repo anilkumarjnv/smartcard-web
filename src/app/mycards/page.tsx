@@ -46,8 +46,10 @@ export default function MyCardsPage() {
         if (currentCard) {
             setCardData(currentCard);
         } else if (modeParam === 'create') {
-            // For create mode, clear card data
+            // For create mode, clear all card data and form data
             setCardData(null);
+            setLiveFormData(null);
+            setLiveTheme(undefined);
         }
     }, [currentCard, modeParam]);
 
@@ -57,6 +59,15 @@ export default function MyCardsPage() {
             setActiveTab(tabParam as 'card' | 'theme' | 'share');
         }
     }, [tabParam]);
+
+    // Clear all state when entering create mode
+    useEffect(() => {
+        if (modeParam === 'create' && !cardIdParam) {
+            setCardData(null);
+            setLiveFormData(null);
+            setLiveTheme(undefined);
+        }
+    }, [modeParam, cardIdParam]);
 
     // Check if we're in edit/create mode
     const isEditingCard = cardIdParam || modeParam === 'create';
@@ -326,7 +337,16 @@ export default function MyCardsPage() {
                                     />
                                 ) : (
                                     <div className="flex items-center justify-center h-full text-center py-12 text-gray-400">
-                                        {isLoading ? 'Loading preview...' : 'No card data available'}
+                                        {modeParam === 'create' ? (
+                                            <div>
+                                                <p className="text-lg font-medium text-gray-500 mb-2">Start Creating Your Card</p>
+                                                <p className="text-sm text-gray-400">Fill in the form to see your card preview</p>
+                                            </div>
+                                        ) : isLoading ? (
+                                            'Loading preview...'
+                                        ) : (
+                                            'No card data available'
+                                        )}
                                     </div>
                                 )}
                             </div>
