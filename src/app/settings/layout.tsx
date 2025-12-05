@@ -4,22 +4,16 @@
  * Wraps settings pages with AuthGuard and Sidebar
  */
 
-import { AuthGuard } from '@/components/auth/AuthGuard';
-import { Sidebar } from '@/components/layout/Sidebar';
+import { ReactNode } from 'react';
+import { AppSidebar } from '@/components/navigation/AppSidebar';
 
-export default function SettingsLayout({
-    children,
-}: {
-    children: React.ReactNode;
-}) {
+export default function SettingsLayout({ children }: { children: ReactNode }) {
     return (
-        <AuthGuard>
-            <div className="flex min-h-screen bg-gray-50">
-                <Sidebar />
-                <main className="flex-1 ml-64 p-8">
-                    {children}
-                </main>
+        <div className="min-h-screen bg-background">
+            <AppSidebar />
+            <div className="pl-20">
+                {children}
             </div>
-        </AuthGuard>
+        </div>
     );
 }

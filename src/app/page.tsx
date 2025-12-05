@@ -51,7 +51,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       <Navbar />
 
       {/* Hero Section */}
@@ -62,7 +62,7 @@ export default function Home() {
               <h1 className="mb-6">
                 Your Professional Digital Business Card
               </h1>
-              <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+              <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
                 Create, customize, and share beautiful digital business cards in seconds. Modern, minimal, and made for professionals.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
@@ -83,10 +83,10 @@ export default function Home() {
               <div className="bg-gradient-to-br from-indigo-100 to-purple-100 rounded-3xl p-8 md:p-12">
                 <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-sm mx-auto">
                   <div className="flex flex-col items-center text-center">
-                    <div className="w-24 h-24 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-full mb-4" />
+                    <div className="w-24 h-24 bg-gradient-to-br from-primary to-accent rounded-full mb-4" />
                     <h3 className="text-xl font-semibold mb-2">John Doe</h3>
-                    <p className="text-gray-600 mb-1">Product Designer</p>
-                    <p className="text-gray-500 text-sm">Tech Company</p>
+                    <p className="text-muted-foreground mb-1">Product Designer</p>
+                    <p className="text-muted-foreground text-sm">Tech Company</p>
                   </div>
                 </div>
               </div>
@@ -96,22 +96,22 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-6 bg-gray-50">
+      <section className="py-20 px-6 bg-muted/30">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="mb-4">Everything you need to stand out</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Professional features designed to help you make the best first impression
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <div key={index} className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow">
-                <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-600 mb-4">
+              <div key={index} className="bg-card rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow border border-border">
+                <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary mb-4">
                   {feature.icon}
                 </div>
                 <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                <p className="text-gray-600">{feature.description}</p>
+                <p className="text-muted-foreground">{feature.description}</p>
               </div>
             ))}
           </div>
@@ -123,7 +123,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="mb-4">Simple, transparent pricing</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Choose the plan that works best for you
             </p>
           </div>
@@ -131,19 +131,18 @@ export default function Home() {
             {pricingPlans.map((plan, index) => (
               <div
                 key={index}
-                className={`rounded-3xl p-8 ${
-                  plan.highlighted
-                    ? 'bg-gradient-to-br from-indigo-600 to-purple-600 text-white shadow-2xl scale-105'
-                    : 'bg-white border-2 border-gray-200'
-                }`}
+                className={`rounded-3xl p-8 ${plan.highlighted
+                  ? 'bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-2xl scale-105'
+                  : 'bg-card border-2 border-border'
+                  }`}
               >
-                <h3 className={`text-2xl font-bold mb-2 ${!plan.highlighted && 'text-gray-900'}`}>
+                <h3 className={`text-2xl font-bold mb-2 ${!plan.highlighted && 'text-foreground'}`}>
                   {plan.name}
                 </h3>
                 <div className="mb-6">
                   <span className="text-4xl font-bold">{plan.price}</span>
                   {plan.period && (
-                    <span className={`text-lg ${plan.highlighted ? 'text-white/80' : 'text-gray-600'}`}>
+                    <span className={`text-lg ${plan.highlighted ? 'text-primary-foreground/80' : 'text-muted-foreground'}`}>
                       {plan.period}
                     </span>
                   )}
@@ -151,8 +150,8 @@ export default function Home() {
                 <ul className="space-y-3 mb-8">
                   {plan.features.map((feature, featureIndex) => (
                     <li key={featureIndex} className="flex items-center gap-3">
-                      <Check className={`w-5 h-5 ${plan.highlighted ? 'text-white' : 'text-indigo-600'}`} />
-                      <span className={plan.highlighted ? 'text-white/90' : 'text-gray-700'}>
+                      <Check className={`w-5 h-5 ${plan.highlighted ? 'text-primary-foreground' : 'text-primary'}`} />
+                      <span className={plan.highlighted ? 'text-primary-foreground/90' : 'text-foreground'}>
                         {feature}
                       </span>
                     </li>
@@ -174,10 +173,10 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-6 bg-gray-900 text-white">
+      <section className="py-20 px-6 bg-foreground text-primary-foreground">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-white mb-6">Ready to create your digital card?</h2>
-          <p className="text-xl text-gray-300 mb-8">
+          <h2 className="text-primary-foreground mb-6">Ready to create your digital card?</h2>
+          <p className="text-xl text-muted-foreground/80 mb-8">
             Join thousands of professionals using SmartShare to grow their network
           </p>
           <Link href="/signup">
@@ -190,20 +189,20 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-gray-200 py-8 px-6">
+      <footer className="border-t border-border py-8 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center">
                 <span className="text-white text-sm font-bold">S</span>
               </div>
-              <span className="text-gray-600">© 2025 SmartShare. All rights reserved.</span>
+              <span className="text-muted-foreground">© 2025 SmartShare. All rights reserved.</span>
             </div>
             <div className="flex items-center gap-6">
-              <Link href="/login" className="text-gray-600 hover:text-gray-900 text-sm transition-colors">
+              <Link href="/login" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
                 Sign In
               </Link>
-              <Link href="/signup" className="text-gray-600 hover:text-gray-900 text-sm transition-colors">
+              <Link href="/signup" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
                 Sign Up
               </Link>
             </div>
