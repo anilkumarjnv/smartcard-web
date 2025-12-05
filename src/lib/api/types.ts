@@ -27,6 +27,14 @@ export interface Card {
     cover_url?: string;   // Keep for backward compatibility
     social_links?: Record<string, string>;
     theme?: Record<string, unknown>;
+    // Role-specific fields
+    school?: string;
+    major?: string;
+    graduation_year?: string;
+    skills?: string;
+    projects?: string;
+    experience?: string;
+    certifications?: string;
     views_count?: number;
     is_published: boolean;
     created_at: string;
@@ -52,6 +60,14 @@ export interface CreateCardDTO {
     cover_url?: string;
     social_links?: Record<string, string>;
     theme?: Record<string, unknown>;
+    // Role-specific fields
+    school?: string;
+    major?: string;
+    graduation_year?: string;
+    skills?: string;
+    projects?: string;
+    experience?: string;
+    certifications?: string;
 }
 
 /**
@@ -74,6 +90,14 @@ export interface UpdateCardDTO {
     social_links?: Record<string, string>;
     theme?: Record<string, unknown>;
     is_published?: boolean;
+    // Role-specific fields
+    school?: string;
+    major?: string;
+    graduation_year?: string;
+    skills?: string;
+    projects?: string;
+    experience?: string;
+    certifications?: string;
 }
 
 /**
@@ -165,5 +189,11 @@ export interface AuthUser {
     id: string;
     email: string;
     role?: string;
+    user_metadata?: {
+        role?: string;
+        full_name?: string;
+        avatar_url?: string;
+        [key: string]: any;
+    };
     [key: string]: unknown;
 }

@@ -44,6 +44,12 @@ export async function middleware(request: NextRequest) {
         if (!user) {
             return NextResponse.redirect(new URL('/login', request.url));
         }
+
+        // Check for role
+        const role = user.user_metadata?.role;
+        if (!role && !request.nextUrl.pathname.startsWith('/onboarding')) {
+            return NextResponse.redirect(new URL('/onboarding', request.url));
+        }
     }
 
     // Auth routes (redirect to mycards if already logged in)
@@ -51,6 +57,22 @@ export async function middleware(request: NextRequest) {
         request.nextUrl.pathname.startsWith('/signup') ||
         request.nextUrl.pathname.startsWith('/register')) {
         if (user) {
+            // If user has no role, go to onboarding, else mycards
+            const role = user.user_metadata?.role;
+            if (!role) {
+                return NextResponse.redirect(new URL('/onboarding', request.url));
+            }
+            return NextResponse.redirect(new URL('/mycards', request.url));
+        }
+    }
+
+    // Onboarding route protection
+    if (request.nextUrl.pathname.startsWith('/onboarding')) {
+        if (!user) {
+            return NextResponse.redirect(new URL('/login', request.url));
+        }
+        // If already has role, redirect to mycards
+        if (user.user_metadata?.role) {
             return NextResponse.redirect(new URL('/mycards', request.url));
         }
     }

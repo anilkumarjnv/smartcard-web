@@ -18,6 +18,7 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [role, setRole] = useState<string>('');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
@@ -29,10 +30,43 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
       if (user) {
         setEmail(user.email || '');
         setName(user.user_metadata?.name || '');
+        setRole(user.user_metadata?.role || 'professional');
       }
     };
     loadUserData();
   }, [supabase]);
+
+  const handleRoleChange = async (newRole: string) => {
+    if (newRole === role) return;
+
+    setIsSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('No user found');
+
+      const { error } = await supabase.rpc('update_user_role', {
+        user_id: user.id,
+        new_role: newRole
+      });
+
+      if (error) throw error;
+
+      // Update local state and refresh session
+      setRole(newRole);
+      await supabase.auth.refreshSession();
+
+      setSaveMessage(`✓ Role updated to ${newRole}`);
+      setTimeout(() => setSaveMessage(''), 3000);
+
+      // Force reload to update UI components that depend on role
+      window.location.reload();
+    } catch (err) {
+      console.error('Error updating role:', err);
+      setSaveMessage('✗ Failed to update role');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const handleSaveProfile = async () => {
     setIsSaving(true);
@@ -61,7 +95,7 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
       // This would typically be handled by a backend service
       console.log('Account deletion requested');
       setShowDeleteModal(false);
-      
+
       // Sign out after deletion request
       await supabase.auth.signOut();
       if (onLogout) {
@@ -89,11 +123,10 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
 
       <div className="space-y-8">
         {saveMessage && (
-          <div className={`p-4 rounded-2xl ${
-            saveMessage.includes('✓') 
-              ? 'bg-green-50 text-green-700' 
-              : 'bg-red-50 text-red-700'
-          }`}>
+          <div className={`p-4 rounded-2xl ${saveMessage.includes('✓')
+            ? 'bg-green-50 text-green-700'
+            : 'bg-red-50 text-red-700'
+            }`}>
             {saveMessage}
           </div>
         )}
@@ -125,6 +158,48 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
         </div>
 
         <div className="border-t border-gray-200 pt-8">
+          <h4 className="text-lg font-semibold mb-4">Role & Experience</h4>
+          <div className="p-6 bg-gray-50 rounded-2xl">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <p className="font-medium">Current Role</p>
+                <p className="text-sm text-gray-600 mt-1">Determines your card layout and fields</p>
+              </div>
+              <span className={`px-4 py-2 rounded-xl text-sm font-medium ${(role || 'professional') === 'student'
+                ? 'bg-blue-100 text-blue-700'
+                : 'bg-indigo-100 text-indigo-700'
+                }`}>
+                {(role || 'Professional').charAt(0).toUpperCase() + (role || 'professional').slice(1)}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                onClick={() => handleRoleChange('student')}
+                className={`p-4 rounded-xl border-2 text-left transition-all ${role === 'student'
+                  ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
+                  : 'border-gray-200 hover:border-blue-200 hover:bg-white'
+                  }`}
+              >
+                <div className="font-semibold mb-1 text-blue-900">Student</div>
+                <div className="text-xs text-blue-700">Academic focus, projects, GPA</div>
+              </button>
+
+              <button
+                onClick={() => handleRoleChange('professional')}
+                className={`p-4 rounded-xl border-2 text-left transition-all ${role === 'professional'
+                  ? 'border-indigo-500 bg-indigo-50 ring-1 ring-indigo-500'
+                  : 'border-gray-200 hover:border-indigo-200 hover:bg-white'
+                  }`}
+              >
+                <div className="font-semibold mb-1 text-indigo-900">Professional</div>
+                <div className="text-xs text-indigo-700">Career focus, experience, portfolio</div>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="border-t border-gray-200 pt-8">
           <h4 className="text-lg font-semibold mb-4">Subscription</h4>
           <div className="p-6 bg-gray-50 rounded-2xl">
             <div className="flex items-center justify-between mb-4">
@@ -136,7 +211,7 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
             </div>
             <Button variant="primary" fullWidth>
               <CreditCard className="w-5 h-5 mr-2" />
-              Upgrade to Pro
+              {role === 'student' ? 'Upgrade to Student Pro ($3/mo)' : 'Upgrade to Pro ($9/mo)'}
             </Button>
           </div>
         </div>
@@ -218,7 +293,7 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
           </div>
         </div>
       </Modal>
-    </div>
+    </div >
   );
 }
 
