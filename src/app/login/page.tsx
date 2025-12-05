@@ -1,128 +1,88 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Mail, Lock, ArrowLeft } from 'lucide-react';
+import React from 'react';
+import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/molecules/Button';
-import { Input } from '@/components/molecules/Input';
-import { createClient } from '@/lib/supabaseClient';
+import { useSearchParams } from 'next/navigation';
+import { OAuthButton } from '@/components/auth/OAuthButton';
 
 export default function LoginPage() {
-  const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+    const searchParams = useSearchParams();
+    const error = searchParams?.get('error');
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    try {
-      const supabase = createClient();
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-
-      if (data.user) {
-        router.push('/mycards');
-      }
-    } catch (err: any) {
-      setError(err.message || 'Failed to sign in');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-6 py-12">
-      <div className="w-full max-w-md">
-        <Link
-          href="/"
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-8 transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back
-        </Link>
-
-        <div className="bg-white rounded-3xl shadow-xl p-8 md:p-10">
-          <div className="flex items-center gap-2 mb-8">
-            <div className="w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center">
-              <span className="text-white text-xl font-bold">S</span>
-            </div>
-            <span className="text-2xl font-semibold">SmartShare</span>
-          </div>
-
-          <h2 className="mb-2">Welcome back</h2>
-          <p className="text-gray-600 mb-8">Sign in to your account to continue</p>
-
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl">
-              <p className="text-sm text-red-600">{error}</p>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <Input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              icon={<Mail className="w-5 h-5" />}
-              required
-            />
-
-            <Input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              icon={<Lock className="w-5 h-5" />}
-              required
-            />
-
-            <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600" />
-                <span className="text-sm text-gray-600">Remember me</span>
-              </label>
-              <Link
-                href="/forgot-password"
-                className="text-sm text-indigo-600 hover:text-indigo-700 transition-colors"
-              >
-                Forgot password?
-              </Link>
-            </div>
-
-            <Button type="submit" fullWidth size="lg" disabled={loading}>
-              {loading ? 'Signing in...' : 'Sign In'}
-            </Button>
-
-            <div className="relative my-8">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-gray-500">or</span>
-              </div>
-            </div>
-
-            <div className="text-center">
-              <p className="text-gray-600">
-                Don't have an account?{' '}
-                <Link href="/signup" className="text-indigo-600 hover:text-indigo-700 font-medium transition-colors">
-                  Sign up
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 flex items-center justify-center px-6 py-12">
+            <div className="w-full max-w-md">
+                <Link
+                    href="/"
+                    className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-8 transition-colors"
+                >
+                    <ArrowLeft className="w-4 h-4" />
+                    Back to Home
                 </Link>
-              </p>
+
+                <div className="bg-card rounded-3xl shadow-xl border border-border p-8 md:p-10">
+                    {/* Logo */}
+                    <div className="flex items-center gap-3 mb-8">
+                        <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center">
+                            <span className="text-primary-foreground text-xl font-bold">S</span>
+                        </div>
+                        <span className="text-2xl font-semibold">SmartCard</span>
+                    </div>
+
+                    {/* Header */}
+                    <h2 className="text-2xl font-bold mb-2">Welcome back</h2>
+                    <p className="text-muted-foreground mb-8">
+                        Sign in to your account to continue
+                    </p>
+
+                    {/* Error message */}
+                    {error && (
+                        <div className="mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-xl">
+                            <p className="text-sm text-destructive">
+                                {error === 'auth_failed'
+                                    ? 'Authentication failed. Please try again.'
+                                    : 'An error occurred. Please try again.'}
+                            </p>
+                        </div>
+                    )}
+
+                    {/* OAuth Button */}
+                    <OAuthButton provider="google" />
+
+                    {/* Terms */}
+                    <p className="mt-8 text-center text-sm text-muted-foreground">
+                        By continuing, you agree to our{' '}
+                        <Link href="/terms" className="text-primary hover:text-primary/80 font-medium">
+                            Terms of Service
+                        </Link>{' '}
+                        and{' '}
+                        <Link href="/privacy" className="text-primary hover:text-primary/80 font-medium">
+                            Privacy Policy
+                        </Link>
+                    </p>
+
+                    {/* Divider */}
+                    <div className="relative my-8">
+                        <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-border" />
+                        </div>
+                        <div className="relative flex justify-center text-sm">
+                            <span className="px-4 bg-card text-muted-foreground">New to SmartCard?</span>
+                        </div>
+                    </div>
+
+                    {/* Sign up link */}
+                    <div className="text-center">
+                        <Link
+                            href="/signup"
+                            className="text-primary hover:text-primary/80 font-medium transition-colors"
+                        >
+                            Create an account →
+                        </Link>
+                    </div>
+                </div>
             </div>
-          </form>
         </div>
-      </div>
-    </div>
-  );
+    );
 }

@@ -199,11 +199,11 @@ export default function Home() {
               <span className="text-muted-foreground">© 2025 SmartShare. All rights reserved.</span>
             </div>
             <div className="flex items-center gap-6">
-              <Link href="/login" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
-                Sign In
+              <Link href="/terms" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
+                Terms
               </Link>
-              <Link href="/signup" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
-                Sign Up
+              <Link href="/privacy" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
+                Privacy
               </Link>
             </div>
           </div>

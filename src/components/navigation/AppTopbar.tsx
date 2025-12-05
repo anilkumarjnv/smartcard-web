@@ -1,6 +1,9 @@
 "use client"
 
 import { Bell, Search } from "lucide-react"
+import { useEffect, useState } from "react"
+import { createClient } from "@/lib/supabaseClient"
+import { User } from "@supabase/supabase-js"
 
 interface AppTopbarProps {
     title: string
@@ -8,6 +11,31 @@ interface AppTopbarProps {
 }
 
 export function AppTopbar({ title, subtitle }: AppTopbarProps) {
+    const [user, setUser] = useState<User | null>(null)
+
+    useEffect(() => {
+        const supabase = createClient()
+
+        // Get initial user
+        supabase.auth.getUser().then(({ data: { user } }) => {
+            setUser(user)
+        })
+
+        // Listen for auth changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setUser(session?.user ?? null)
+        })
+
+        return () => {
+            subscription.unsubscribe()
+        }
+    }, [])
+
+    const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'
+    const userEmail = user?.email || ''
+    const userInitials = userName.substring(0, 2).toUpperCase()
+    const userAvatar = user?.user_metadata?.avatar_url || user?.user_metadata?.picture
+
     return (
         <header className="h-16 border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-30 flex items-center justify-between px-6">
             <div>
@@ -34,11 +62,19 @@ export function AppTopbar({ title, subtitle }: AppTopbarProps) {
                 {/* User */}
                 <div className="flex items-center gap-3 pl-4 border-l border-border">
                     <div className="text-right hidden sm:block">
-                        <p className="text-sm font-medium">John Doe</p>
-                        <p className="text-xs text-muted-foreground">john@example.com</p>
+                        <p className="text-sm font-medium">{userName}</p>
+                        <p className="text-xs text-muted-foreground">{userEmail}</p>
                     </div>
-                    <div className="w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold">
-                        JD
+                    <div className="w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold overflow-hidden">
+                        {userAvatar ? (
+                            <img
+                                src={userAvatar}
+                                alt={userName}
+                                className="w-full h-full object-cover"
+                            />
+                        ) : (
+                            userInitials
+                        )}
                     </div>
                 </div>
             </div>
