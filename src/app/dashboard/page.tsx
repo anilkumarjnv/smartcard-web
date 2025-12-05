@@ -17,7 +17,10 @@ import { Button } from '@/components/ui/Button';
 import { Spinner } from '@/components/ui/Spinner';
 import { Avatar } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
+import { RoleBasedDashboard } from '@/components/dashboard/RoleBasedDashboard';
+import { useUserRole } from '@/hooks/useUserRole';
 import { formatDate } from '@/utils/formatters';
+import { getRoleColorClasses } from '@/lib/roleStyles';
 import type { Card as CardType } from '@/lib/api/types';
 
 // SWR fetcher
@@ -26,6 +29,8 @@ const fetcher = (url: string) => apiClient.get<any>(url);
 export default function DashboardPage() {
     // Fetch user's cards
     const { data: cards, error, isLoading } = useSWR<CardType[]>('/api/v1/cards/user', fetcher);
+    const { role, roleConfig } = useUserRole();
+    const roleColors = getRoleColorClasses(role);
 
     if (isLoading) {
         return (
@@ -55,6 +60,13 @@ export default function DashboardPage() {
             <div className="mb-8">
                 <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
             </div>
+
+            {/* Role-based Dashboard Section */}
+            {roleConfig && (
+                <div className="mb-8">
+                    <RoleBasedDashboard roleConfig={roleConfig} />
+                </div>
+            )}
 
             {!hasCards ? (
                 <Card className="text-center py-12">

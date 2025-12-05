@@ -1,15 +1,21 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Mail, Lock, User, ArrowLeft } from 'lucide-react';
+import { Mail, Lock, User, ArrowLeft, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/molecules/Button';
 import { Input } from '@/components/molecules/Input';
+import { RoleSelection } from '@/components/auth/RoleSelection';
 import { createClient } from '@/lib/supabaseClient';
+import type { UserRole } from '@/lib/roles';
+
+type SignupStep = 'role' | 'details';
 
 export default function SignupPage() {
   const router = useRouter();
+  const [step, setStep] = useState<SignupStep>('role');
+  const [selectedRole, setSelectedRole] = useState<UserRole | undefined>();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -17,9 +23,26 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
+  const handleRoleSelect = (role: UserRole) => {
+    setSelectedRole(role);
+    setStep('details');
+  };
+
+  const handleBack = () => {
+    if (step === 'details') {
+      setStep('role');
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (!selectedRole) {
+      setError('Please select your role');
+      setStep('role');
+      return;
+    }
 
     if (!agreedToTerms) {
       setError('Please agree to the Terms of Service and Privacy Policy');
@@ -36,6 +59,7 @@ export default function SignupPage() {
         options: {
           data: {
             full_name: name,
+            role: selectedRole,
           },
         },
       });
@@ -71,8 +95,15 @@ export default function SignupPage() {
             <span className="text-2xl font-semibold">SmartShare</span>
           </div>
 
-          <h2 className="mb-2">Create your account</h2>
-          <p className="text-gray-600 mb-8">Start building your digital presence today</p>
+          <h2 className="mb-2">
+            {step === 'role' ? 'Choose Your Role' : 'Create your account'}
+          </h2>
+          <p className="text-gray-600 mb-8">
+            {step === 'role' 
+              ? 'Select the option that best describes you to personalize your experience'
+              : 'Start building your digital presence today'
+            }
+          </p>
 
           {error && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl">
@@ -80,7 +111,33 @@ export default function SignupPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          {step === 'role' ? (
+            <div>
+              <RoleSelection
+                onRoleSelect={handleRoleSelect}
+                selectedRole={selectedRole}
+                isLoading={loading}
+              />
+              <div className="mt-6 text-center">
+                <p className="text-gray-600">
+                  Already have an account?{' '}
+                  <Link href="/login" className="text-indigo-600 hover:text-indigo-700 font-medium transition-colors">
+                    Sign in
+                  </Link>
+                </p>
+              </div>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={handleBack}
+                className="mb-4"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Role Selection
+              </Button>
             <Input
               type="text"
               placeholder="Full Name"
@@ -135,15 +192,16 @@ export default function SignupPage() {
               </div>
             </div>
 
-            <div className="text-center">
-              <p className="text-gray-600">
-                Already have an account?{' '}
-                <Link href="/login" className="text-indigo-600 hover:text-indigo-700 font-medium transition-colors">
-                  Sign in
-                </Link>
-              </p>
-            </div>
-          </form>
+              <div className="text-center">
+                <p className="text-gray-600">
+                  Already have an account?{' '}
+                  <Link href="/login" className="text-indigo-600 hover:text-indigo-700 font-medium transition-colors">
+                    Sign in
+                  </Link>
+                </p>
+              </div>
+            </form>
+          )}
         </div>
       </div>
     </div>

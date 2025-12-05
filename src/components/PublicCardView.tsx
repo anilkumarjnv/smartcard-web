@@ -14,7 +14,7 @@ interface PublicCardViewProps {
 export function PublicCardView({ card }: PublicCardViewProps) {
     return (
         <div className="min-h-screen" style={{ backgroundColor: 'transparent' }}>
-            <CardPreview card={card} theme={card.theme} />
+            <CardPreview card={card} theme={card.theme} isPublicView={true} />
         </div>
     );
 }

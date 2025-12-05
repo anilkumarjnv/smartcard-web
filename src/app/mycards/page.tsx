@@ -30,6 +30,7 @@ export default function MyCardsPage() {
     const [activeTab, setActiveTab] = useState<'card' | 'theme' | 'share'>(tabParam as 'card' | 'theme' | 'share' || 'card');
     const [cardData, setCardData] = useState<CardType | null>(null);
     const [liveFormData, setLiveFormData] = useState<any>(null);
+    const [persistedFormData, setPersistedFormData] = useState<any>(null); // Persist form data across tab switches
     const [liveTheme, setLiveTheme] = useState<Record<string, unknown> | undefined>(undefined);
     const [togglingId, setTogglingId] = useState<string | null>(null);
 
@@ -45,13 +46,47 @@ export default function MyCardsPage() {
     useEffect(() => {
         if (currentCard) {
             setCardData(currentCard);
+            // Only initialize persisted form data if we don't have it yet or if card ID changed
+            if (!persistedFormData || persistedFormData._cardId !== cardIdParam) {
+                const cardData = currentCard as any;
+                const initialFormData = {
+                    _cardId: currentCard.id, // Track which card this form data belongs to
+                    name: currentCard.name || '',
+                    title: currentCard.title || '',
+                    company: currentCard.company || '',
+                    about: cardData.bio || currentCard.about || '',
+                    phone: currentCard.phone || '',
+                    phone_public: currentCard.phone_public ?? false,
+                    email: currentCard.email || '',
+                    website: currentCard.website || '',
+                    photo_url: currentCard.avatar_url || currentCard.photo_url || '',
+                    school: cardData.school || (cardData.student_fields?.school) || '',
+                    major: cardData.major || (cardData.student_fields?.major) || '',
+                    graduation_year: cardData.graduation_year || (cardData.student_fields?.graduation_year) || '',
+                    skills: cardData.skills || '',
+                    projects: cardData.projects || (cardData.student_fields?.projects) || '',
+                    experience: cardData.experience || (cardData.professional_fields?.experience) || '',
+                    certifications: cardData.certifications || '',
+                    phone_public: currentCard.phone_public ?? false,
+                    social_links: {
+                        linkedin: (currentCard.social_links as Record<string, string>)?.linkedin || '',
+                        instagram: (currentCard.social_links as Record<string, string>)?.instagram || '',
+                        twitter: (currentCard.social_links as Record<string, string>)?.twitter || '',
+                        github: (currentCard.social_links as Record<string, string>)?.github || '',
+                        whatsapp: (currentCard.social_links as Record<string, string>)?.whatsapp || ''
+                    }
+                };
+                setPersistedFormData(initialFormData);
+                setLiveFormData(initialFormData);
+            }
         } else if (modeParam === 'create') {
             // For create mode, clear all card data and form data
             setCardData(null);
             setLiveFormData(null);
+            setPersistedFormData(null);
             setLiveTheme(undefined);
         }
-    }, [currentCard, modeParam]);
+    }, [cardIdParam, modeParam]); // Only re-initialize when cardId or mode changes
 
     // Update active tab based on URL parameter
     useEffect(() => {
@@ -65,6 +100,7 @@ export default function MyCardsPage() {
         if (modeParam === 'create' && !cardIdParam) {
             setCardData(null);
             setLiveFormData(null);
+            setPersistedFormData(null);
             setLiveTheme(undefined);
         }
     }, [modeParam, cardIdParam]);
@@ -293,8 +329,21 @@ export default function MyCardsPage() {
                             <CardEditorTab
                                 cardId={cardIdParam || undefined}
                                 mode={modeParam as 'create' | undefined}
-                                onCardUpdate={(card) => setCardData(card)}
-                                onFormChange={(formData) => setLiveFormData(formData)}
+                                initialFormData={persistedFormData}
+                                onCardUpdate={(card) => {
+                                    setCardData(card);
+                                    // Update persisted form data when card is saved
+                                    if (persistedFormData) {
+                                        setPersistedFormData({ ...persistedFormData, _cardId: card.id });
+                                    }
+                                }}
+                                onFormChange={(formData) => {
+                                    setLiveFormData(formData);
+                                    // Persist form data across tab switches
+                                    if (formData) {
+                                        setPersistedFormData({ ...formData, _cardId: cardIdParam || formData._cardId });
+                                    }
+                                }}
                             />
                         )}
                         {activeTab === 'theme' && (
@@ -334,6 +383,7 @@ export default function MyCardsPage() {
                                     <CardPreview
                                         card={liveFormData || cardData}
                                         theme={liveTheme || cardData?.theme}
+                                        isPublicView={true}
                                     />
                                 ) : (
                                     <div className="flex items-center justify-center h-full text-center py-12 text-gray-400">

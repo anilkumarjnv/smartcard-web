@@ -19,6 +19,7 @@ export interface Card {
     about?: string;
     email?: string;
     phone?: string;
+    phone_public?: boolean;
     website?: string;
     photo_url?: string;
     logo_url?: string;
@@ -43,6 +44,7 @@ export interface CreateCardDTO {
     about?: string;
     email?: string;
     phone?: string;
+    phone_public?: boolean;
     website?: string;
     photo_url?: string;
     logo_url?: string;
@@ -63,6 +65,7 @@ export interface UpdateCardDTO {
     about?: string;
     email?: string;
     phone?: string;
+    phone_public?: boolean;
     website?: string;
     photo_url?: string;
     logo_url?: string;

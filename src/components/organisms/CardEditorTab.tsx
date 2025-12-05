@@ -5,6 +5,8 @@ import { User, Briefcase, Building, Phone, Mail, MessageCircle, Globe, Linkedin,
 import { Input } from '@/components/molecules/Input';
 import { Textarea } from '@/components/molecules/Textarea';
 import { Button } from '@/components/molecules/Button';
+import { RoleBasedCardFields } from '@/components/organisms/RoleBasedCardFields';
+import { useUserRole } from '@/hooks/useUserRole';
 import useSWR, { mutate } from 'swr';
 import { apiClient } from '@/lib/apiClient';
 import type { Card } from '@/lib/api/types';
@@ -15,9 +17,17 @@ interface FormData {
   company: string;
   about: string;
   phone: string;
+  phone_public: boolean;
   email: string;
   website: string;
   photo_url: string;
+  school?: string;
+  major?: string;
+  graduation_year?: string;
+  skills?: string;
+  projects?: string;
+  experience?: string;
+  certifications?: string;
   social_links: {
     linkedin: string;
     instagram: string;
@@ -30,14 +40,16 @@ interface FormData {
 interface CardEditorTabProps {
   cardId?: string;
   mode?: 'create';
+  initialFormData?: any; // Persisted form data from parent
   onCardUpdate?: (card: Card) => void;
   onFormChange?: (formData: FormData) => void;
 }
 
 const fetcher = (url: string) => apiClient.get<Card[]>(url);
 
-export function CardEditorTab({ cardId, mode, onCardUpdate, onFormChange }: CardEditorTabProps) {
+export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onFormChange }: CardEditorTabProps) {
   const { data: cards, error } = useSWR<Card[]>('/api/v1/cards/user', fetcher);
+  const { roleConfig, isLoading: roleLoading } = useUserRole();
 
   // Determine which card to use based on props
   const currentCard = mode === 'create'
@@ -52,9 +64,18 @@ export function CardEditorTab({ cardId, mode, onCardUpdate, onFormChange }: Card
     company: '',
     about: '',
     phone: '',
+    phone_public: false,
     email: '',
     website: '',
     photo_url: '',
+    // Additional fields for role-based data
+    school: '',
+    major: '',
+    graduation_year: '',
+    skills: '',
+    projects: '',
+    experience: '',
+    certifications: '',
     social_links: {
       linkedin: '',
       instagram: '',
@@ -69,7 +90,19 @@ export function CardEditorTab({ cardId, mode, onCardUpdate, onFormChange }: Card
   const [imagePreview, setImagePreview] = useState<string>('');
 
   // Initialize form data when card loads or when entering create mode
+  // Use persisted form data if available, otherwise initialize from card
   useEffect(() => {
+    // If we have persisted form data and it matches the current card, use it
+    if (initialFormData && initialFormData._cardId === cardId) {
+      const { _cardId, ...formDataWithoutId } = initialFormData;
+      setFormData(formDataWithoutId);
+      setImagePreview(formDataWithoutId.photo_url || '');
+      if (onFormChange) {
+        onFormChange(formDataWithoutId);
+      }
+      return;
+    }
+
     if (mode === 'create') {
       // Clear form data for create mode
       const emptyData = {
@@ -78,9 +111,17 @@ export function CardEditorTab({ cardId, mode, onCardUpdate, onFormChange }: Card
         company: '',
         about: '',
         phone: '',
+        phone_public: false,
         email: '',
         website: '',
         photo_url: '',
+        school: '',
+        major: '',
+        graduation_year: '',
+        skills: '',
+        projects: '',
+        experience: '',
+        certifications: '',
         social_links: {
           linkedin: '',
           instagram: '',
@@ -97,15 +138,25 @@ export function CardEditorTab({ cardId, mode, onCardUpdate, onFormChange }: Card
         onFormChange(emptyData);
       }
     } else if (currentCard) {
+      const cardData = currentCard as any;
       const initialData = {
         name: currentCard.name || '',
         title: currentCard.title || '',
         company: currentCard.company || '',
-        about: (currentCard as Card & { bio?: string }).bio || currentCard.about || '',  // Map 'bio' to 'about'
+        about: cardData.bio || currentCard.about || '',  // Map 'bio' to 'about'
         phone: currentCard.phone || '',
+        phone_public: currentCard.phone_public ?? false,
         email: currentCard.email || '',
         website: currentCard.website || '',
         photo_url: currentCard.avatar_url || currentCard.photo_url || '',  // Map 'avatar_url' to 'photo_url'
+        // Additional fields
+        school: cardData.school || (cardData.student_fields?.school) || '',
+        major: cardData.major || (cardData.student_fields?.major) || '',
+        graduation_year: cardData.graduation_year || (cardData.student_fields?.graduation_year) || '',
+        skills: cardData.skills || '',
+        projects: cardData.projects || (cardData.student_fields?.projects) || '',
+        experience: cardData.experience || (cardData.professional_fields?.experience) || '',
+        certifications: cardData.certifications || '',
         social_links: {
           linkedin: (currentCard.social_links as Record<string, string>)?.linkedin || '',
           instagram: (currentCard.social_links as Record<string, string>)?.instagram || '',
@@ -123,7 +174,7 @@ export function CardEditorTab({ cardId, mode, onCardUpdate, onFormChange }: Card
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentCard, mode]);
+  }, [cardId, mode]); // Only re-initialize if cardId or mode changes, not on every currentCard update
 
   // Helper function to update form data and notify parent
   const handleFormChange = (updates: Partial<typeof formData>) => {
@@ -162,17 +213,26 @@ export function CardEditorTab({ cardId, mode, onCardUpdate, onFormChange }: Card
         .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
 
       // Transform data to match backend schema
-      const payload = {
+      const payload: any = {
         name: formData.name,
         title: formData.title || undefined,
         company: formData.company || undefined,
         bio: formData.about || undefined,  // Map 'about' to 'bio'
         phone: formData.phone || undefined,
+        phone_public: formData.phone_public || false,
         email: formData.email || undefined,
         website: formData.website || undefined,
         avatar_url: formData.photo_url || undefined,  // Map 'photo_url' to 'avatar_url'
         social_links: Object.keys(filteredSocialLinks).length > 0 ? filteredSocialLinks : undefined
       };
+
+      // Include all additional fields from formData (school, major, skills, projects, etc.)
+      const additionalFields = ['school', 'major', 'graduation_year', 'skills', 'projects', 'experience', 'certifications'];
+      additionalFields.forEach(field => {
+        if (formData[field] && formData[field].trim() !== '') {
+          payload[field] = formData[field];
+        }
+      });
 
       let savedCard: Card;
 
@@ -295,7 +355,7 @@ export function CardEditorTab({ cardId, mode, onCardUpdate, onFormChange }: Card
         </div>
 
         {/* Basic Info */}
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="space-y-4">
           <Input
             placeholder="Full Name"
             value={formData.name}
@@ -303,20 +363,29 @@ export function CardEditorTab({ cardId, mode, onCardUpdate, onFormChange }: Card
             icon={<User className="w-5 h-5" />}
           />
 
-          <Input
-            placeholder="Job Title"
-            value={formData.title}
-            onChange={(e) => handleFormChange({ title: e.target.value })}
-            icon={<Briefcase className="w-5 h-5" />}
-          />
+          {!roleLoading && roleConfig ? (
+            <RoleBasedCardFields
+              roleConfig={roleConfig}
+              formData={formData}
+              onChange={(field, value) => handleFormChange({ [field]: value })}
+            />
+          ) : (
+            <>
+              <Input
+                placeholder="Job Title"
+                value={formData.title}
+                onChange={(e) => handleFormChange({ title: e.target.value })}
+                icon={<Briefcase className="w-5 h-5" />}
+              />
+              <Input
+                placeholder="Company Name"
+                value={formData.company}
+                onChange={(e) => handleFormChange({ company: e.target.value })}
+                icon={<Building className="w-5 h-5" />}
+              />
+            </>
+          )}
         </div>
-
-        <Input
-          placeholder="Company Name"
-          value={formData.company}
-          onChange={(e) => handleFormChange({ company: e.target.value })}
-          icon={<Building className="w-5 h-5" />}
-        />
 
         <Textarea
           placeholder="About / Bio"
@@ -337,6 +406,20 @@ export function CardEditorTab({ cardId, mode, onCardUpdate, onFormChange }: Card
               onChange={(e) => handleFormChange({ phone: e.target.value })}
               icon={<Phone className="w-5 h-5" />}
             />
+
+            {/* Phone Privacy Toggle */}
+            <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+              <div className="flex items-center gap-2">
+                <Phone className="w-4 h-4 text-gray-500" />
+                <span className="text-sm text-gray-700">Make phone number public</span>
+              </div>
+              <input
+                type="checkbox"
+                checked={formData.phone_public || false}
+                onChange={(e) => handleFormChange({ phone_public: e.target.checked })}
+                className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500 focus:ring-2"
+              />
+            </label>
 
             <Input
               type="email"
