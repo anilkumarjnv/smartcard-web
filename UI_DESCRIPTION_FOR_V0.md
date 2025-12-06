@@ -588,3 +588,4 @@ SmartCard is a digital business card platform that allows users to create, custo
 
 This document provides a comprehensive overview of the current UI. Use this as a reference to create modernized designs while maintaining the same user flows and functionality.
 
+
