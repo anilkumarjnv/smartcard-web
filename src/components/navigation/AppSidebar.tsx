@@ -77,6 +77,7 @@ export function AppSidebar() {
                 <button
                     className="mt-2 p-1 rounded-full ring-2 ring-sidebar-border hover:ring-sidebar-primary transition-all"
                     title="Profile"
+                    suppressHydrationWarning
                 >
                     <div className="w-10 h-10 rounded-full bg-sidebar-accent text-sidebar-foreground flex items-center justify-center text-sm font-semibold">
                         JD

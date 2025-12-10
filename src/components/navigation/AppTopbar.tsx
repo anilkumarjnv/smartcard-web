@@ -50,11 +50,12 @@ export function AppTopbar({ title, subtitle }: AppTopbarProps) {
                     <input
                         placeholder="Search..."
                         className="pl-10 w-64 h-10 bg-secondary border-0 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                        suppressHydrationWarning
                     />
                 </div>
 
                 {/* Notifications */}
-                <button className="relative w-10 h-10 rounded-xl hover:bg-accent flex items-center justify-center transition-colors">
+                <button className="relative w-10 h-10 rounded-xl hover:bg-accent flex items-center justify-center transition-colors" suppressHydrationWarning>
                     <Bell className="w-5 h-5" />
                     <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full" />
                 </button>
