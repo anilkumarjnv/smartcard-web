@@ -4,10 +4,8 @@ import React, { useState, useEffect } from 'react';
 import useSWR, { mutate } from 'swr';
 import { apiClient } from '@/lib/apiClient';
 import type { Card } from '@/lib/api/types';
-import { StyleSelector } from '@/components/StyleSelector';
-import { ColorPaletteSelector } from '@/components/ColorPaletteSelector';
-import { FontSelector } from '@/components/FontSelector';
-import { type CardStyle, getCardStyle, buildTheme } from '@/lib/themes';
+import { ThemeSelector } from '@/components/profile/ThemeSelector';
+import { ShapeSelector, type ProfileCardShape } from '@/components/profile/ShapeSelector';
 
 interface ThemeCustomizationTabProps {
   cardId?: string;
@@ -22,87 +20,63 @@ export function ThemeCustomizationTab({ cardId, onThemeUpdate }: ThemeCustomizat
     cardId ? `/api/v1/cards/${cardId}` : null,
     fetcher
   );
-  
+
   // Use specific card if cardId is provided, otherwise fall back to first card
   const currentCard = cardId ? specificCard : (cards && cards.length > 0 ? cards[0] : null);
 
-  // Theme state using proper structure
-  const [selectedStyle, setSelectedStyle] = useState<CardStyle>('classic');
-  const [selectedPaletteId, setSelectedPaletteId] = useState('classicBlue');
-  const [selectedFontId, setSelectedFontId] = useState('inter');
+  // Theme state using new simple format
+  const [selectedTheme, setSelectedTheme] = useState<'light' | 'dark' | 'accent'>('light');
+  const [selectedShape, setSelectedShape] = useState<ProfileCardShape>('wave');
   const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
-  // Initialize theme from card data
+  // Initialize theme and shape from card data
   useEffect(() => {
     if (currentCard && currentCard.theme) {
       const theme = currentCard.theme as Record<string, unknown>;
 
-      // Check if it's the new format
-      if (theme.style) {
-        setSelectedStyle(theme.style as CardStyle);
-        setSelectedPaletteId((theme.colorPalette as string) || 'classicBlue');
-        setSelectedFontId((theme.fontId as string) || 'inter');
+      // Check if it's the new format with profileTheme
+      if (theme.profileTheme) {
+        setSelectedTheme(theme.profileTheme as 'light' | 'dark' | 'accent');
       }
-      // Legacy format conversion
-      else if (theme.colorScheme || theme.layout) {
-        // Map old colorScheme to style
-        const legacySchemeToStyle: Record<string, CardStyle> = {
-          'indigo': 'classic',
-          'purple': 'modern',
-          'blue': 'classic',
-          'green': 'elegant',
-          'rose': 'bold',
-          'slate': 'minimal'
-        };
+      // Default to light theme for legacy cards
+      else {
+        setSelectedTheme('light');
+      }
 
-        const style = legacySchemeToStyle[theme.colorScheme as string] || 'classic';
-        setSelectedStyle(style);
-
-        // Set default palette for the style
-        const styleConfig = getCardStyle(style);
-        setSelectedPaletteId(styleConfig.colorPalettes[0].id);
-        setSelectedFontId('inter');
+      // Initialize shape
+      if (theme.shape) {
+        setSelectedShape(theme.shape as ProfileCardShape);
+      } else {
+        setSelectedShape('wave');
       }
     }
   }, [currentCard]);
 
-  // Send initial theme to parent in create mode
+  // Send initial theme and shape to parent in create mode
   useEffect(() => {
     if (!currentCard && onThemeUpdate) {
       onThemeUpdate({
-        style: selectedStyle,
-        colorPalette: selectedPaletteId,
-        fontId: selectedFontId
+        profileTheme: selectedTheme,
+        shape: selectedShape,
       });
     }
   }, []); // Only run once on mount
 
-  const handleStyleChange = async (style: CardStyle) => {
-    setSelectedStyle(style);
-
-    // When style changes, set default palette for that style
-    const styleConfig = getCardStyle(style);
-    const defaultPalette = styleConfig.colorPalettes[0];
-    setSelectedPaletteId(defaultPalette.id);
-
-    await saveTheme(style, defaultPalette.id, selectedFontId);
+  const handleThemeChange = async (theme: 'light' | 'dark' | 'accent') => {
+    setSelectedTheme(theme);
+    await saveThemeAndShape(theme, selectedShape);
   };
 
-  const handlePaletteChange = async (paletteId: string) => {
-    setSelectedPaletteId(paletteId);
-    await saveTheme(selectedStyle, paletteId, selectedFontId);
+  const handleShapeChange = async (shape: ProfileCardShape) => {
+    setSelectedShape(shape);
+    await saveThemeAndShape(selectedTheme, shape);
   };
 
-  const handleFontChange = async (fontId: string) => {
-    setSelectedFontId(fontId);
-    await saveTheme(selectedStyle, selectedPaletteId, fontId);
-  };
-
-  const saveTheme = async (style: CardStyle, paletteId: string, fontId: string) => {
+  const saveThemeAndShape = async (theme: 'light' | 'dark' | 'accent', shape: ProfileCardShape) => {
     const updatedTheme = {
-      style,
-      colorPalette: paletteId,
-      fontId
+      profileTheme: theme,
+      shape: shape,
     };
 
     // If there's no card (create mode), just notify parent for preview
@@ -115,6 +89,7 @@ export function ThemeCustomizationTab({ cardId, onThemeUpdate }: ThemeCustomizat
 
     // If there's a card, save it to the backend
     setIsSaving(true);
+    setSaveSuccess(false);
 
     try {
       await apiClient.patch(
@@ -124,6 +99,10 @@ export function ThemeCustomizationTab({ cardId, onThemeUpdate }: ThemeCustomizat
 
       // Refresh the cards list
       mutate('/api/v1/cards/user');
+
+      // Show success message
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
 
       // Notify parent component for live preview update
       if (onThemeUpdate) {
@@ -139,51 +118,74 @@ export function ThemeCustomizationTab({ cardId, onThemeUpdate }: ThemeCustomizat
   return (
     <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm">
       <h3 className="text-2xl font-bold mb-2">Customize Theme</h3>
-      <p className="text-gray-600 mb-8">Choose a style, color palette, and font for your card</p>
+      <p className="text-gray-600 mb-8">Choose a professional theme for your digital profile card</p>
 
       <div className="space-y-8">
-        {/* Card Style Selector */}
+        {/* New Theme Selector */}
         <div>
-          <StyleSelector
-            selectedStyle={selectedStyle}
-            onStyleChange={handleStyleChange}
+          <ThemeSelector
+            selectedTheme={selectedTheme}
+            onThemeChange={handleThemeChange}
           />
         </div>
 
-        {/* Color Palette Selector */}
+        {/* Shape Selector */}
         <div className="border-t border-gray-200 pt-8">
-          <ColorPaletteSelector
-            cardStyle={selectedStyle}
-            selectedPaletteId={selectedPaletteId}
-            onPaletteChange={handlePaletteChange}
+          <ShapeSelector
+            selectedShape={selectedShape}
+            onShapeChange={handleShapeChange}
           />
         </div>
 
-        {/* Font Selector */}
+        {/* Theme Features */}
         <div className="border-t border-gray-200 pt-8">
-          <FontSelector
-            selectedFontId={selectedFontId}
-            onFontChange={handleFontChange}
-          />
-        </div>
+          <h4 className="text-lg font-semibold mb-4">Theme Features</h4>
+          <div className="grid gap-4">
+            <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl">
+              <svg className="w-5 h-5 text-indigo-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <div>
+                <h5 className="font-medium text-gray-900">Background Image Hero</h5>
+                <p className="text-sm text-gray-600">Your profile photo serves as an editorial-style header</p>
+              </div>
+            </div>
 
-        {/* Pro Themes Teaser */}
-        <div className="border-t border-gray-200 pt-8">
-          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-6">
-            <h4 className="text-lg font-semibold mb-2">Pro Themes Coming Soon</h4>
-            <p className="text-gray-600 mb-4">
-              Unlock advanced customization options, custom fonts, and premium layouts with SmartShare Pro.
-            </p>
-            <button className="px-6 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:opacity-90 transition-opacity font-medium">
-              Upgrade to Pro
-            </button>
+            <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl">
+              <svg className="w-5 h-5 text-indigo-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+              </svg>
+              <div>
+                <h5 className="font-medium text-gray-900">Wave Shape Dividers</h5>
+                <p className="text-sm text-gray-600">Smooth, professional transitions between sections</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl">
+              <svg className="w-5 h-5 text-indigo-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              </svg>
+              <div>
+                <h5 className="font-medium text-gray-900">Mobile Optimized</h5>
+                <p className="text-sm text-gray-600">Perfect for sharing via NFC, QR codes, and messaging apps</p>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Saving indicator */}
+        {/* Saving/Success indicators */}
         {isSaving && (
           <div className="fixed bottom-4 right-4 bg-gray-900 text-white px-4 py-2 rounded-lg shadow-lg">
             Saving theme...
+          </div>
+        )}
+
+        {saveSuccess && (
+          <div className="fixed bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            Theme saved successfully!
           </div>
         )}
       </div>

@@ -19,9 +19,7 @@ import { Alert } from '@/components/ui/Alert';
 import { Spinner } from '@/components/ui/Spinner';
 import { updateCardSchema, type UpdateCardFormData } from '@/lib/validators';
 import type { Card as CardType } from '@/lib/api/types';
-import { ThemeSelector } from '@/components/ThemeSelector';
-import type { CardTheme } from '@/lib/themes';
-import { convertLegacyTheme } from '@/lib/themes';
+import { ThemeSelector } from '@/components/profile/ThemeSelector';
 
 interface PageProps {
     params: Promise<{
@@ -106,22 +104,11 @@ export default function EditCardPage({ params }: PageProps) {
         }
     };
 
-    const handleThemeChange = (theme: CardTheme) => {
+    const handleThemeChange = (theme: 'light' | 'dark' | 'accent') => {
         setFormData(prev => ({
             ...prev,
             theme: {
-                style: theme.style,
-                colorPalette: theme.colorPalette,
-                fontId: theme.font.id,
-                fontFamily: theme.fontFamily,
-                // Include all theme data for backward compatibility
-                primaryColor: theme.colors.primaryColor,
-                secondaryColor: theme.colors.secondaryColor,
-                accentColor: theme.colors.accentColor,
-                headerGradient: theme.colors.headerGradient,
-                backgroundColor: theme.colors.backgroundColor,
-                textColor: theme.colors.textColor,
-                cardBackground: theme.colors.cardBackground,
+                profileTheme: theme,
             } as Record<string, unknown>
         }));
     };
@@ -288,10 +275,17 @@ export default function EditCardPage({ params }: PageProps) {
                                 </CardBody>
                             </Card>
 
-                            <ThemeSelector
-                                currentTheme={formData.theme}
-                                onThemeChange={handleThemeChange}
-                            />
+                            <Card>
+                                <CardHeader>
+                                    <h2 className="text-lg font-medium text-gray-900">Card Theme</h2>
+                                </CardHeader>
+                                <CardBody>
+                                    <ThemeSelector
+                                        selectedTheme={(formData.theme as any)?.profileTheme || 'light'}
+                                        onThemeChange={handleThemeChange}
+                                    />
+                                </CardBody>
+                            </Card>
 
                             <Card>
                                 <CardHeader>

@@ -1,208 +1,186 @@
+'use client';
+
 import Link from "next/link";
-import { ArrowRight, Zap, Share2, Sparkles, Check } from 'lucide-react';
-import { Button } from "@/components/molecules/Button";
+import { motion } from 'framer-motion';
+import { ArrowRight } from 'lucide-react';
 import { Navbar } from "@/components/organisms/Navbar";
+import { HeroMockup } from "@/components/landing/HeroMockup";
+import { BeforeAfter } from "@/components/landing/BeforeAfter";
+import { FeatureGrid } from "@/components/landing/FeatureGrid";
+import { UseCaseCards } from "@/components/landing/UseCaseCards";
+import { PricingSimple } from "@/components/landing/PricingSimple";
+import { SocialProof } from "@/components/landing/SocialProof";
 
 export default function Home() {
-  const features = [
-    {
-      icon: <Zap className="w-6 h-6" />,
-      title: 'Create in 1 Minute',
-      description: 'Build your professional digital card in under 60 seconds'
-    },
-    {
-      icon: <Share2 className="w-6 h-6" />,
-      title: 'Share with Link or QR',
-      description: 'Share instantly via unique link or downloadable QR code'
-    },
-    {
-      icon: <Sparkles className="w-6 h-6" />,
-      title: 'Clean, Premium Design',
-      description: 'Beautiful templates that make you look professional'
-    }
-  ];
-
-  const pricingPlans = [
-    {
-      name: 'Free',
-      price: '$0',
-      features: [
-        'One digital card',
-        'Basic themes',
-        'QR code generation',
-        'Unlimited shares',
-        'SmartShare branding'
-      ]
-    },
-    {
-      name: 'Pro',
-      price: '$9',
-      period: '/month',
-      features: [
-        'Unlimited cards',
-        'All premium themes',
-        'Remove branding',
-        'Analytics dashboard',
-        'Custom domains',
-        'Priority support'
-      ],
-      highlighted: true
-    }
-  ];
-
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
+    <div className="min-h-screen bg-background dark:bg-neutral-950">
+      <Navbar isLandingPage={true} />
 
-      {/* Hero Section */}
-      <section className="pt-32 pb-20 px-6">
+      {/* 1. Hero Section - "Quiet Confidence" */}
+      <section className="pt-32 pb-24 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <h1 className="mb-6">
-                Your Professional Digital Business Card
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Left - Text Content */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="max-w-2xl"
+            >
+              {/* Tagline */}
+              <span className="tagline mb-6 block dark:text-neutral-400">PROFESSIONAL IDENTITY</span>
+
+              {/* Headline */}
+              <h1 className="mb-6 text-neutral-900 dark:text-white">
+                Your professional identity, in one link.
               </h1>
-              <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-                Create, customize, and share beautiful digital business cards in seconds. Modern, minimal, and made for professionals.
+
+              {/* Subtext */}
+              <p className="text-xl text-secondary dark:text-neutral-400 mb-8 leading-relaxed">
+                Replace Scattered PDFs and links with a single, permanent profile. Your work, contact details, and portfolio links in one place.
               </p>
+
+              {/* CTAs */}
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link href="/signup">
-                  <Button size="lg">
-                    Create Card Free
-                    <ArrowRight className="w-5 h-5" />
-                  </Button>
+                  <button className="btn-primary dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-100">
+                    Create your profile
+                  </button>
                 </Link>
-                <Link href="/demo">
-                  <Button size="lg" variant="outline">
-                    View Demo
-                  </Button>
+                <Link href="#" className="text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white font-medium flex items-center gap-2 transition-colors">
+                  View example
+                  <ArrowRight className="w-4 h-4" strokeWidth={2} />
                 </Link>
               </div>
-            </div>
-            <div className="relative">
-              <div className="bg-gradient-to-br from-indigo-100 to-purple-100 rounded-3xl p-8 md:p-12">
-                <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-sm mx-auto">
-                  <div className="flex flex-col items-center text-center">
-                    <div className="w-24 h-24 bg-gradient-to-br from-primary to-accent rounded-full mb-4" />
-                    <h3 className="text-xl font-semibold mb-2">John Doe</h3>
-                    <p className="text-muted-foreground mb-1">Product Designer</p>
-                    <p className="text-muted-foreground text-sm">Tech Company</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            </motion.div>
+
+            {/* Right - Mockup */}
+            <HeroMockup />
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-20 px-6 bg-muted/30">
+      {/* 2. Before & After Section */}
+      <section className="py-24 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="mb-4">Everything you need to stand out</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Professional features designed to help you make the best first impression
-            </p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {features.map((feature, index) => (
-              <div key={index} className="bg-card rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow border border-border">
-                <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary mb-4">
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                <p className="text-muted-foreground">{feature.description}</p>
-              </div>
-            ))}
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
+            <h2 className="mb-4 text-neutral-900 dark:text-white">From scattered links to one profile</h2>
+          </motion.div>
+          <BeforeAfter />
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section className="py-20 px-6">
+      {/* 3. Features Grid - "Premium Tool" Vibe */}
+      <section className="py-24 px-6 bg-neutral-50 dark:bg-neutral-900/50">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="mb-4">Simple, transparent pricing</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Choose the plan that works best for you
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
+            <h2 className="mb-4 text-neutral-900 dark:text-white">Designed for professional visibility</h2>
+            <p className="text-xl text-secondary dark:text-neutral-400 max-w-2xl mx-auto">
+              Everything required to represent yourself clearly and professionally.
             </p>
-          </div>
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {pricingPlans.map((plan, index) => (
-              <div
-                key={index}
-                className={`rounded-3xl p-8 ${plan.highlighted
-                  ? 'bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-2xl scale-105'
-                  : 'bg-card border-2 border-border'
-                  }`}
-              >
-                <h3 className={`text-2xl font-bold mb-2 ${!plan.highlighted && 'text-foreground'}`}>
-                  {plan.name}
-                </h3>
-                <div className="mb-6">
-                  <span className="text-4xl font-bold">{plan.price}</span>
-                  {plan.period && (
-                    <span className={`text-lg ${plan.highlighted ? 'text-primary-foreground/80' : 'text-muted-foreground'}`}>
-                      {plan.period}
-                    </span>
-                  )}
-                </div>
-                <ul className="space-y-3 mb-8">
-                  {plan.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className="flex items-center gap-3">
-                      <Check className={`w-5 h-5 ${plan.highlighted ? 'text-primary-foreground' : 'text-primary'}`} />
-                      <span className={plan.highlighted ? 'text-primary-foreground/90' : 'text-foreground'}>
-                        {feature}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/signup">
-                  <Button
-                    fullWidth
-                    variant={plan.highlighted ? 'secondary' : 'primary'}
-                    size="lg"
-                  >
-                    Get Started
-                  </Button>
-                </Link>
-              </div>
-            ))}
-          </div>
+          </motion.div>
+          <FeatureGrid />
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 px-6 bg-foreground text-primary-foreground">
+      {/* 4. Segmentation - Use Cases */}
+      <section className="py-24 px-6">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
+            <h2 className="mb-4 text-neutral-900 dark:text-white">Built for the serious.</h2>
+          </motion.div>
+          <UseCaseCards />
+        </div>
+      </section>
+
+      {/* 5. Pricing */}
+      <section className="py-24 px-6 bg-neutral-50 dark:bg-neutral-900/50">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
+            <h2 className="mb-4 text-neutral-900 dark:text-white">Simple, transparent pricing</h2>
+          </motion.div>
+          <PricingSimple />
+        </div>
+      </section>
+
+      {/* 6. Social Proof */}
+      <section className="py-16 px-6">
+        <div className="max-w-7xl mx-auto">
+          <SocialProof />
+        </div>
+      </section>
+
+      {/* 7. Final CTA - "The Closer" */}
+      <section className="py-24 px-6 bg-neutral-900 dark:bg-neutral-950 border-t border-neutral-800 text-white">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-primary-foreground mb-6">Ready to create your digital card?</h2>
-          <p className="text-xl text-muted-foreground/80 mb-8">
-            Join thousands of professionals using SmartShare to grow their network
-          </p>
-          <Link href="/signup">
-            <Button size="lg" variant="secondary">
-              Get Started Free
-              <ArrowRight className="w-5 h-5" />
-            </Button>
-          </Link>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="text-white mb-6">
+              Be visible. Be credible. Be remembered.
+            </h2>
+            <p className="text-xl text-neutral-300 dark:text-neutral-400 mb-8">
+              It takes 2 minutes to look professional.
+            </p>
+            <Link href="/signup">
+              <button className="bg-white text-neutral-900 hover:bg-neutral-100 px-8 py-4 rounded-md font-semibold transition-all duration-200 hover:-translate-y-0.5 active:scale-98">
+                Claim your username
+              </button>
+            </Link>
+          </motion.div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border py-8 px-6">
+      <footer className="border-t border-neutral-200 dark:border-neutral-800 py-12 px-6 bg-white dark:bg-neutral-950">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center">
-                <span className="text-white text-sm font-bold">S</span>
+              <div className="w-8 h-8 bg-neutral-900 dark:bg-white rounded-lg flex items-center justify-center">
+                <span className="text-white dark:text-neutral-900 text-sm font-bold">S</span>
               </div>
-              <span className="text-muted-foreground">© 2025 SmartShare. All rights reserved.</span>
+              <span className="text-neutral-600 dark:text-neutral-400 text-sm">
+                © 2025 SmartShare. All rights reserved.
+              </span>
             </div>
-            <div className="flex items-center gap-6">
-              <Link href="/terms" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
+            <div className="flex items-center gap-8">
+              <Link
+                href="/terms"
+                className="text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white text-sm transition-colors font-medium"
+              >
                 Terms
               </Link>
-              <Link href="/privacy" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
+              <Link
+                href="/privacy"
+                className="text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white text-sm transition-colors font-medium"
+              >
                 Privacy
               </Link>
             </div>
