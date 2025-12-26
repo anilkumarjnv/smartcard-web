@@ -24,10 +24,10 @@ export function RoleBasedDashboard({ roleConfig }: RoleBasedDashboardProps) {
   return (
     <div className="space-y-6">
       {/* Role-specific welcome section */}
-      <Card className={`border-2 ${isStudent ? 'border-blue-200 bg-blue-50' : 'border-indigo-200 bg-indigo-50'}`}>
+      <Card className={`border-2 ${isStudent ? 'border-neutral-200 bg-neutral-50' : 'border-neutral-200 bg-neutral-50'}`}>
         <CardBody>
           <div className="flex items-center gap-4">
-            <div className={`w-16 h-16 rounded-xl flex items-center justify-center text-3xl ${isStudent ? 'bg-blue-600' : 'bg-indigo-600'}`}>
+            <div className={`w-16 h-16 rounded-xl flex items-center justify-center text-3xl ${isStudent ? 'bg-neutral-900' : 'bg-neutral-900'}`}>
               {isStudent ? <GraduationCap className="w-8 h-8 text-white" /> : <Briefcase className="w-8 h-8 text-white" />}
             </div>
             <div>
@@ -44,8 +44,8 @@ export function RoleBasedDashboard({ roleConfig }: RoleBasedDashboardProps) {
           <Card className="hover:shadow-lg transition-shadow cursor-pointer">
             <CardHeader>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
-                  <BarChart3 className="w-5 h-5 text-indigo-600" />
+                <div className="w-10 h-10 bg-neutral-100 rounded-lg flex items-center justify-center">
+                  <BarChart3 className="w-5 h-5 text-neutral-900" />
                 </div>
                 <h4 className="font-semibold">Analytics</h4>
               </div>

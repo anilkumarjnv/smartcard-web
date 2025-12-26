@@ -11,7 +11,7 @@ interface CardPreviewProps {
 }
 
 export interface ProfileCardTheme {
-    name: 'light' | 'dark' | 'accent';
+    name: 'light' | 'dark' | 'accent' | 'neutral';
     displayName: string;
     description: string;
 }
@@ -32,6 +32,11 @@ export const PROFILE_THEMES: ProfileCardTheme[] = [
         displayName: 'Brand Accent',
         description: 'Distinctive and creative. Shows personality while staying professional.',
     },
+    {
+        name: 'neutral',
+        displayName: 'Minimalist Neutral',
+        description: 'Ultra-clean monochrome. Timeless and distraction-free elegance.',
+    },
 ];
 
 /**
@@ -40,7 +45,7 @@ export const PROFILE_THEMES: ProfileCardTheme[] = [
  */
 export function CardPreview({ card, theme, isPublicView = false }: CardPreviewProps) {
     // Determine theme from card data
-    const selectedTheme = (theme?.profileTheme as 'light' | 'dark' | 'accent') || 'light';
+    const selectedTheme = (theme?.profileTheme as 'light' | 'dark' | 'accent' | 'neutral') || 'light';
 
     // Determine shape from card data  
     const selectedShape = (theme?.shape as ProfileCardShape) || 'wave';
@@ -66,7 +71,12 @@ export function CardPreview({ card, theme, isPublicView = false }: CardPreviewPr
 
     return (
         <div className="w-full h-full overflow-auto flex items-center justify-center bg-neutral-50 dark:bg-neutral-950 p-6">
-            <ProfileCard user={userProfile} theme={selectedTheme} shape={selectedShape} />
+            <ProfileCard
+                user={userProfile}
+                theme={selectedTheme}
+                shape={selectedShape}
+                cardId={card.id}
+            />
         </div>
     );
 }

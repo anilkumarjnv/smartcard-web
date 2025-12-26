@@ -70,13 +70,13 @@ export function ShapeSelector({ selectedShape = 'wave', onShapeChange }: ShapeSe
                             onMouseEnter={() => setHoveredShape(shape.name)}
                             onMouseLeave={() => setHoveredShape(null)}
                             className={`relative p-4 rounded-xl border-2 transition-all duration-200 text-left ${isSelected
-                                    ? 'border-indigo-600 shadow-lg bg-indigo-50'
+                                    ? 'border-neutral-900 shadow-lg bg-neutral-50'
                                     : 'border-neutral-200 hover:border-neutral-300 bg-white'
                                 }`}
                         >
                             {/* Selected Indicator */}
                             {isSelected && (
-                                <div className="absolute top-2 right-2 w-5 h-5 bg-indigo-600 rounded-full flex items-center justify-center">
+                                <div className="absolute top-2 right-2 w-5 h-5 bg-neutral-900 rounded-full flex items-center justify-center">
                                     <Check className="w-3 h-3 text-white" strokeWidth={3} />
                                 </div>
                             )}
@@ -94,7 +94,7 @@ export function ShapeSelector({ selectedShape = 'wave', onShapeChange }: ShapeSe
                                 <p className="text-xs text-neutral-600 mb-1">
                                     {shape.description}
                                 </p>
-                                <p className="text-xs text-indigo-600 font-medium">
+                                <p className="text-xs text-neutral-900 font-medium">
                                     {shape.useCase}
                                 </p>
                             </div>

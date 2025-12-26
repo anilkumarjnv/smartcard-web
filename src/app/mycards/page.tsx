@@ -3,8 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { AppTopbar } from '@/components/navigation/AppTopbar';
-import { CardsGrid } from '@/components/cards/CardsGrid';
+import { ProfileCardsGrid } from '@/components/cards/ProfileCardsGrid';
 import { CardEditorTab } from '@/components/organisms/CardEditorTab';
 import { ThemeCustomizationTab } from '@/components/organisms/ThemeCustomizationTab';
 import { ShareTab } from '@/components/organisms/ShareTab';
@@ -115,8 +114,8 @@ export default function MyCardsPage() {
                             <button
                                 onClick={() => router.push(`/mycards?tab=card${cardIdParam ? `&cardId=${cardIdParam}` : modeParam ? `&mode=${modeParam}` : ''}`)}
                                 className={`px-6 py-2.5 rounded-xl font-medium transition-all ${activeTab === 'card'
-                                        ? 'bg-primary text-primary-foreground shadow-sm'
-                                        : 'text-muted-foreground hover:text-foreground'
+                                    ? 'bg-primary text-primary-foreground shadow-sm'
+                                    : 'text-muted-foreground hover:text-foreground'
                                     }`}
                             >
                                 My Card
@@ -124,8 +123,8 @@ export default function MyCardsPage() {
                             <button
                                 onClick={() => router.push(`/mycards?tab=theme${cardIdParam ? `&cardId=${cardIdParam}` : modeParam ? `&mode=${modeParam}` : ''}`)}
                                 className={`px-6 py-2.5 rounded-xl font-medium transition-all ${activeTab === 'theme'
-                                        ? 'bg-primary text-primary-foreground shadow-sm'
-                                        : 'text-muted-foreground hover:text-foreground'
+                                    ? 'bg-primary text-primary-foreground shadow-sm'
+                                    : 'text-muted-foreground hover:text-foreground'
                                     }`}
                             >
                                 Themes
@@ -133,8 +132,8 @@ export default function MyCardsPage() {
                             <button
                                 onClick={() => router.push(`/mycards?tab=share${cardIdParam ? `&cardId=${cardIdParam}` : modeParam ? `&mode=${modeParam}` : ''}`)}
                                 className={`px-6 py-2.5 rounded-xl font-medium transition-all ${activeTab === 'share'
-                                        ? 'bg-primary text-primary-foreground shadow-sm'
-                                        : 'text-muted-foreground hover:text-foreground'
+                                    ? 'bg-primary text-primary-foreground shadow-sm'
+                                    : 'text-muted-foreground hover:text-foreground'
                                     }`}
                             >
                                 Share
@@ -226,11 +225,10 @@ export default function MyCardsPage() {
         );
     }
 
-    // Show card listing
+    // Show card listing with ProfileCard themes
     if (isLoading) {
         return (
             <div className="p-6">
-                <AppTopbar title="My Cards" subtitle="Manage your digital business cards" />
                 <div className="flex justify-center py-20">
                     <Spinner size="lg" />
                 </div>
@@ -238,31 +236,9 @@ export default function MyCardsPage() {
         );
     }
 
-    // Transform cards to match SmartCard props
-    const transformedCards = cards?.map(card => ({
-        id: card.id,
-        name: card.name || 'Unnamed',
-        title: card.title,
-        company: card.company,
-        email: card.email,
-        phone: card.phone,
-        website: card.website,
-        location: (card as any).location,
-        avatar: card.avatar_url || card.photo_url,
-        category: ((card as any).category || 'work') as 'personal' | 'work' | 'student',
-        socials: {
-            linkedin: (card.social_links as any)?.linkedin,
-            twitter: (card.social_links as any)?.twitter,
-            github: (card.social_links as any)?.github,
-        }
-    })) || [];
-
     return (
-        <div>
-            <AppTopbar title="My Cards" subtitle="Manage your digital business cards" />
-            <div className="p-6">
-                <CardsGrid cards={transformedCards} />
-            </div>
+        <div className="p-6">
+            <ProfileCardsGrid cards={cards || []} />
         </div>
     );
 }

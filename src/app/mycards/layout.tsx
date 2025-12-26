@@ -2,6 +2,7 @@
 /**
  * MyCards Layout
  * Wraps mycards pages with AuthGuard and Sidebar
+ * Forces light theme for all app pages
  */
 
 import { ReactNode } from 'react';

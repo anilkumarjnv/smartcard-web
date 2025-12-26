@@ -1,9 +1,10 @@
 "use client"
 
-import { Bell, Search } from "lucide-react"
+import { Bell, Search, Moon, Sun } from "lucide-react"
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabaseClient"
 import { User } from "@supabase/supabase-js"
+import { useTheme } from "next-themes"
 
 interface AppTopbarProps {
     title: string
@@ -12,6 +13,12 @@ interface AppTopbarProps {
 
 export function AppTopbar({ title, subtitle }: AppTopbarProps) {
     const [user, setUser] = useState<User | null>(null)
+    const { theme, setTheme } = useTheme()
+    const [mounted, setMounted] = useState(false)
+
+    useEffect(() => {
+        setMounted(true)
+    }, [])
 
     useEffect(() => {
         const supabase = createClient()
@@ -53,6 +60,22 @@ export function AppTopbar({ title, subtitle }: AppTopbarProps) {
                         suppressHydrationWarning
                     />
                 </div>
+
+                {/* Dark Mode Toggle */}
+                {mounted && (
+                    <button
+                        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                        className="w-10 h-10 rounded-xl hover:bg-accent flex items-center justify-center transition-colors"
+                        aria-label="Toggle theme"
+                        suppressHydrationWarning
+                    >
+                        {theme === 'dark' ? (
+                            <Sun className="w-5 h-5" />
+                        ) : (
+                            <Moon className="w-5 h-5" />
+                        )}
+                    </button>
+                )}
 
                 {/* Notifications */}
                 <button className="relative w-10 h-10 rounded-xl hover:bg-accent flex items-center justify-center transition-colors" suppressHydrationWarning>

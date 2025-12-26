@@ -132,7 +132,7 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
       };
       setFormData(emptyData);
       setImagePreview('');
-      
+
       // Notify parent of empty data
       if (onFormChange) {
         onFormChange(emptyData);
@@ -280,8 +280,8 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
 
   if (error) {
     return (
-      <div className="bg-white rounded-3xl p-8 shadow-sm">
-        <p className="text-red-600">Failed to load card data. Please refresh the page.</p>
+      <div className="bg-card rounded-3xl p-8 shadow-sm border border-border">
+        <p className="text-destructive">Failed to load card data. Please refresh the page.</p>
       </div>
     );
   }
@@ -289,8 +289,8 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
   // Show loading only if we're trying to fetch a specific card and it hasn't loaded yet
   if (!mode && !currentCard && !cards) {
     return (
-      <div className="bg-white rounded-3xl p-8 shadow-sm">
-        <p className="text-gray-600">Loading your card...</p>
+      <div className="bg-card rounded-3xl p-8 shadow-sm border border-border">
+        <p className="text-muted-foreground">Loading your card...</p>
       </div>
     );
   }
@@ -298,9 +298,9 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
   const isCreating = mode === 'create' || !currentCard;
 
   return (
-    <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm">
+    <div className="bg-card rounded-3xl p-6 md:p-8 shadow-sm border border-border">
       <div className="flex items-center justify-between mb-8">
-        <h3 className="text-2xl font-bold">{isCreating ? 'Create New Card' : 'Edit Your Card'}</h3>
+        <h3 className="text-2xl font-bold text-foreground">{isCreating ? 'Create New Card' : 'Edit Your Card'}</h3>
         <Button onClick={handleSave} size="sm" disabled={isSaving} className="hidden md:flex">
           {isSaving ? 'Saving...' : isCreating ? 'Create Card' : 'Save Changes'}
         </Button>
@@ -318,14 +318,14 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
       <div className="space-y-6">
         {/* Profile Photo Upload */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-3">Profile Photo</label>
+          <label className="block text-sm font-medium text-foreground-secondary mb-3">Profile Photo</label>
           <div className="flex items-center gap-4">
             <div className="relative">
-              <div className="w-24 h-24 rounded-full border-4 border-gray-200 overflow-hidden bg-gray-50 flex items-center justify-center">
+              <div className="w-24 h-24 rounded-full border-4 border-border overflow-hidden bg-muted flex items-center justify-center">
                 {imagePreview ? (
                   <img src={imagePreview} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
-                  <User className="w-10 h-10 text-gray-400" />
+                  <User className="w-10 h-10 text-muted-foreground" />
                 )}
               </div>
               {imagePreview && (
@@ -339,7 +339,7 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
               )}
             </div>
             <label className="cursor-pointer">
-              <div className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors flex items-center gap-2">
+              <div className="px-4 py-2 bg-muted hover:bg-muted/80 text-foreground rounded-xl transition-colors flex items-center gap-2">
                 <Upload className="w-4 h-4" />
                 <span>Upload Photo</span>
               </div>
@@ -351,7 +351,7 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
               />
             </label>
           </div>
-          <p className="mt-2 text-sm text-gray-500">Recommended: Square image, at least 400x400px</p>
+          <p className="mt-2 text-sm text-muted-foreground">Recommended: Square image, at least 400x400px</p>
         </div>
 
         {/* Basic Info */}
@@ -396,8 +396,8 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
         />
 
         {/* Contact Information */}
-        <div className="border-t border-gray-200 pt-6">
-          <h4 className="text-lg font-semibold mb-4">Contact Information</h4>
+        <div className="border-t border-border pt-6">
+          <h4 className="text-lg font-semibold mb-4 text-foreground">Contact Information</h4>
           <div className="space-y-4">
             <Input
               type="tel"
@@ -408,16 +408,16 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
             />
 
             {/* Phone Privacy Toggle */}
-            <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+            <label className="flex items-center justify-between p-3 bg-muted rounded-lg border border-border">
               <div className="flex items-center gap-2">
-                <Phone className="w-4 h-4 text-gray-500" />
-                <span className="text-sm text-gray-700">Make phone number public</span>
+                <Phone className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm text-foreground">Make phone number public</span>
               </div>
               <input
                 type="checkbox"
                 checked={formData.phone_public || false}
                 onChange={(e) => handleFormChange({ phone_public: e.target.checked })}
-                className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500 focus:ring-2"
+                className="w-4 h-4 text-accent rounded focus:ring-accent focus:ring-2"
               />
             </label>
 
@@ -450,8 +450,8 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
         </div>
 
         {/* Social Links */}
-        <div className="border-t border-gray-200 pt-6">
-          <h4 className="text-lg font-semibold mb-4">Social Links</h4>
+        <div className="border-t border-border pt-6">
+          <h4 className="text-lg font-semibold mb-4 text-foreground">Social Links</h4>
           <div className="space-y-4">
             <Input
               type="url"

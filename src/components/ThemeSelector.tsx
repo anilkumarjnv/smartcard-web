@@ -62,7 +62,7 @@ export function ThemeSelector({ currentTheme, onThemeChange }: ThemeSelectorProp
                         onClick={() => setActiveTab('style')}
                         className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                             activeTab === 'style'
-                                ? 'border-blue-500 text-blue-600'
+                                ? 'border-neutral-900 text-blue-600'
                                 : 'border-transparent text-gray-500 hover:text-gray-700'
                         }`}
                     >
@@ -72,7 +72,7 @@ export function ThemeSelector({ currentTheme, onThemeChange }: ThemeSelectorProp
                         onClick={() => setActiveTab('colors')}
                         className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                             activeTab === 'colors'
-                                ? 'border-blue-500 text-blue-600'
+                                ? 'border-neutral-900 text-blue-600'
                                 : 'border-transparent text-gray-500 hover:text-gray-700'
                         }`}
                     >
@@ -82,7 +82,7 @@ export function ThemeSelector({ currentTheme, onThemeChange }: ThemeSelectorProp
                         onClick={() => setActiveTab('fonts')}
                         className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                             activeTab === 'fonts'
-                                ? 'border-blue-500 text-blue-600'
+                                ? 'border-neutral-900 text-blue-600'
                                 : 'border-transparent text-gray-500 hover:text-gray-700'
                         }`}
                     >

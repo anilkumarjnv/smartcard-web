@@ -75,7 +75,7 @@ export default function OnboardingPage() {
                                 </div>
                             )}
 
-                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl mb-4 ${role.id === 'student' ? 'bg-blue-100 text-blue-600' : 'bg-indigo-100 text-indigo-600'
+                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl mb-4 ${role.id === 'student' ? 'bg-neutral-100 text-neutral-900' : 'bg-neutral-100 text-neutral-900'
                                 }`}>
                                 {role.id === 'student' ? <GraduationCap /> : <Briefcase />}
                             </div>

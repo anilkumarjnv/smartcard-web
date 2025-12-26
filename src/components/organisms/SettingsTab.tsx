@@ -166,8 +166,8 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
                 <p className="text-sm text-gray-600 mt-1">Determines your card layout and fields</p>
               </div>
               <span className={`px-4 py-2 rounded-xl text-sm font-medium ${(role || 'professional') === 'student'
-                ? 'bg-blue-100 text-blue-700'
-                : 'bg-indigo-100 text-indigo-700'
+                ? 'bg-neutral-100 text-neutral-700'
+                : 'bg-neutral-100 text-neutral-700'
                 }`}>
                 {(role || 'Professional').charAt(0).toUpperCase() + (role || 'professional').slice(1)}
               </span>
@@ -177,23 +177,23 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
               <button
                 onClick={() => handleRoleChange('student')}
                 className={`p-4 rounded-xl border-2 text-left transition-all ${role === 'student'
-                  ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
-                  : 'border-gray-200 hover:border-blue-200 hover:bg-white'
+                  ? 'border-neutral-900 bg-neutral-50 ring-1 ring-neutral-900'
+                  : 'border-gray-200 hover:border-neutral-200 hover:bg-white'
                   }`}
               >
-                <div className="font-semibold mb-1 text-blue-900">Student</div>
-                <div className="text-xs text-blue-700">Academic focus, projects, GPA</div>
+                <div className="font-semibold mb-1 text-neutral-900">Student</div>
+                <div className="text-xs text-neutral-700">Academic focus, projects, GPA</div>
               </button>
 
               <button
                 onClick={() => handleRoleChange('professional')}
                 className={`p-4 rounded-xl border-2 text-left transition-all ${role === 'professional'
-                  ? 'border-indigo-500 bg-indigo-50 ring-1 ring-indigo-500'
-                  : 'border-gray-200 hover:border-indigo-200 hover:bg-white'
+                  ? 'border-neutral-900 bg-neutral-50 ring-1 ring-neutral-900'
+                  : 'border-gray-200 hover:border-neutral-200 hover:bg-white'
                   }`}
               >
-                <div className="font-semibold mb-1 text-indigo-900">Professional</div>
-                <div className="text-xs text-indigo-700">Career focus, experience, portfolio</div>
+                <div className="font-semibold mb-1 text-neutral-900">Professional</div>
+                <div className="text-xs text-neutral-700">Career focus, experience, portfolio</div>
               </button>
             </div>
           </div>

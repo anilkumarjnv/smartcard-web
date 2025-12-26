@@ -1,7 +1,8 @@
 'use client';
 
-import React from 'react';
-import { Mail, Phone, Linkedin, Globe, Download, Share2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Mail, Phone, Linkedin, Globe, Download, Share2, Edit, BarChart3, QrCode, Trash2 } from 'lucide-react';
 import { WaveShape } from './shapes/WaveShape';
 import { GeometricShape } from './shapes/GeometricShape';
 import { SoftArcShape } from './shapes/SoftArcShape';
@@ -27,11 +28,65 @@ interface UserProfile {
 
 interface ProfileCardProps {
     user: UserProfile;
-    theme?: 'light' | 'dark' | 'accent';
+    theme?: 'light' | 'dark' | 'accent' | 'neutral';
     shape?: 'wave' | 'geometric' | 'soft-arc' | 'layered-waves' | 'slant';
+    cardId?: string;
+    disableFlip?: boolean;
+    onEdit?: () => void;
+    onAnalytics?: () => void;
+    onDownloadQR?: () => void;
+    onDelete?: () => void;
 }
 
-export function ProfileCard({ user, theme = 'light', shape = 'wave' }: ProfileCardProps) {
+export function ProfileCard({
+    user,
+    theme = 'light',
+    shape = 'wave',
+    cardId,
+    disableFlip = false,
+    onEdit,
+    onAnalytics,
+    onDownloadQR,
+    onDelete
+}: ProfileCardProps) {
+    const [isFlipped, setIsFlipped] = useState(false);
+    const router = useRouter();
+
+    // Action handlers - use provided callbacks or default navigation
+    const handleEdit = () => {
+        if (onEdit) {
+            onEdit();
+        } else if (cardId) {
+            router.push(`/mycards?tab=card&cardId=${cardId}`);
+        }
+    };
+
+    const handleAnalytics = () => {
+        if (onAnalytics) {
+            onAnalytics();
+        } else if (cardId) {
+            router.push(`/mycards/analytics/${cardId}`);
+        }
+    };
+
+    const handleDownloadQR = () => {
+        if (onDownloadQR) {
+            onDownloadQR();
+        } else {
+            // Default QR download logic can be added here
+            console.log('Download QR code for card:', cardId);
+        }
+    };
+
+    const handleDelete = () => {
+        if (onDelete) {
+            onDelete();
+        } else {
+            // Default delete logic can be added here
+            console.log('Delete card:', cardId);
+        }
+    };
+
     const themeClasses = {
         light: {
             bg: 'bg-white',
@@ -60,14 +115,24 @@ export function ProfileCard({ user, theme = 'light', shape = 'wave' }: ProfileCa
             hover: 'hover:bg-violet-50',
             shapeColor: '#8B5CF6',
         },
+        neutral: {
+            bg: 'bg-white',
+            text: 'text-neutral-900',
+            secondary: 'text-neutral-600',
+            accent: 'text-neutral-900',
+            border: 'border-neutral-200',
+            hover: 'hover:bg-neutral-50',
+            shapeColor: '#111111',
+        },
     };
 
     const currentTheme = themeClasses[theme];
 
-    return (
-        <div className={`max-w-md mx-auto ${currentTheme.bg} rounded-2xl overflow-hidden shadow-lg`}>
+    // Card content component (reusable for both flip and non-flip versions)
+    const cardContent = (
+        <div className={`${currentTheme.bg} rounded-2xl overflow-hidden shadow-lg`}>
             {/* Identity Header - Background Image Section */}
-            <div className="relative h-80 overflow-visible">
+            <div className="relative h-96 overflow-visible">
                 {/* Background Image or Gradient Fallback */}
                 <div
                     className="absolute inset-0"
@@ -202,6 +267,235 @@ export function ProfileCard({ user, theme = 'light', shape = 'wave' }: ProfileCa
                             Share
                         </span>
                     </button>
+                </div>
+            </div>
+        </div>
+    );
+
+    // If flip is disabled, return just the card content
+    if (disableFlip) {
+        return <div className="max-w-md mx-auto">{cardContent}</div>;
+    }
+
+    // Otherwise, return with flip animation
+    return (
+        <div
+            className="max-w-md mx-auto perspective-1000"
+            onMouseEnter={() => setIsFlipped(true)}
+            onMouseLeave={() => setIsFlipped(false)}
+        >
+            <div
+                className="relative w-full h-full transition-transform duration-700 transform-style-3d"
+                style={{
+                    transformStyle: 'preserve-3d',
+                    transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+                }}
+            >
+                {/* FRONT FACE */}
+                <div
+                    className="backface-hidden"
+                    style={{ backfaceVisibility: 'hidden' }}
+                >
+                    <div className={`${currentTheme.bg} rounded-2xl overflow-hidden shadow-lg`}>
+                        {/* Identity Header - Background Image Section */}
+                        <div className="relative h-96 overflow-visible">
+                            {/* Background Image or Gradient Fallback */}
+                            <div
+                                className="absolute inset-0"
+                                style={{
+                                    backgroundImage: user.photo
+                                        ? `url(${user.photo})`
+                                        : `linear-gradient(135deg, ${currentTheme.shapeColor}, ${currentTheme.shapeColor}DD)`,
+                                    backgroundSize: 'cover',
+                                    backgroundPosition: 'center',
+                                    backgroundRepeat: 'no-repeat',
+                                }}
+                            />
+
+                            {/* Gradient Overlay for text readability */}
+                            <div
+                                className="absolute inset-0"
+                                style={{
+                                    background: theme === 'dark'
+                                        ? 'linear-gradient(to top, rgba(255,255,255,0.8) 0%, transparent 60%)'
+                                        : theme === 'accent'
+                                            ? `linear-gradient(to top, ${currentTheme.shapeColor}CC 0%, transparent 60%)`
+                                            : 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%)'
+                                }}
+                            />
+
+                            {/* Name and Role - overlaid on image */}
+                            <div className="absolute bottom-20 left-6 z-10">
+                                <h1 className="text-3xl font-bold text-white mb-1 tracking-tight">
+                                    {user.name}
+                                </h1>
+                                <p className="text-lg text-white font-medium">
+                                    {user.role}
+                                </p>
+                            </div>
+
+                            {/* Shape Divider - Overlaid at bottom */}
+                            <div className="absolute bottom-0 left-0 right-0 h-16 z-20">
+                                {shape === 'wave' && <WaveShape color={currentTheme.shapeColor} />}
+                                {shape === 'geometric' && <GeometricShape color={currentTheme.shapeColor} />}
+                                {shape === 'soft-arc' && <SoftArcShape color={currentTheme.shapeColor} />}
+                                {shape === 'layered-waves' && <LayeredWavesShape color={currentTheme.shapeColor} />}
+                                {shape === 'slant' && <SlantShape color={currentTheme.shapeColor} />}
+                            </div>
+                        </div>
+
+                        {/* Professional Details Section */}
+                        <div className={`px-8 pb-6 ${currentTheme.bg}`}>
+                            <div className="mb-6">
+                                <h2 className={`text-xl font-semibold ${currentTheme.text} mb-1`}>
+                                    {user.company}
+                                </h2>
+                                <p className={`text-sm ${currentTheme.secondary}`}>
+                                    {user.location}
+                                </p>
+                                {user.about && (
+                                    <p className={`text-sm ${currentTheme.secondary} mt-3 leading-relaxed`}>
+                                        {user.about}
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* Contact Actions */}
+                            <div className="space-y-1 mb-6">
+                                {user.contact.email && (
+                                    <a
+                                        href={`mailto:${user.contact.email}`}
+                                        className={`flex items-center gap-3 px-3 py-3 rounded-lg border ${currentTheme.border} ${currentTheme.hover} transition-colors`}
+                                    >
+                                        <Mail className={`w-5 h-5 ${currentTheme.accent}`} strokeWidth={2} />
+                                        <span className={`text-sm font-medium ${currentTheme.text}`}>
+                                            {user.contact.email}
+                                        </span>
+                                    </a>
+                                )}
+
+                                {user.contact.phone && (
+                                    <a
+                                        href={`tel:${user.contact.phone}`}
+                                        className={`flex items-center gap-3 px-3 py-3 rounded-lg border ${currentTheme.border} ${currentTheme.hover} transition-colors`}
+                                    >
+                                        <Phone className={`w-5 h-5 ${currentTheme.accent}`} strokeWidth={2} />
+                                        <span className={`text-sm font-medium ${currentTheme.text}`}>
+                                            {user.contact.phone}
+                                        </span>
+                                    </a>
+                                )}
+
+                                {user.contact.linkedin && (
+                                    <a
+                                        href={user.contact.linkedin}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className={`flex items-center gap-3 px-3 py-3 rounded-lg border ${currentTheme.border} ${currentTheme.hover} transition-colors`}
+                                    >
+                                        <Linkedin className={`w-5 h-5 ${currentTheme.accent}`} strokeWidth={2} />
+                                        <span className={`text-sm font-medium ${currentTheme.text}`}>
+                                            LinkedIn Profile
+                                        </span>
+                                    </a>
+                                )}
+
+                                {user.contact.website && (
+                                    <a
+                                        href={user.contact.website}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className={`flex items-center gap-3 px-3 py-3 rounded-lg border ${currentTheme.border} ${currentTheme.hover} transition-colors`}
+                                    >
+                                        <Globe className={`w-5 h-5 ${currentTheme.accent}`} strokeWidth={2} />
+                                        <span className={`text-sm font-medium ${currentTheme.text}`}>
+                                            {user.contact.website.replace(/^https?:\/\//, '')}
+                                        </span>
+                                    </a>
+                                )}
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className={`flex gap-3 pt-4 border-t ${currentTheme.border}`}>
+                                <button
+                                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border ${currentTheme.border} ${currentTheme.hover} transition-colors`}
+                                >
+                                    <Download className={`w-4 h-4 ${currentTheme.accent}`} strokeWidth={2} />
+                                    <span className={`text-sm font-medium ${currentTheme.text}`}>
+                                        Save Contact
+                                    </span>
+                                </button>
+                                <button
+                                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border ${currentTheme.border} ${currentTheme.hover} transition-colors`}
+                                >
+                                    <Share2 className={`w-4 h-4 ${currentTheme.accent}`} strokeWidth={2} />
+                                    <span className={`text-sm font-medium ${currentTheme.text}`}>
+                                        Share
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* BACK FACE */}
+                <div
+                    className="absolute inset-0 backface-hidden"
+                    style={{
+                        backfaceVisibility: 'hidden',
+                        transform: 'rotateY(180deg)'
+                    }}
+                >
+                    <div className={`${currentTheme.bg} rounded-2xl overflow-hidden shadow-lg h-full`}>
+                        <div className={`px-8 py-8 h-full flex flex-col justify-center`}>
+                            <h2 className={`text-2xl font-bold ${currentTheme.text} mb-8 text-center`}>
+                                Quick Actions
+                            </h2>
+
+                            {/* Action Buttons Grid */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <button
+                                    onClick={handleEdit}
+                                    className={`flex flex-col items-center justify-center gap-3 px-6 py-8 rounded-xl border-2 ${currentTheme.border} ${currentTheme.hover} transition-all duration-200 hover:scale-105 hover:shadow-md`}
+                                >
+                                    <Edit className={`w-8 h-8 ${currentTheme.accent}`} strokeWidth={2} />
+                                    <span className={`text-sm font-semibold ${currentTheme.text}`}>
+                                        Edit Card
+                                    </span>
+                                </button>
+
+                                <button
+                                    onClick={handleAnalytics}
+                                    className={`flex flex-col items-center justify-center gap-3 px-6 py-8 rounded-xl border-2 ${currentTheme.border} ${currentTheme.hover} transition-all duration-200 hover:scale-105 hover:shadow-md`}
+                                >
+                                    <BarChart3 className={`w-8 h-8 ${currentTheme.accent}`} strokeWidth={2} />
+                                    <span className={`text-sm font-semibold ${currentTheme.text}`}>
+                                        Analytics
+                                    </span>
+                                </button>
+
+                                <button
+                                    onClick={handleDownloadQR}
+                                    className={`flex flex-col items-center justify-center gap-3 px-6 py-8 rounded-xl border-2 ${currentTheme.border} ${currentTheme.hover} transition-all duration-200 hover:scale-105 hover:shadow-md`}
+                                >
+                                    <QrCode className={`w-8 h-8 ${currentTheme.accent}`} strokeWidth={2} />
+                                    <span className={`text-sm font-semibold ${currentTheme.text}`}>
+                                        Download QR
+                                    </span>
+                                </button>
+
+                                <button
+                                    onClick={handleDelete}
+                                    className={`flex flex-col items-center justify-center gap-3 px-6 py-8 rounded-xl border-2 ${currentTheme.border} ${currentTheme.hover} transition-all duration-200 hover:scale-105 hover:shadow-md`}
+                                >
+                                    <Trash2 className={`w-8 h-8 text-red-500`} strokeWidth={2} />
+                                    <span className={`text-sm font-semibold ${currentTheme.text}`}>
+                                        Delete Card
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -43,7 +43,7 @@ export function Nav() {
                 <div className="flex justify-between items-center h-16">
                     {/* Logo */}
                     <Link href="/" className="flex items-center space-x-2">
-                        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg" />
+                        <div className="w-8 h-8 bg-neutral-900 rounded-lg" />
                         <span className="text-xl font-bold text-gray-900">SmartCard</span>
                     </Link>
 
@@ -54,8 +54,8 @@ export function Nav() {
                                 <Link
                                     href="/mycards"
                                     className={`text-sm font-medium transition-colors ${pathname.startsWith('/mycards')
-                                        ? 'text-blue-600'
-                                        : 'text-gray-700 hover:text-blue-600'
+                                        ? 'text-neutral-900'
+                                        : 'text-gray-700 hover:text-neutral-900'
                                         }`}
                                 >
                                     My Cards
@@ -63,8 +63,8 @@ export function Nav() {
                                 <Link
                                     href="/leads"
                                     className={`text-sm font-medium transition-colors ${pathname.startsWith('/leads')
-                                        ? 'text-blue-600'
-                                        : 'text-gray-700 hover:text-blue-600'
+                                        ? 'text-neutral-900'
+                                        : 'text-gray-700 hover:text-neutral-900'
                                         }`}
                                 >
                                     Leads
@@ -74,13 +74,13 @@ export function Nav() {
                             <>
                                 <Link
                                     href="#features"
-                                    className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
+                                    className="text-sm font-medium text-gray-700 hover:text-neutral-900 transition-colors"
                                 >
                                     Features
                                 </Link>
                                 <Link
                                     href="#pricing"
-                                    className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
+                                    className="text-sm font-medium text-gray-700 hover:text-neutral-900 transition-colors"
                                 >
                                     Pricing
                                 </Link>
