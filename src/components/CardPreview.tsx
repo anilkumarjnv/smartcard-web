@@ -8,6 +8,7 @@ interface CardPreviewProps {
     card: Partial<Card>;
     theme?: Record<string, unknown>;
     isPublicView?: boolean;
+    disableFlip?: boolean;
 }
 
 export interface ProfileCardTheme {
@@ -43,7 +44,7 @@ export const PROFILE_THEMES: ProfileCardTheme[] = [
  * New CardPreview using the professional ProfileCard design
  * with background image and shape theming
  */
-export function CardPreview({ card, theme, isPublicView = false }: CardPreviewProps) {
+export function CardPreview({ card, theme, isPublicView = false, disableFlip = false }: CardPreviewProps) {
     // Determine theme from card data
     const selectedTheme = (theme?.profileTheme as 'light' | 'dark' | 'accent' | 'neutral') || 'light';
 
@@ -53,6 +54,12 @@ export function CardPreview({ card, theme, isPublicView = false }: CardPreviewPr
     // Use photo_url with fallback to avatar_url
     const photoUrl = card.photo_url || card.avatar_url || '';
 
+    // Access custom data which handles extra fields
+    const customData = (card as any).custom_data || {};
+
+    // Helper to get field from root (live preview) or custom_data (saved card)
+    const getField = (field: string) => (card as any)[field] || customData[field];
+
     // Transform card data to ProfileCard format
     const userProfile = {
         name: card.name || 'Your Name',
@@ -61,6 +68,10 @@ export function CardPreview({ card, theme, isPublicView = false }: CardPreviewPr
         location: '', // Location field to be added in future
         photo: photoUrl,
         about: card.about,
+        domain: getField('domain'),
+        custom_highlights: getField('custom_highlights'),
+        cta_button: getField('cta_button'),
+        additional_links: getField('additional_links'),
         contact: {
             email: card.email || '',
             phone: card.phone,
@@ -70,13 +81,14 @@ export function CardPreview({ card, theme, isPublicView = false }: CardPreviewPr
     };
 
     return (
-        <div className="w-full h-full overflow-auto flex items-center justify-center bg-neutral-50 dark:bg-neutral-950 p-6">
-            <ProfileCard
-                user={userProfile}
-                theme={selectedTheme}
-                shape={selectedShape}
-                cardId={card.id}
-            />
-        </div>
+        // <div className="w-full h-full overflow-auto flex items-center justify-center bg-neutral-50 dark:bg-neutral-950 p-6">
+        <ProfileCard
+            user={userProfile}
+            theme={selectedTheme}
+            shape={selectedShape}
+            cardId={card.id}
+            disableFlip={disableFlip}
+        />
+        // </div>
     );
 }

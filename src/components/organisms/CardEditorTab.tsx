@@ -1,46 +1,57 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { User, Briefcase, Building, Phone, Mail, MessageCircle, Globe, Linkedin, Instagram, Twitter, Github, Upload, X } from 'lucide-react';
+import { User, Briefcase, Building, Phone, Mail, Globe, Upload, X, Plus, Trash } from 'lucide-react';
 import { Input } from '@/components/molecules/Input';
 import { Textarea } from '@/components/molecules/Textarea';
 import { Button } from '@/components/molecules/Button';
-import { RoleBasedCardFields } from '@/components/organisms/RoleBasedCardFields';
-import { useUserRole } from '@/hooks/useUserRole';
 import useSWR, { mutate } from 'swr';
 import { apiClient } from '@/lib/apiClient';
 import type { Card } from '@/lib/api/types';
 
 interface FormData {
+  //Section 1: Identity (Required)
   name: string;
-  title: string;
-  company: string;
-  about: string;
-  phone: string;
-  phone_public: boolean;
-  email: string;
-  website: string;
+  role: string;
+
+  // Section 2: Visual Identity (Required)
   photo_url: string;
-  school?: string;
-  major?: string;
-  graduation_year?: string;
-  skills?: string;
-  projects?: string;
-  experience?: string;
-  certifications?: string;
-  social_links: {
-    linkedin: string;
-    instagram: string;
-    twitter: string;
-    github: string;
-    whatsapp: string;
+
+  // Section 3: Context & Credibility (Optional)
+  organization?: string;
+  domain?: string;
+
+  // Section 4: Professional Summary (Optional, max 200 chars)
+  summary?: string;
+
+  // Section 5: Contact & Reach (Required)
+  email: string;
+  phone?: string;
+  primary_link: string;
+
+  // Section 6: Additional Links (Optional, max 3)
+  additional_links: Array<{
+    label: string;
+    url: string;
+  }>;
+
+  // Section 7: Primary CTA (Optional)
+  cta_button?: {
+    text: string;
+    link: string;
   };
+
+  // Section 8: Custom Highlights (Optional, max 3)
+  custom_highlights: Array<{
+    label: string;
+    value: string;
+  }>;
 }
 
 interface CardEditorTabProps {
   cardId?: string;
   mode?: 'create';
-  initialFormData?: any; // Persisted form data from parent
+  initialFormData?: any;
   onCardUpdate?: (card: Card) => void;
   onFormChange?: (formData: FormData) => void;
 }
@@ -49,141 +60,90 @@ const fetcher = (url: string) => apiClient.get<Card[]>(url);
 
 export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onFormChange }: CardEditorTabProps) {
   const { data: cards, error } = useSWR<Card[]>('/api/v1/cards/user', fetcher);
-  const { roleConfig, isLoading: roleLoading } = useUserRole();
 
-  // Determine which card to use based on props
   const currentCard = mode === 'create'
     ? null
     : cardId
       ? cards?.find(card => card.id === cardId) || null
       : cards && cards.length > 0 ? cards[0] : null;
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: '',
-    title: '',
-    company: '',
-    about: '',
-    phone: '',
-    phone_public: false,
-    email: '',
-    website: '',
+    role: '',
     photo_url: '',
-    // Additional fields for role-based data
-    school: '',
-    major: '',
-    graduation_year: '',
-    skills: '',
-    projects: '',
-    experience: '',
-    certifications: '',
-    social_links: {
-      linkedin: '',
-      instagram: '',
-      twitter: '',
-      github: '',
-      whatsapp: ''
-    }
+    organization: '',
+    domain: '',
+    summary: '',
+    email: '',
+    phone: '',
+    primary_link: '',
+    additional_links: [],
+    cta_button: undefined,
+    custom_highlights: []
   });
 
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
   const [imagePreview, setImagePreview] = useState<string>('');
 
-  // Initialize form data when card loads or when entering create mode
-  // Use persisted form data if available, otherwise initialize from card
+  // Initialize form data
   useEffect(() => {
-    // If we have persisted form data and it matches the current card, use it
     if (initialFormData && initialFormData._cardId === cardId) {
       const { _cardId, ...formDataWithoutId } = initialFormData;
       setFormData(formDataWithoutId);
       setImagePreview(formDataWithoutId.photo_url || '');
-      if (onFormChange) {
-        onFormChange(formDataWithoutId);
-      }
+      onFormChange?.(formDataWithoutId);
       return;
     }
 
     if (mode === 'create') {
-      // Clear form data for create mode
-      const emptyData = {
+      const emptyData: FormData = {
         name: '',
-        title: '',
-        company: '',
-        about: '',
-        phone: '',
-        phone_public: false,
-        email: '',
-        website: '',
+        role: '',
         photo_url: '',
-        school: '',
-        major: '',
-        graduation_year: '',
-        skills: '',
-        projects: '',
-        experience: '',
-        certifications: '',
-        social_links: {
-          linkedin: '',
-          instagram: '',
-          twitter: '',
-          github: '',
-          whatsapp: ''
-        }
+        organization: '',
+        domain: '',
+        summary: '',
+        email: '',
+        phone: '',
+        primary_link: '',
+        additional_links: [],
+        cta_button: undefined,
+        custom_highlights: []
       };
       setFormData(emptyData);
       setImagePreview('');
-
-      // Notify parent of empty data
-      if (onFormChange) {
-        onFormChange(emptyData);
-      }
+      onFormChange?.(emptyData);
     } else if (currentCard) {
       const cardData = currentCard as any;
-      const initialData = {
+      const customData = cardData.custom_data || {};
+
+      const initialData: FormData = {
         name: currentCard.name || '',
-        title: currentCard.title || '',
-        company: currentCard.company || '',
-        about: cardData.bio || currentCard.about || '',  // Map 'bio' to 'about'
-        phone: currentCard.phone || '',
-        phone_public: currentCard.phone_public ?? false,
+        role: currentCard.title || '',
+        photo_url: currentCard.avatar_url || currentCard.photo_url || '',
+        organization: currentCard.company || '',
+        domain: customData.domain || '',
+        summary: cardData.bio || currentCard.about || '',
         email: currentCard.email || '',
-        website: currentCard.website || '',
-        photo_url: currentCard.avatar_url || currentCard.photo_url || '',  // Map 'avatar_url' to 'photo_url'
-        // Additional fields
-        school: cardData.school || (cardData.student_fields?.school) || '',
-        major: cardData.major || (cardData.student_fields?.major) || '',
-        graduation_year: cardData.graduation_year || (cardData.student_fields?.graduation_year) || '',
-        skills: cardData.skills || '',
-        projects: cardData.projects || (cardData.student_fields?.projects) || '',
-        experience: cardData.experience || (cardData.professional_fields?.experience) || '',
-        certifications: cardData.certifications || '',
-        social_links: {
-          linkedin: (currentCard.social_links as Record<string, string>)?.linkedin || '',
-          instagram: (currentCard.social_links as Record<string, string>)?.instagram || '',
-          twitter: (currentCard.social_links as Record<string, string>)?.twitter || '',
-          github: (currentCard.social_links as Record<string, string>)?.github || '',
-          whatsapp: (currentCard.social_links as Record<string, string>)?.whatsapp || ''
-        }
+        phone: currentCard.phone || '',
+        primary_link: currentCard.website || (currentCard.social_links as Record<string, string>)?.linkedin || '',
+        additional_links: customData.additional_links || [],
+        cta_button: customData.cta_button,
+        custom_highlights: customData.custom_highlights || []
       };
       setFormData(initialData);
-      setImagePreview(currentCard.avatar_url || currentCard.photo_url || '');
-
-      // Notify parent of initial data
-      if (onFormChange) {
-        onFormChange(initialData);
-      }
+      setImagePreview(initialData.photo_url);
+      onFormChange?.(initialData);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cardId, mode]); // Only re-initialize if cardId or mode changes, not on every currentCard update
+  }, [cardId, mode]);
 
-  // Helper function to update form data and notify parent
-  const handleFormChange = (updates: Partial<typeof formData>) => {
+  const handleFormChange = (updates: Partial<FormData>) => {
     const newFormData = { ...formData, ...updates };
     setFormData(newFormData);
     onFormChange?.(newFormData);
   };
 
-  // Handle image upload
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -191,7 +151,7 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
       reader.onloadend = () => {
         const result = reader.result as string;
         setImagePreview(result);
-        setFormData({ ...formData, photo_url: result });
+        handleFormChange({ photo_url: result });
       };
       reader.readAsDataURL(file);
     }
@@ -199,7 +159,45 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
 
   const removeImage = () => {
     setImagePreview('');
-    setFormData({ ...formData, photo_url: '' });
+    handleFormChange({ photo_url: '' });
+  };
+
+  const addAdditionalLink = () => {
+    if (formData.additional_links.length < 3) {
+      handleFormChange({
+        additional_links: [...formData.additional_links, { label: '', url: '' }]
+      });
+    }
+  };
+
+  const updateAdditionalLink = (index: number, field: 'label' | 'url', value: string) => {
+    const newLinks = [...formData.additional_links];
+    newLinks[index] = { ...newLinks[index], [field]: value };
+    handleFormChange({ additional_links: newLinks });
+  };
+
+  const removeAdditionalLink = (index: number) => {
+    const newLinks = formData.additional_links.filter((_, i) => i !== index);
+    handleFormChange({ additional_links: newLinks });
+  };
+
+  const addCustomHighlight = () => {
+    if (formData.custom_highlights.length < 3) {
+      handleFormChange({
+        custom_highlights: [...formData.custom_highlights, { label: '', value: '' }]
+      });
+    }
+  };
+
+  const updateCustomHighlight = (index: number, field: 'label' | 'value', value: string) => {
+    const newHighlights = [...formData.custom_highlights];
+    newHighlights[index] = { ...newHighlights[index], [field]: value };
+    handleFormChange({ custom_highlights: newHighlights });
+  };
+
+  const removeCustomHighlight = (index: number) => {
+    const newHighlights = formData.custom_highlights.filter((_, i) => i !== index);
+    handleFormChange({ custom_highlights: newHighlights });
   };
 
   const handleSave = async () => {
@@ -207,69 +205,47 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
     setSaveMessage('');
 
     try {
-      // Filter out empty social links
-      const filteredSocialLinks = Object.entries(formData.social_links)
-        .filter(([, value]) => value && value.trim() !== '')
-        .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
-
-      // Transform data to match backend schema
       const payload: any = {
         name: formData.name,
-        title: formData.title || undefined,
-        company: formData.company || undefined,
-        bio: formData.about || undefined,  // Map 'about' to 'bio'
+        title: formData.role,
+        company: formData.organization || undefined,
+        bio: formData.summary || undefined,
         phone: formData.phone || undefined,
-        phone_public: formData.phone_public || false,
         email: formData.email || undefined,
-        website: formData.website || undefined,
-        avatar_url: formData.photo_url || undefined,  // Map 'photo_url' to 'avatar_url'
-        social_links: Object.keys(filteredSocialLinks).length > 0 ? filteredSocialLinks : undefined
-      };
-
-      // Include all additional fields from formData (school, major, skills, projects, etc.)
-      const additionalFields = ['school', 'major', 'graduation_year', 'skills', 'projects', 'experience', 'certifications'];
-      additionalFields.forEach(field => {
-        if (formData[field] && formData[field].trim() !== '') {
-          payload[field] = formData[field];
+        website: formData.primary_link || undefined,
+        avatar_url: formData.photo_url || undefined,
+        custom_data: {
+          domain: formData.domain || undefined,
+          additional_links: formData.additional_links.filter(l => l.label && l.url) || undefined,
+          cta_button: formData.cta_button && formData.cta_button.text && formData.cta_button.link
+            ? formData.cta_button
+            : undefined,
+          custom_highlights: formData.custom_highlights.filter(h => h.label && h.value) || undefined
         }
-      });
+      };
 
       let savedCard: Card;
 
       if (mode === 'create' || !currentCard) {
-        // Create new card - slug is required
         const slug = formData.name
           .toLowerCase()
           .replace(/[^a-z0-9]+/g, '-')
           .replace(/^-+|-+$/g, '');
 
-        savedCard = await apiClient.post<Card>(
-          '/api/v1/cards',
-          { ...payload, slug }
-        );
+        savedCard = await apiClient.post<Card>('/api/v1/cards', { ...payload, slug });
         setSaveMessage('✓ Card created successfully');
 
-        // Redirect to the new card's edit page after a brief delay
         setTimeout(() => {
           window.location.href = `/mycards?tab=card&cardId=${savedCard.id}`;
         }, 1500);
       } else {
-        // Update existing card
-        savedCard = await apiClient.patch<Card>(
-          `/api/v1/cards/${currentCard.id}`,
-          payload
-        );
+        savedCard = await apiClient.patch<Card>(`/api/v1/cards/${currentCard.id}`, payload);
         setSaveMessage('✓ Changes saved successfully');
         setTimeout(() => setSaveMessage(''), 3000);
       }
 
-      // Refresh the cards list
       mutate('/api/v1/cards/user');
-
-      // Notify parent component
-      if (onCardUpdate) {
-        onCardUpdate(savedCard);
-      }
+      onCardUpdate?.(savedCard);
     } catch (err) {
       setSaveMessage('✗ Failed to save changes');
       console.error('Error saving card:', err);
@@ -286,7 +262,6 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
     );
   }
 
-  // Show loading only if we're trying to fetch a specific card and it hasn't loaded yet
   if (!mode && !currentCard && !cards) {
     return (
       <div className="bg-card rounded-3xl p-8 shadow-sm border border-border">
@@ -300,7 +275,9 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
   return (
     <div className="bg-card rounded-3xl p-6 md:p-8 shadow-sm border border-border">
       <div className="flex items-center justify-between mb-8">
-        <h3 className="text-2xl font-bold text-foreground">{isCreating ? 'Create New Card' : 'Edit Your Card'}</h3>
+        <h3 className="text-2xl font-bold text-foreground">
+          {isCreating ? 'Create New Card' : 'Edit Your Card'}
+        </h3>
         <Button onClick={handleSave} size="sm" disabled={isSaving} className="hidden md:flex">
           {isSaving ? 'Saving...' : isCreating ? 'Create Card' : 'Save Changes'}
         </Button>
@@ -308,20 +285,37 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
 
       {saveMessage && (
         <div className={`mb-6 p-4 rounded-2xl ${saveMessage.includes('✓')
-          ? 'bg-green-50 text-green-700'
-          : 'bg-red-50 text-red-700'
+          ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300'
+          : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300'
           }`}>
           {saveMessage}
         </div>
       )}
 
-      <div className="space-y-6">
-        {/* Profile Photo Upload */}
-        <div>
-          <label className="block text-sm font-medium text-foreground-secondary mb-3">Profile Photo</label>
+      <div className="space-y-8">
+        {/* SECTION 1: Identity */}
+        <div className="space-y-4">
+          <h4 className="text-lg font-semibold text-foreground">Identity</h4>
+          <Input
+            placeholder="Full Name *"
+            value={formData.name}
+            onChange={(e) => handleFormChange({ name: e.target.value })}
+            icon={<User className="w-5 h-5 text-muted-foreground" />}
+          />
+          <Input
+            placeholder="Role / Title * (e.g., Mobile App Developer, Final Year CSE Student, Product Manager)"
+            value={formData.role}
+            onChange={(e) => handleFormChange({ role: e.target.value })}
+            icon={<Briefcase className="w-5 h-5 text-muted-foreground" />}
+          />
+        </div>
+
+        {/* SECTION 2: Visual Identity */}
+        <div className="border-t border-border pt-6">
+          <label className="block text-sm font-medium text-foreground mb-3">Profile Photo *</label>
           <div className="flex items-center gap-4">
             <div className="relative">
-              <div className="w-24 h-24 rounded-full border-4 border-border overflow-hidden bg-muted flex items-center justify-center">
+              <div className="w-24 h-24 rounded-lg border-4 border-border overflow-hidden bg-muted flex items-center justify-center">
                 {imagePreview ? (
                   <img src={imagePreview} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
@@ -351,147 +345,178 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
               />
             </label>
           </div>
-          <p className="mt-2 text-sm text-muted-foreground">Recommended: Square image, at least 400x400px</p>
+          <p className="mt-2 text-sm text-muted-foreground">Used as card background. Recommended: 800x800px or larger</p>
         </div>
 
-        {/* Basic Info */}
-        <div className="space-y-4">
+        {/* SECTION 3: Context & Credibility */}
+        <div className="border-t border-border pt-6 space-y-4">
+          <h4 className="text-lg font-semibold text-foreground">Context & Credibility</h4>
+          <p className="text-sm text-muted-foreground -mt-2">Optional but recommended</p>
           <Input
-            placeholder="Full Name"
-            value={formData.name}
-            onChange={(e) => handleFormChange({ name: e.target.value })}
-            icon={<User className="w-5 h-5" />}
+            placeholder="Organization / Institution (e.g., Company name, University name, Independent / Freelancer)"
+            value={formData.organization || ''}
+            onChange={(e) => handleFormChange({ organization: e.target.value })}
+            icon={<Building className="w-5 h-5" />}
           />
-
-          {!roleLoading && roleConfig ? (
-            <RoleBasedCardFields
-              roleConfig={roleConfig}
-              formData={formData}
-              onChange={(field, value) => handleFormChange({ [field]: value })}
-            />
-          ) : (
-            <>
-              <Input
-                placeholder="Job Title"
-                value={formData.title}
-                onChange={(e) => handleFormChange({ title: e.target.value })}
-                icon={<Briefcase className="w-5 h-5" />}
-              />
-              <Input
-                placeholder="Company Name"
-                value={formData.company}
-                onChange={(e) => handleFormChange({ company: e.target.value })}
-                icon={<Building className="w-5 h-5" />}
-              />
-            </>
-          )}
+          <Input
+            placeholder="Domain / Expertise (e.g., Software Development, Marketing & Growth, Finance)"
+            value={formData.domain || ''}
+            onChange={(e) => handleFormChange({ domain: e.target.value })}
+          />
         </div>
 
-        <Textarea
-          placeholder="About / Bio"
-          label="About You"
-          value={formData.about}
-          onChange={(e) => handleFormChange({ about: e.target.value })}
-          rows={4}
-        />
-
-        {/* Contact Information */}
+        {/* SECTION 4: Professional Summary */}
         <div className="border-t border-border pt-6">
-          <h4 className="text-lg font-semibold mb-4 text-foreground">Contact Information</h4>
-          <div className="space-y-4">
-            <Input
-              type="tel"
-              placeholder="Phone Number"
-              value={formData.phone}
-              onChange={(e) => handleFormChange({ phone: e.target.value })}
-              icon={<Phone className="w-5 h-5" />}
-            />
+          <div className="flex items-baseline justify-between mb-2">
+            <label className="text-sm font-medium text-foreground">Professional Summary</label>
+            <span className="text-xs text-muted-foreground">{(formData.summary || '').length}/200</span>
+          </div>
+          <Textarea
+            placeholder="Final year computer science student focused on mobile app development and fintech products."
+            value={formData.summary || ''}
+            onChange={(e) => handleFormChange({ summary: e.target.value.slice(0, 200) })}
+            rows={3}
+          />
+          <p className="mt-2 text-sm text-muted-foreground">Single paragraph, max 200 characters. No emojis.</p>
+        </div>
 
-            {/* Phone Privacy Toggle */}
-            <label className="flex items-center justify-between p-3 bg-muted rounded-lg border border-border">
-              <div className="flex items-center gap-2">
-                <Phone className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm text-foreground">Make phone number public</span>
+        {/* SECTION 5: Contact & Reach */}
+        <div className="border-t border-border pt-6 space-y-4">
+          <h4 className="text-lg font-semibold text-foreground">Contact & Reach</h4>
+          <Input
+            type="email"
+            placeholder="Email Address *"
+            value={formData.email}
+            onChange={(e) => handleFormChange({ email: e.target.value })}
+            icon={<Mail className="w-5 h-5" />}
+          />
+          <Input
+            type="tel"
+            placeholder="Phone Number (with country code)"
+            value={formData.phone || ''}
+            onChange={(e) => handleFormChange({ phone: e.target.value })}
+            icon={<Phone className="w-5 h-5" />}
+          />
+          <Input
+            type="url"
+            placeholder="Primary Professional Link * (LinkedIn / Portfolio / Website)"
+            value={formData.primary_link}
+            onChange={(e) => handleFormChange({ primary_link: e.target.value })}
+            icon={<Globe className="w-5 h-5" />}
+          />
+        </div>
+
+        {/* SECTION 6: Additional Links */}
+        <div className="border-t border-border pt-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h4 className="text-lg font-semibold text-foreground">Additional Links</h4>
+              <p className="text-sm text-muted-foreground">Max 3 (e.g., GitHub, Portfolio, LinkedIn)</p>
+            </div>
+            {formData.additional_links.length < 3 && (
+              <Button onClick={addAdditionalLink} variant="outline" size="sm">
+                <Plus className="w-4 h-4 mr-1" /> Add Link
+              </Button>
+            )}
+          </div>
+          <div className="space-y-3">
+            {formData.additional_links.map((link, idx) => (
+              <div key={idx} className="flex gap-2">
+                <select
+                  value={link.label}
+                  onChange={(e) => updateAdditionalLink(idx, 'label', e.target.value)}
+                  className="w-1/3 flex h-10 rounded-md border border-input bg-background dark:bg-neutral-800 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 text-foreground"
+                >
+                  <option value="" disabled className="text-muted-foreground">Select Platform</option>
+                  <option value="Website">Website</option>
+                  <option value="Portfolio">Portfolio</option>
+                  <option value="LinkedIn">LinkedIn</option>
+                  <option value="GitHub">GitHub</option>
+                  <option value="Twitter">Twitter</option>
+                  <option value="Instagram">Instagram</option>
+                  <option value="Facebook">Facebook</option>
+                  <option value="YouTube">YouTube</option>
+                  <option value="Twitch">Twitch</option>
+                  <option value="Discord">Discord</option>
+                  <option value="GitLab">GitLab</option>
+                  <option value="Stack Overflow">Stack Overflow</option>
+                  <option value="Dribbble">Dribbble</option>
+                  <option value="Behance">Behance</option>
+                  <option value="Figma">Figma</option>
+                  <option value="Medium">Medium</option>
+                  <option value="Dev.to">Dev.to</option>
+                </select>
+                <Input
+                  type="url"
+                  placeholder="URL"
+                  value={link.url}
+                  onChange={(e) => updateAdditionalLink(idx, 'url', e.target.value)}
+                  className="flex-1"
+                />
+                <Button variant="ghost" size="sm" onClick={() => removeAdditionalLink(idx)}>
+                  <Trash className="w-4 h-4" />
+                </Button>
               </div>
-              <input
-                type="checkbox"
-                checked={formData.phone_public || false}
-                onChange={(e) => handleFormChange({ phone_public: e.target.checked })}
-                className="w-4 h-4 text-accent rounded focus:ring-accent focus:ring-2"
-              />
-            </label>
-
-            <Input
-              type="email"
-              placeholder="Email Address"
-              value={formData.email}
-              onChange={(e) => handleFormChange({ email: e.target.value })}
-              icon={<Mail className="w-5 h-5" />}
-            />
-
-            <Input
-              type="tel"
-              placeholder="WhatsApp Number"
-              value={formData.social_links.whatsapp}
-              onChange={(e) => handleFormChange({
-                social_links: { ...formData.social_links, whatsapp: e.target.value }
-              })}
-              icon={<MessageCircle className="w-5 h-5" />}
-            />
-
-            <Input
-              type="url"
-              placeholder="Website URL"
-              value={formData.website}
-              onChange={(e) => handleFormChange({ website: e.target.value })}
-              icon={<Globe className="w-5 h-5" />}
-            />
+            ))}
           </div>
         </div>
 
-        {/* Social Links */}
+        {/* SECTION 7: Primary CTA Button */}
+        <div className="border-t border-border pt-6 space-y-4">
+          <div>
+            <h4 className="text-lg font-semibold text-foreground">Primary Action Button</h4>
+            <p className="text-sm text-muted-foreground">Optional call-to-action button</p>
+          </div>
+          <Input
+            placeholder="Button Text (e.g., Contact Me, View Portfolio, Connect on LinkedIn)"
+            value={formData.cta_button?.text || ''}
+            onChange={(e) => handleFormChange({
+              cta_button: { ...formData.cta_button, text: e.target.value, link: formData.cta_button?.link || '' } as any
+            })}
+          />
+          <Input
+            type="url"
+            placeholder="Action Link (URL or mailto:your@email.com)"
+            value={formData.cta_button?.link || ''}
+            onChange={(e) => handleFormChange({
+              cta_button: { text: formData.cta_button?.text || '', link: e.target.value } as any
+            })}
+          />
+        </div>
+
+        {/* SECTION 8: Custom Highlights */}
         <div className="border-t border-border pt-6">
-          <h4 className="text-lg font-semibold mb-4 text-foreground">Social Links</h4>
-          <div className="space-y-4">
-            <Input
-              type="url"
-              placeholder="LinkedIn Profile URL"
-              value={formData.social_links.linkedin}
-              onChange={(e) => handleFormChange({
-                social_links: { ...formData.social_links, linkedin: e.target.value }
-              })}
-              icon={<Linkedin className="w-5 h-5" />}
-            />
-
-            <Input
-              type="url"
-              placeholder="Instagram Profile URL"
-              value={formData.social_links.instagram}
-              onChange={(e) => handleFormChange({
-                social_links: { ...formData.social_links, instagram: e.target.value }
-              })}
-              icon={<Instagram className="w-5 h-5" />}
-            />
-
-            <Input
-              type="url"
-              placeholder="Twitter/X Profile URL"
-              value={formData.social_links.twitter}
-              onChange={(e) => handleFormChange({
-                social_links: { ...formData.social_links, twitter: e.target.value }
-              })}
-              icon={<Twitter className="w-5 h-5" />}
-            />
-
-            <Input
-              type="url"
-              placeholder="GitHub Profile URL"
-              value={formData.social_links.github}
-              onChange={(e) => handleFormChange({
-                social_links: { ...formData.social_links, github: e.target.value }
-              })}
-              icon={<Github className="w-5 h-5" />}
-            />
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h4 className="text-lg font-semibold text-foreground">Custom Highlights</h4>
+              <p className="text-sm text-muted-foreground">Max 3 key-value pairs (e.g., Projects → 5+ shipped apps, Experience → 3 years)</p>
+            </div>
+            {formData.custom_highlights.length < 3 && (
+              <Button onClick={addCustomHighlight} variant="outline" size="sm">
+                <Plus className="w-4 h-4 mr-1" /> Add Highlight
+              </Button>
+            )}
+          </div>
+          <div className="space-y-3">
+            {formData.custom_highlights.map((highlight, idx) => (
+              <div key={idx} className="flex gap-2">
+                <Input
+                  placeholder="Label (max 20)"
+                  value={highlight.label}
+                  onChange={(e) => updateCustomHighlight(idx, 'label', e.target.value.slice(0, 20))}
+                  className="w-1/3"
+                />
+                <Input
+                  placeholder="Value (max 60)"
+                  value={highlight.value}
+                  onChange={(e) => updateCustomHighlight(idx, 'value', e.target.value.slice(0, 60))}
+                  className="flex-1"
+                />
+                <Button variant="ghost" size="sm" onClick={() => removeCustomHighlight(idx)}>
+                  <Trash className="w-4 h-4" />
+                </Button>
+              </div>
+            ))}
           </div>
         </div>
 

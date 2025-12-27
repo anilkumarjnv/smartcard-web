@@ -87,7 +87,9 @@ export default function MyCardsPage() {
         if (isLoading && !modeParam) {
             return (
                 <div className="p-6">
-                    <AppTopbar title="Loading..." subtitle="Please wait" />
+                    <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+                        <h1 className="text-xl font-semibold">Loading...</h1>
+                    </div>
                     <div className="flex justify-center py-20">
                         <Spinner size="lg" />
                     </div>
@@ -159,7 +161,7 @@ export default function MyCardsPage() {
                                 onFormChange={(formData) => {
                                     setLiveFormData(formData);
                                     if (formData) {
-                                        setPersistedFormData({ ...formData, _cardId: cardIdParam || formData._cardId });
+                                        setPersistedFormData({ ...formData, _cardId: cardIdParam || (formData as any)._cardId });
                                     }
                                 }}
                             />
@@ -199,9 +201,18 @@ export default function MyCardsPage() {
                             <div className="bg-muted/30 rounded-2xl overflow-hidden" style={{ minHeight: '600px' }}>
                                 {(liveFormData || cardData) ? (
                                     <CardPreview
-                                        card={liveFormData || cardData}
+                                        card={liveFormData ? {
+                                            ...liveFormData,
+                                            title: liveFormData.role,
+                                            company: liveFormData.organization,
+                                            about: liveFormData.summary,
+                                            website: liveFormData.primary_link,
+                                            photo_url: liveFormData.photo_url || liveFormData.avatar_url,
+                                            social_links: liveFormData.social_links || {}
+                                        } as any : cardData}
                                         theme={liveTheme || cardData?.theme}
                                         isPublicView={true}
+                                        disableFlip={true}
                                     />
                                 ) : (
                                     <div className="flex items-center justify-center h-full text-center py-12 text-muted-foreground">

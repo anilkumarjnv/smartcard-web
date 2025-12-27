@@ -129,7 +129,7 @@ export function ShareTab({ cardId }: ShareTabProps) {
           </div>
 
           <div className="border-t border-border pt-6">
-            <div className="flex items-center justify-between p-4 bg-muted rounded-2xl">
+            <div className="flex items-center justify-between p-4 bg-muted dark:bg-neutral-800 rounded-2xl">
               <div>
                 <p className="text-sm font-medium text-foreground">Show SmartCard Branding</p>
                 <p className="text-xs text-muted-foreground mt-1">Remove with Pro plan</p>
@@ -141,7 +141,7 @@ export function ShareTab({ cardId }: ShareTabProps) {
                   onChange={(e) => setShowBranding(e.target.checked)}
                   className="sr-only peer"
                 />
-                <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-neutral-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-neutral-900"></div>
+                <div className="w-11 h-6 bg-gray-300 dark:bg-neutral-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-neutral-300 dark:peer-focus:ring-neutral-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-neutral-900 dark:peer-checked:bg-neutral-100 dark:peer-checked:after:bg-neutral-900 dark:peer-checked:after:border-neutral-900"></div>
               </label>
             </div>
           </div>
@@ -151,7 +151,7 @@ export function ShareTab({ cardId }: ShareTabProps) {
             <p className="text-muted-foreground mb-4">
               See who views your card, track link clicks, and get detailed analytics with Pro.
             </p>
-            <button className="px-6 py-2 bg-neutral-900 text-white rounded-xl hover:bg-neutral-800 transition-colors font-medium">
+            <button className="px-6 py-2 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-xl hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-colors font-medium">
               Upgrade to Pro
             </button>
           </div>

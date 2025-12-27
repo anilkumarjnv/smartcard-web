@@ -8,31 +8,31 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
 }
 
-export function Button({ 
-  variant = 'primary', 
-  size = 'md', 
+export function Button({
+  variant = 'primary',
+  size = 'md',
   fullWidth = false,
-  children, 
+  children,
   className = '',
-  ...props 
+  ...props
 }: ButtonProps) {
   const baseStyles = 'inline-flex items-center justify-center gap-2 rounded-2xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium';
-  
+
   const variants = {
-    primary: 'bg-neutral-900 text-white hover:bg-neutral-800 active:bg-neutral-900 shadow-sm hover:shadow-md',
-    secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200 active:bg-gray-300',
-    ghost: 'text-gray-700 hover:bg-gray-100 active:bg-gray-200',
-    outline: 'border-2 border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50'
+    primary: 'bg-neutral-900 text-white hover:bg-neutral-800 active:bg-neutral-900 shadow-sm hover:shadow-md dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-100',
+    secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200 active:bg-gray-300 dark:bg-neutral-800 dark:text-white dark:hover:bg-neutral-700',
+    ghost: 'text-gray-700 hover:bg-gray-100 active:bg-gray-200 dark:text-neutral-300 dark:hover:bg-neutral-800',
+    outline: 'border-2 border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50 dark:border-neutral-700 dark:text-white dark:hover:border-neutral-600 dark:hover:bg-neutral-800'
   };
-  
+
   const sizes = {
     sm: 'px-4 py-2 text-sm',
     md: 'px-6 py-3',
     lg: 'px-8 py-4 text-lg'
   };
-  
+
   const widthClass = fullWidth ? 'w-full' : '';
-  
+
   return (
     <button
       className={cn(baseStyles, variants[variant], sizes[size], widthClass, className)}

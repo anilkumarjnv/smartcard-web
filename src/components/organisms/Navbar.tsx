@@ -11,9 +11,11 @@ import { useTheme } from 'next-themes';
 interface NavbarProps {
   variant?: 'default' | 'dashboard';
   isLandingPage?: boolean;
+  onLoginClick?: () => void;
+  onSignupClick?: () => void;
 }
 
-export function Navbar({ variant = 'default', isLandingPage = false }: NavbarProps) {
+export function Navbar({ variant = 'default', isLandingPage = false, onLoginClick, onSignupClick }: NavbarProps) {
   const [user, setUser] = useState<User | null>(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const { theme, setTheme } = useTheme();
@@ -92,10 +94,10 @@ export function Navbar({ variant = 'default', isLandingPage = false }: NavbarPro
                       className="fixed inset-0 z-10"
                       onClick={() => setShowUserMenu(false)}
                     />
-                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-neutral-200 py-2 z-20">
+                    <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-neutral-800 rounded-lg shadow-lg border border-neutral-200 dark:border-neutral-700 py-2 z-20">
                       <Link
                         href="/settings"
-                        className="flex items-center gap-3 px-4 py-2 hover:bg-neutral-100 transition-colors text-neutral-900"
+                        className="flex items-center gap-3 px-4 py-2 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors text-neutral-900 dark:text-neutral-200"
                         onClick={() => setShowUserMenu(false)}
                       >
                         <UserIcon className="w-4 h-4" />
@@ -103,7 +105,7 @@ export function Navbar({ variant = 'default', isLandingPage = false }: NavbarPro
                       </Link>
                       <button
                         onClick={handleSignOut}
-                        className="w-full flex items-center gap-3 px-4 py-2 hover:bg-neutral-100 transition-colors text-red-600"
+                        className="w-full flex items-center gap-3 px-4 py-2 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors text-red-600 dark:text-red-400"
                       >
                         <LogOut className="w-4 h-4" />
                         <span className="text-sm font-medium">Sign Out</span>
@@ -178,10 +180,10 @@ export function Navbar({ variant = 'default', isLandingPage = false }: NavbarPro
                     className="fixed inset-0 z-10"
                     onClick={() => setShowUserMenu(false)}
                   />
-                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-20">
+                  <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-gray-200 dark:border-neutral-700 py-2 z-20">
                     <Link
                       href="/mycards"
-                      className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 transition-colors"
+                      className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors text-gray-900 dark:text-neutral-200"
                       onClick={() => setShowUserMenu(false)}
                     >
                       <UserIcon className="w-4 h-4" />
@@ -189,7 +191,7 @@ export function Navbar({ variant = 'default', isLandingPage = false }: NavbarPro
                     </Link>
                     <button
                       onClick={handleSignOut}
-                      className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-100 transition-colors text-red-600"
+                      className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors text-red-600 dark:text-red-400"
                     >
                       <LogOut className="w-4 h-4" />
                       <span className="text-sm">Sign Out</span>
@@ -200,16 +202,35 @@ export function Navbar({ variant = 'default', isLandingPage = false }: NavbarPro
             </div>
           ) : (
             <>
-              <Link href="/login">
-                <button className="px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white transition-colors">
+              {onLoginClick ? (
+                <button
+                  onClick={onLoginClick}
+                  className="px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white transition-colors"
+                >
                   Login
                 </button>
-              </Link>
-              <Link href="/signup">
-                <button className="px-4 py-2 text-sm font-medium bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-colors">
+              ) : (
+                <Link href="/login">
+                  <button className="px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white transition-colors">
+                    Login
+                  </button>
+                </Link>
+              )}
+
+              {onSignupClick ? (
+                <button
+                  onClick={onSignupClick}
+                  className="px-4 py-2 text-sm font-medium bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-colors"
+                >
                   Get Started
                 </button>
-              </Link>
+              ) : (
+                <Link href="/signup">
+                  <button className="px-4 py-2 text-sm font-medium bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-colors">
+                    Get Started
+                  </button>
+                </Link>
+              )}
             </>
           )}
         </div>

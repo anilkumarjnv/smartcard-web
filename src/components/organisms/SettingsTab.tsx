@@ -118,28 +118,28 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
   };
 
   return (
-    <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm">
-      <h3 className="text-2xl font-bold mb-8">Settings</h3>
+    <div className="bg-white dark:bg-card rounded-3xl p-6 md:p-8 shadow-sm">
+      <h3 className="text-2xl font-bold mb-8 text-neutral-900 dark:text-white">Settings</h3>
 
       <div className="space-y-8">
         {saveMessage && (
           <div className={`p-4 rounded-2xl ${saveMessage.includes('✓')
-            ? 'bg-green-50 text-green-700'
-            : 'bg-red-50 text-red-700'
+            ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300'
+            : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300'
             }`}>
             {saveMessage}
           </div>
         )}
 
         <div>
-          <h4 className="text-lg font-semibold mb-4">Profile Information</h4>
+          <h4 className="text-lg font-semibold mb-4 text-neutral-900 dark:text-white">Profile Information</h4>
           <div className="space-y-4">
             <Input
               label="Full Name"
               placeholder="Full Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              icon={<User className="w-5 h-5" />}
+              icon={<User className="w-5 h-5 text-muted-foreground" />}
             />
             <Input
               label="Email Address"
@@ -157,13 +157,13 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
           </div>
         </div>
 
-        <div className="border-t border-gray-200 pt-8">
-          <h4 className="text-lg font-semibold mb-4">Role & Experience</h4>
-          <div className="p-6 bg-gray-50 rounded-2xl">
+        <div className="border-t border-gray-200 dark:border-neutral-800 pt-8">
+          <h4 className="text-lg font-semibold mb-4 text-neutral-900 dark:text-white">Role & Experience</h4>
+          <div className="p-6 bg-gray-50 dark:bg-neutral-800/50 rounded-2xl">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <p className="font-medium">Current Role</p>
-                <p className="text-sm text-gray-600 mt-1">Determines your card layout and fields</p>
+                <p className="font-medium text-neutral-900 dark:text-white">Current Role</p>
+                <p className="text-sm text-gray-600 dark:text-neutral-400 mt-1">Determines your card layout and fields</p>
               </div>
               <span className={`px-4 py-2 rounded-xl text-sm font-medium ${(role || 'professional') === 'student'
                 ? 'bg-neutral-100 text-neutral-700'
@@ -177,37 +177,37 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
               <button
                 onClick={() => handleRoleChange('student')}
                 className={`p-4 rounded-xl border-2 text-left transition-all ${role === 'student'
-                  ? 'border-neutral-900 bg-neutral-50 ring-1 ring-neutral-900'
-                  : 'border-gray-200 hover:border-neutral-200 hover:bg-white'
+                  ? 'border-neutral-900 bg-neutral-50 ring-1 ring-neutral-900 dark:bg-neutral-800 dark:border-neutral-100 dark:ring-neutral-100'
+                  : 'border-gray-200 hover:border-neutral-200 hover:bg-white dark:border-neutral-700 dark:hover:bg-neutral-900 dark:hover:border-neutral-500'
                   }`}
               >
-                <div className="font-semibold mb-1 text-neutral-900">Student</div>
-                <div className="text-xs text-neutral-700">Academic focus, projects, GPA</div>
+                <div className="font-semibold mb-1 text-neutral-900 dark:text-white">Student</div>
+                <div className="text-xs text-neutral-700 dark:text-neutral-300">Academic focus, projects, GPA</div>
               </button>
 
               <button
                 onClick={() => handleRoleChange('professional')}
                 className={`p-4 rounded-xl border-2 text-left transition-all ${role === 'professional'
-                  ? 'border-neutral-900 bg-neutral-50 ring-1 ring-neutral-900'
-                  : 'border-gray-200 hover:border-neutral-200 hover:bg-white'
+                  ? 'border-neutral-900 bg-neutral-50 ring-1 ring-neutral-900 dark:bg-neutral-800 dark:border-neutral-100 dark:ring-neutral-100'
+                  : 'border-gray-200 hover:border-neutral-200 hover:bg-white dark:border-neutral-700 dark:hover:bg-neutral-900 dark:hover:border-neutral-500'
                   }`}
               >
-                <div className="font-semibold mb-1 text-neutral-900">Professional</div>
-                <div className="text-xs text-neutral-700">Career focus, experience, portfolio</div>
+                <div className="font-semibold mb-1 text-neutral-900 dark:text-white">Professional</div>
+                <div className="text-xs text-neutral-700 dark:text-neutral-300">Career focus, experience, portfolio</div>
               </button>
             </div>
           </div>
         </div>
 
-        <div className="border-t border-gray-200 pt-8">
-          <h4 className="text-lg font-semibold mb-4">Subscription</h4>
-          <div className="p-6 bg-gray-50 rounded-2xl">
+        <div className="border-t border-gray-200 dark:border-neutral-800 pt-8">
+          <h4 className="text-lg font-semibold mb-4 text-neutral-900 dark:text-white">Subscription</h4>
+          <div className="p-6 bg-gray-50 dark:bg-neutral-800/50 rounded-2xl">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <p className="font-medium">Free Plan</p>
-                <p className="text-sm text-gray-600 mt-1">Limited features</p>
+                <p className="font-medium text-neutral-900 dark:text-white">Free Plan</p>
+                <p className="text-sm text-gray-600 dark:text-neutral-400 mt-1">Limited features</p>
               </div>
-              <span className="px-4 py-2 bg-gray-200 text-gray-700 rounded-xl text-sm font-medium">Current</span>
+              <span className="px-4 py-2 bg-gray-200 dark:bg-neutral-700 text-gray-700 dark:text-neutral-200 rounded-xl text-sm font-medium">Current</span>
             </div>
             <Button variant="primary" fullWidth>
               <CreditCard className="w-5 h-5 mr-2" />
@@ -216,8 +216,8 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
           </div>
         </div>
 
-        <div className="border-t border-gray-200 pt-8">
-          <h4 className="text-lg font-semibold mb-4">Password</h4>
+        <div className="border-t border-gray-200 dark:border-neutral-800 pt-8">
+          <h4 className="text-lg font-semibold mb-4 text-neutral-900 dark:text-white">Password</h4>
           <Button variant="outline" onClick={() => {
             // This would open a password change modal or redirect to a password change page
             alert('Password change functionality would be implemented here');
@@ -226,20 +226,20 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
           </Button>
         </div>
 
-        <div className="border-t border-gray-200 pt-8">
-          <h4 className="text-lg font-semibold mb-4 text-red-600">Danger Zone</h4>
-          <div className="p-6 bg-red-50 border-2 border-red-200 rounded-2xl">
+        <div className="border-t border-gray-200 dark:border-neutral-800 pt-8">
+          <h4 className="text-lg font-semibold mb-4 text-red-600 dark:text-red-400">Danger Zone</h4>
+          <div className="p-6 bg-red-50 dark:bg-red-900/10 border-2 border-red-200 dark:border-red-900/30 rounded-2xl">
             <div className="flex items-start gap-4">
-              <AlertTriangle className="w-6 h-6 text-red-600 flex-shrink-0 mt-1" />
+              <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400 flex-shrink-0 mt-1" />
               <div className="flex-1">
-                <p className="font-medium mb-2">Delete Account</p>
-                <p className="text-sm text-gray-600 mb-4">
+                <p className="font-medium mb-2 text-neutral-900 dark:text-white">Delete Account</p>
+                <p className="text-sm text-gray-600 dark:text-neutral-400 mb-4">
                   Once you delete your account, there is no going back. All your data will be permanently removed.
                 </p>
                 <Button
                   variant="outline"
                   onClick={() => setShowDeleteModal(true)}
-                  className="border-red-300 text-red-600 hover:bg-red-50"
+                  className="border-red-300 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/20"
                 >
                   Delete Account
                 </Button>
