@@ -19,10 +19,10 @@ export function SummaryCards({ totalViews, uniqueViews }: SummaryCardsProps) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <Card>
                 <CardBody>
-                    <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">
+                    <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
                         Total Views
                     </p>
-                    <p className="mt-2 text-3xl font-bold text-gray-900">
+                    <p className="mt-2 text-3xl font-bold text-foreground">
                         {formatNumber(totalViews)}
                     </p>
                 </CardBody>
@@ -30,10 +30,10 @@ export function SummaryCards({ totalViews, uniqueViews }: SummaryCardsProps) {
 
             <Card>
                 <CardBody>
-                    <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">
+                    <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
                         Unique Visitors
                     </p>
-                    <p className="mt-2 text-3xl font-bold text-gray-900">
+                    <p className="mt-2 text-3xl font-bold text-foreground">
                         {formatNumber(uniqueViews)}
                     </p>
                 </CardBody>
@@ -41,10 +41,10 @@ export function SummaryCards({ totalViews, uniqueViews }: SummaryCardsProps) {
 
             <Card>
                 <CardBody>
-                    <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">
+                    <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
                         Engagement Rate
                     </p>
-                    <p className="mt-2 text-3xl font-bold text-gray-900">
+                    <p className="mt-2 text-3xl font-bold text-foreground">
                         {/* Placeholder calculation */}
                         {totalViews > 0
                             ? `${((uniqueViews / totalViews) * 100).toFixed(1)}%`

@@ -23,7 +23,7 @@ export function Input({ label, error, icon, className = '', ...props }: InputPro
         )}
         <input
           className={cn(
-            'w-full px-4 py-3 rounded-2xl border-2 border-border bg-card text-foreground transition-all duration-200 focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10',
+            'w-full px-4 py-3 rounded-2xl border-1 border-border bg-card text-foreground transition-all duration-200 focus:outline-none focus:border-accent focus:ring-0 focus:ring-accent/10',
             icon && 'pl-12',
             error && 'border-destructive',
             className
@@ -47,7 +47,7 @@ export function Input({ label, error, icon, className = '', ...props }: InputPro
             className={cn(
               'absolute transition-all duration-200 pointer-events-none',
               icon ? 'left-12' : 'left-4',
-              isFocused || hasValue || props.value
+              isFocused || hasValue || props.value || props.placeholder
                 ? '-top-2 text-xs bg-card px-2 text-accent'
                 : 'top-1/2 -translate-y-1/2 text-muted-foreground'
             )}

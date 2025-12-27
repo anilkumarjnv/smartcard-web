@@ -36,10 +36,12 @@ interface ProfileCardProps {
     shape?: 'wave' | 'geometric' | 'soft-arc' | 'layered-waves' | 'slant';
     cardId?: string;
     disableFlip?: boolean;
+    disableInteractions?: boolean;
     onEdit?: () => void;
     onAnalytics?: () => void;
     onDownloadQR?: () => void;
     onDelete?: () => void;
+    onSave?: () => void;
 }
 
 export function ProfileCard({
@@ -48,17 +50,22 @@ export function ProfileCard({
     shape = 'wave',
     cardId,
     disableFlip = false,
+    disableInteractions = false,
     onEdit,
     onAnalytics,
     onDownloadQR,
-    onDelete
+    onDelete,
+    onSave
 }: ProfileCardProps) {
     // ... (keep state and handlers as is)
     const [isFlipped, setIsFlipped] = useState(false);
     const router = useRouter();
 
+    const interactionClass = disableInteractions ? 'pointer-events-none' : '';
+
     // Action handlers - use provided callbacks or default navigation
     const handleEdit = () => {
+        if (disableInteractions) return;
         if (onEdit) {
             onEdit();
         } else if (cardId) {
@@ -67,6 +74,7 @@ export function ProfileCard({
     };
 
     const handleAnalytics = () => {
+        if (disableInteractions) return;
         if (onAnalytics) {
             onAnalytics();
         } else if (cardId) {
@@ -75,6 +83,7 @@ export function ProfileCard({
     };
 
     const handleDownloadQR = () => {
+        if (disableInteractions) return;
         if (onDownloadQR) {
             onDownloadQR();
         } else {
@@ -84,6 +93,7 @@ export function ProfileCard({
     };
 
     const handleDelete = () => {
+        if (disableInteractions) return;
         if (onDelete) {
             onDelete();
         } else {
@@ -92,14 +102,20 @@ export function ProfileCard({
         }
     };
 
+    const runOnSave = () => {
+        if (disableInteractions) return;
+        onSave?.();
+    };
+
     const themeClasses = {
+        // ... (keep themeClasses as is)
         light: {
             bg: 'bg-white',
             text: 'text-neutral-900',
             secondary: 'text-neutral-600',
             accent: 'text-indigo-600',
             border: 'border-neutral-200',
-            hover: 'hover:bg-neutral-50',
+            hover: disableInteractions ? '' : 'hover:bg-neutral-50',
             shapeColor: '#4F46E5',
             highlightBg: 'bg-indigo-50',
             dividerColor: '#FFFFFF',
@@ -111,7 +127,7 @@ export function ProfileCard({
             secondary: 'text-neutral-400',
             accent: 'text-white',
             border: 'border-neutral-700',
-            hover: 'hover:bg-neutral-800',
+            hover: disableInteractions ? '' : 'hover:bg-neutral-800',
             shapeColor: '#FFFFFF',
             highlightBg: 'bg-neutral-800',
             dividerColor: '#171717', // Matching bg-neutral-900
@@ -123,7 +139,7 @@ export function ProfileCard({
             secondary: 'text-neutral-600',
             accent: 'text-violet-600',
             border: 'border-violet-200',
-            hover: 'hover:bg-violet-50',
+            hover: disableInteractions ? '' : 'hover:bg-violet-50',
             shapeColor: '#8B5CF6',
             highlightBg: 'bg-violet-50',
             dividerColor: '#FFFFFF',
@@ -135,7 +151,7 @@ export function ProfileCard({
             secondary: 'text-neutral-600',
             accent: 'text-neutral-900',
             border: 'border-neutral-200',
-            hover: 'hover:bg-neutral-50',
+            hover: disableInteractions ? '' : 'hover:bg-neutral-50',
             shapeColor: '#111111',
             highlightBg: 'bg-neutral-100',
             dividerColor: '#FFFFFF',
@@ -145,8 +161,9 @@ export function ProfileCard({
 
     const currentTheme = themeClasses[theme];
 
-    // Helper to get icon for specific platforms
+    // ... (keep getPlatformIcon and cardContent setup)
     const getPlatformIcon = (label: string) => {
+        // ... (keep implementation)
         const normalizedLabel = label.toLowerCase();
         switch (normalizedLabel) {
             case 'github': return <Github className={`w-5 h-5 ${currentTheme.accent}`} strokeWidth={2} />;
@@ -263,7 +280,7 @@ export function ProfileCard({
                             href={user.cta_button.link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className={`flex items-center justify-center w-full py-3 px-6 rounded-xl font-bold ${currentTheme.buttonTextColor} shadow-md transition-transform active:scale-95`}
+                            className={`flex items-center justify-center w-full py-3 px-6 rounded-xl font-bold ${currentTheme.buttonTextColor} shadow-md transition-transform active:scale-95 ${interactionClass}`}
                             style={{ backgroundColor: currentTheme.shapeColor }}
                         >
                             {user.cta_button.text}
@@ -276,7 +293,7 @@ export function ProfileCard({
                     {user.contact.email && (
                         <a
                             href={`mailto:${user.contact.email}`}
-                            className={`flex items-center gap-3 px-3 py-3 rounded-lg border ${currentTheme.border} ${currentTheme.hover} transition-colors`}
+                            className={`flex items-center gap-3 px-3 py-3 rounded-lg border ${currentTheme.border} ${currentTheme.hover} transition-colors ${interactionClass}`}
                         >
                             <Mail className={`w-5 h-5 ${currentTheme.accent}`} strokeWidth={2} />
                             <span className={`text-sm font-medium ${currentTheme.text}`}>
@@ -288,7 +305,7 @@ export function ProfileCard({
                     {user.contact.phone && (
                         <a
                             href={`tel:${user.contact.phone}`}
-                            className={`flex items-center gap-3 px-3 py-3 rounded-lg border ${currentTheme.border} ${currentTheme.hover} transition-colors`}
+                            className={`flex items-center gap-3 px-3 py-3 rounded-lg border ${currentTheme.border} ${currentTheme.hover} transition-colors ${interactionClass}`}
                         >
                             <Phone className={`w-5 h-5 ${currentTheme.accent}`} strokeWidth={2} />
                             <span className={`text-sm font-medium ${currentTheme.text}`}>
@@ -302,7 +319,7 @@ export function ProfileCard({
                             href={user.contact.linkedin}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className={`flex items-center gap-3 px-3 py-3 rounded-lg border ${currentTheme.border} ${currentTheme.hover} transition-colors`}
+                            className={`flex items-center gap-3 px-3 py-3 rounded-lg border ${currentTheme.border} ${currentTheme.hover} transition-colors ${interactionClass}`}
                         >
                             <Linkedin className={`w-5 h-5 ${currentTheme.accent}`} strokeWidth={2} />
                             <span className={`text-sm font-medium ${currentTheme.text}`}>
@@ -316,7 +333,7 @@ export function ProfileCard({
                             href={user.contact.website}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className={`flex items-center gap-3 px-3 py-3 rounded-lg border ${currentTheme.border} ${currentTheme.hover} transition-colors`}
+                            className={`flex items-center gap-3 px-3 py-3 rounded-lg border ${currentTheme.border} ${currentTheme.hover} transition-colors ${interactionClass}`}
                         >
                             <Globe className={`w-5 h-5 ${currentTheme.accent}`} strokeWidth={2} />
                             <span className={`text-sm font-medium ${currentTheme.text}`}>
@@ -332,7 +349,7 @@ export function ProfileCard({
                             href={link.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className={`flex items-center gap-3 px-3 py-3 rounded-lg border ${currentTheme.border} ${currentTheme.hover} transition-colors`}
+                            className={`flex items-center gap-3 px-3 py-3 rounded-lg border ${currentTheme.border} ${currentTheme.hover} transition-colors ${interactionClass}`}
                         >
                             {getPlatformIcon(link.label)}
                             <span className={`text-sm font-medium ${currentTheme.text}`}>
@@ -345,7 +362,8 @@ export function ProfileCard({
                 {/* Action Buttons */}
                 <div className={`flex gap-3 pt-4 border-t ${currentTheme.border}`}>
                     <button
-                        className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border ${currentTheme.border} ${currentTheme.hover} transition-colors`}
+                        onClick={runOnSave}
+                        className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border ${currentTheme.border} ${currentTheme.hover} transition-colors ${interactionClass}`}
                     >
                         <Download className={`w-4 h-4 ${currentTheme.accent}`} strokeWidth={2} />
                         <span className={`text-sm font-medium ${currentTheme.text}`}>
@@ -353,7 +371,7 @@ export function ProfileCard({
                         </span>
                     </button>
                     <button
-                        className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border ${currentTheme.border} ${currentTheme.hover} transition-colors`}
+                        className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border ${currentTheme.border} ${currentTheme.hover} transition-colors ${interactionClass}`}
                     >
                         <Share2 className={`w-4 h-4 ${currentTheme.accent}`} strokeWidth={2} />
                         <span className={`text-sm font-medium ${currentTheme.text}`}>

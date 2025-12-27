@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/molecules/Button';
-import { createClient } from '@/lib/supabaseClient';
-import { User } from '@supabase/supabase-js';
+import { apiClient } from '@/lib/apiClient';
+import { signOut } from '@/lib/auth';
 import { LogOut, User as UserIcon, Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
@@ -16,7 +16,7 @@ interface NavbarProps {
 }
 
 export function Navbar({ variant = 'default', isLandingPage = false, onLoginClick, onSignupClick }: NavbarProps) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<any>(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -26,26 +26,25 @@ export function Navbar({ variant = 'default', isLandingPage = false, onLoginClic
   }, []);
 
   useEffect(() => {
-    const supabase = createClient();
-
-    // Get initial user
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user);
-    });
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => {
-      subscription.unsubscribe();
+    const loadUser = async () => {
+      try {
+        const userData = await apiClient.get<any>('/api/v1/auth/me');
+        setUser(userData);
+      } catch (err) {
+        // User not logged in or error
+        console.error('Failed to load user in Navbar', err);
+      }
     };
+    loadUser();
   }, []);
 
   const handleSignOut = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
+    try {
+      await signOut(); // Clear local session
+      await apiClient.post('/api/v1/auth/logout', {}); // Notify backend
+    } catch (err) {
+      console.error('Logout error', err);
+    }
     window.location.href = '/';
   };
 
@@ -69,20 +68,20 @@ export function Navbar({ variant = 'default', isLandingPage = false, onLoginClic
                 >
                   <div className="flex flex-col items-end">
                     <span className="text-sm font-medium text-foreground">
-                      {user.user_metadata?.full_name || user.email?.split('@')[0]}
+                      {user.full_name || user.name || user.email?.split('@')[0]}
                     </span>
                     <span className="text-xs text-muted-foreground">{user.email}</span>
                   </div>
                   <div className="w-9 h-9 bg-neutral-900 rounded-full flex items-center justify-center text-white overflow-hidden">
-                    {user.user_metadata?.avatar_url || user.user_metadata?.picture ? (
+                    {user.avatar_url || user.picture ? (
                       <img
-                        src={user.user_metadata?.avatar_url || user.user_metadata?.picture}
-                        alt={user.user_metadata?.full_name || user.email?.split('@')[0] || 'User'}
+                        src={user.avatar_url || user.picture}
+                        alt={user.full_name || user.name || user.email?.split('@')[0] || 'User'}
                         className="w-full h-full object-cover"
                       />
                     ) : (
                       <span className="text-sm font-medium">
-                        {(user.user_metadata?.full_name || user.email?.split('@')[0] || 'U').substring(0, 2).toUpperCase()}
+                        {(user.full_name || user.name || user.email?.split('@')[0] || 'U').substring(0, 2).toUpperCase()}
                       </span>
                     )}
                   </div>
@@ -155,20 +154,20 @@ export function Navbar({ variant = 'default', isLandingPage = false, onLoginClic
               >
                 <div className="flex flex-col items-end">
                   <span className="text-sm font-medium text-foreground dark:text-white">
-                    {user.user_metadata?.full_name || user.email?.split('@')[0]}
+                    {user.full_name || user.name || user.email?.split('@')[0]}
                   </span>
                   <span className="text-xs text-muted-foreground dark:text-neutral-400">{user.email}</span>
                 </div>
                 <div className="w-9 h-9 bg-neutral-900 dark:bg-neutral-100 rounded-full flex items-center justify-center text-white dark:text-neutral-900 overflow-hidden">
-                  {user.user_metadata?.avatar_url || user.user_metadata?.picture ? (
+                  {user.avatar_url || user.picture ? (
                     <img
-                      src={user.user_metadata?.avatar_url || user.user_metadata?.picture}
-                      alt={user.user_metadata?.full_name || user.email?.split('@')[0] || 'User'}
+                      src={user.avatar_url || user.picture}
+                      alt={user.full_name || user.name || user.email?.split('@')[0] || 'User'}
                       className="w-full h-full object-cover"
                     />
                   ) : (
                     <span className="text-sm font-medium">
-                      {(user.user_metadata?.full_name || user.email?.split('@')[0] || 'U').substring(0, 2).toUpperCase()}
+                      {(user.full_name || user.name || user.email?.split('@')[0] || 'U').substring(0, 2).toUpperCase()}
                     </span>
                   )}
                 </div>

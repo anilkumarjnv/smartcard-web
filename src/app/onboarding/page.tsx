@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabaseClient';
+import { apiClient } from '@/lib/apiClient';
 import { getAvailableRoles, UserRole } from '@/lib/roles';
 import { Button } from '@/components/molecules/Button';
 import { Check, GraduationCap, Briefcase } from 'lucide-react';
@@ -22,21 +22,7 @@ export default function OnboardingPage() {
 
         setLoading(true);
         try {
-            const supabase = createClient();
-            const { data: { user } } = await supabase.auth.getUser();
-
-            if (!user) throw new Error('No user found');
-
-            // Call the RPC function to update role in both profiles and auth.users
-            const { error } = await supabase.rpc('update_user_role', {
-                user_id: user.id,
-                new_role: selectedRole
-            });
-
-            if (error) throw error;
-
-            // Force refresh session to get new metadata
-            await supabase.auth.refreshSession();
+            await apiClient.patch('/api/v1/auth/me/role', { role: selectedRole });
 
             router.push('/mycards');
         } catch (error) {
@@ -65,8 +51,8 @@ export default function OnboardingPage() {
                             key={role.id}
                             onClick={() => handleRoleSelect(role.id)}
                             className={`relative p-6 rounded-2xl border-2 cursor-pointer transition-all hover:border-primary/50 hover:bg-accent/50 ${selectedRole === role.id
-                                    ? 'border-primary bg-primary/5 ring-2 ring-primary/20'
-                                    : 'border-border bg-card'
+                                ? 'border-primary bg-primary/5 ring-2 ring-primary/20'
+                                : 'border-border bg-card'
                                 }`}
                         >
                             {selectedRole === role.id && (

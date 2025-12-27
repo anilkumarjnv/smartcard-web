@@ -225,7 +225,7 @@ export default function Home() {
             </motion.div>
 
             {/* Mockup - Card Carousel */}
-            <div className="relative mx-auto w-full max-w-[420px] h-[900px] perspective-1000 scale-90 sm:scale-100 origin-top lg:origin-center">
+            <div className="relative mx-auto w-full max-w-[420px] h-[900px] perspective-1000 scale-50 sm:scale-100 origin-top lg:origin-center">
               <AnimatePresence mode="popLayout">
                 <motion.div
                   key={SAMPLE_CARDS[currentCardIndex].id}
@@ -243,6 +243,7 @@ export default function Home() {
                     }}
                     isPublicView={true}
                     disableFlip={true}
+                    disableInteractions={true}
                   />
                 </motion.div>
               </AnimatePresence>

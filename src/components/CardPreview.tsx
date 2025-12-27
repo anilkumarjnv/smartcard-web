@@ -9,6 +9,8 @@ interface CardPreviewProps {
     theme?: Record<string, unknown>;
     isPublicView?: boolean;
     disableFlip?: boolean;
+    disableInteractions?: boolean;
+    onSave?: () => void;
 }
 
 export interface ProfileCardTheme {
@@ -44,7 +46,7 @@ export const PROFILE_THEMES: ProfileCardTheme[] = [
  * New CardPreview using the professional ProfileCard design
  * with background image and shape theming
  */
-export function CardPreview({ card, theme, isPublicView = false, disableFlip = false }: CardPreviewProps) {
+export function CardPreview({ card, theme, isPublicView = false, disableFlip = false, disableInteractions = false, onSave }: CardPreviewProps) {
     // Determine theme from card data
     const selectedTheme = (theme?.profileTheme as 'light' | 'dark' | 'accent' | 'neutral') || 'light';
 
@@ -88,6 +90,8 @@ export function CardPreview({ card, theme, isPublicView = false, disableFlip = f
             shape={selectedShape}
             cardId={card.id}
             disableFlip={disableFlip}
+            disableInteractions={disableInteractions}
+            onSave={onSave}
         />
         // </div>
     );

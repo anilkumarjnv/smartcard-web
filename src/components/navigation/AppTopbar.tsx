@@ -2,8 +2,7 @@
 
 import { Bell, Search, Moon, Sun } from "lucide-react"
 import { useEffect, useState } from "react"
-import { createClient } from "@/lib/supabaseClient"
-import { User } from "@supabase/supabase-js"
+import { apiClient } from "@/lib/apiClient"
 import { useTheme } from "next-themes"
 
 interface AppTopbarProps {
@@ -12,36 +11,37 @@ interface AppTopbarProps {
 }
 
 export function AppTopbar({ title, subtitle }: AppTopbarProps) {
-    const [user, setUser] = useState<User | null>(null)
+    const [user, setUser] = useState<any>(null)
     const { theme, setTheme } = useTheme()
     const [mounted, setMounted] = useState(false)
+    const [imgError, setImgError] = useState(false)
+
+    useEffect(() => {
+        setImgError(false)
+    }, [user])
 
     useEffect(() => {
         setMounted(true)
     }, [])
 
     useEffect(() => {
-        const supabase = createClient()
-
-        // Get initial user
-        supabase.auth.getUser().then(({ data: { user } }) => {
-            setUser(user)
-        })
-
-        // Listen for auth changes
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            setUser(session?.user ?? null)
-        })
-
-        return () => {
-            subscription.unsubscribe()
-        }
+        const loadUser = async () => {
+            try {
+                const userData = await apiClient.get<any>('/api/v1/auth/me');
+                setUser(userData);
+            } catch (err) {
+                console.error("Failed to load user profile", err);
+            }
+        };
+        loadUser();
     }, [])
 
-    const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'
+    // Backend returns flattened metadata: { id, email, full_name, avatar_url, ... }
+    // Fallback to defaults if missing
+    const userName = user?.full_name || user?.name || user?.email?.split('@')[0] || 'User'
     const userEmail = user?.email || ''
     const userInitials = userName.substring(0, 2).toUpperCase()
-    const userAvatar = user?.user_metadata?.avatar_url || user?.user_metadata?.picture
+    const userAvatar = user?.avatar_url || user?.picture
 
     return (
         <header className="h-16 border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-30 flex items-center justify-between px-6">
@@ -89,11 +89,12 @@ export function AppTopbar({ title, subtitle }: AppTopbarProps) {
                         <p className="text-xs text-muted-foreground">{userEmail}</p>
                     </div>
                     <div className="w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold overflow-hidden">
-                        {userAvatar ? (
+                        {userAvatar && !imgError ? (
                             <img
                                 src={userAvatar}
                                 alt={userName}
                                 className="w-full h-full object-cover"
+                                onError={() => setImgError(true)}
                             />
                         ) : (
                             userInitials

@@ -9,7 +9,7 @@
 import React from 'react';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-    variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
+    variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'outline';
     size?: 'sm' | 'md' | 'lg';
     isLoading?: boolean;
     children: React.ReactNode;
@@ -20,6 +20,7 @@ const variantStyles = {
     secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80 focus:ring-ring',
     ghost: 'bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground focus:ring-ring',
     danger: 'bg-destructive text-destructive-foreground hover:bg-destructive/90 focus:ring-destructive',
+    outline: 'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
 };
 
 const sizeStyles = {

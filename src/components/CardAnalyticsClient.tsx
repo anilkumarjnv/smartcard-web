@@ -4,13 +4,14 @@ import React, { useEffect, useState, useCallback } from "react";
 import TimelineChart from "./TimelineChart";
 import RecentViews from "./RecentViews";
 import { SummaryCards } from "@/components/analytics/SummaryCards";
+import { Card, CardBody } from "@/components/ui/Card";
 
 type Analytics = {
   total_views: number;
   unique_views: number;
   daily: { day: string; count: number }[];
   referrers: { referrer: string | null; count: number }[];
-  recent: Array<{ id: string; referrer: string | null; viewed_at: string; user_agent: string }>;
+  recent: Array<{ id: string; referrer: string | null; viewed_at: string; user_agent: string; city?: string | null; country?: string | null }>;
 };
 
 export default function CardAnalyticsClient({ cardId }: { cardId: string }) {
@@ -43,37 +44,46 @@ export default function CardAnalyticsClient({ cardId }: { cardId: string }) {
     return () => clearInterval(id);
   }, [load]);
 
-  if (loading) return <div className="p-4">Loading analytics...</div>;
-  if (err) return <div className="p-4 text-red-500">Error loading analytics: {err}</div>;
-  if (!data) return <div className="p-4">No analytics</div>;
+  if (loading) return <div className="p-4 text-muted-foreground">Loading analytics...</div>;
+  if (err) return <div className="p-4 text-destructive">Error loading analytics: {err}</div>;
+  if (!data) return <div className="p-4 text-muted-foreground">No analytics</div>;
 
   return (
-    <div className="space-y-6 p-4">
+    <div className="space-y-6">
       <SummaryCards totalViews={data.total_views} uniqueViews={data.unique_views} />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2">
-          <div className="bg-white shadow rounded p-4">
-            <h3 className="text-sm font-semibold mb-2">Daily views</h3>
-            <TimelineChart daily={data.daily} />
-          </div>
+          <Card>
+            <CardBody>
+              <h3 className="text-sm font-semibold mb-4 text-foreground">Daily views</h3>
+              <TimelineChart daily={data.daily} />
+            </CardBody>
+          </Card>
         </div>
-        <div>
-          <div className="bg-white shadow rounded p-4 mb-4">
-            <h3 className="text-sm font-semibold mb-2">Top referrers</h3>
-            <ul className="space-y-2">
-              {data.referrers.map((r) => (
-                <li key={String(r.referrer) + r.count} className="flex justify-between text-sm">
-                  <span className="truncate">{r.referrer || "direct"}</span>
-                  <span className="font-medium">{r.count}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+        <div className="space-y-6">
+          <Card>
+            <CardBody>
+              <h3 className="text-sm font-semibold mb-4 text-foreground">Top referrers</h3>
+              <ul className="space-y-2">
+                {data.referrers.length === 0 && (
+                  <li className="text-sm text-muted-foreground">No referrers yet</li>
+                )}
+                {data.referrers.map((r) => (
+                  <li key={String(r.referrer) + r.count} className="flex justify-between text-sm">
+                    <span className="truncate text-foreground">{r.referrer || "Direct"}</span>
+                    <span className="font-medium text-foreground">{r.count}</span>
+                  </li>
+                ))}
+              </ul>
+            </CardBody>
+          </Card>
 
-          <div className="bg-white shadow rounded p-4">
-            <h3 className="text-sm font-semibold mb-2">Recent views</h3>
-            <RecentViews rows={data.recent.slice(0, 8)} />
-          </div>
+          <Card>
+            <CardBody>
+              <h3 className="text-sm font-semibold mb-4 text-foreground">Recent views</h3>
+              <RecentViews rows={data.recent.slice(0, 8)} />
+            </CardBody>
+          </Card>
         </div>
       </div>
     </div>
