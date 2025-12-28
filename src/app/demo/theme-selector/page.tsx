@@ -6,7 +6,7 @@ import { ThemeSelector } from '@/components/profile/ThemeSelector';
 import { ProfileCard } from '@/components/profile/ProfileCard';
 
 export default function ThemeSelectorDemo() {
-    const [selectedTheme, setSelectedTheme] = useState<'light' | 'dark' | 'accent'>('light');
+    const [selectedTheme, setSelectedTheme] = useState<'light' | 'dark' | 'accent' | 'neutral'>('light');
 
     // Example user data
     const exampleUser = {

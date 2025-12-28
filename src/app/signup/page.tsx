@@ -1,12 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { OAuthButton } from '@/components/auth/OAuthButton';
 
-export default function SignupPage() {
+function SignupContent() {
     const searchParams = useSearchParams();
     const error = searchParams?.get('error');
 
@@ -84,5 +84,17 @@ export default function SignupPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function SignupPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 flex items-center justify-center">
+                <div className="text-muted-foreground">Loading...</div>
+            </div>
+        }>
+            <SignupContent />
+        </Suspense>
     );
 }

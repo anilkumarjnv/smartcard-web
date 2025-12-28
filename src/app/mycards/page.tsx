@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ProfileCardsGrid } from '@/components/cards/ProfileCardsGrid';
@@ -16,7 +16,7 @@ import type { Card as CardType } from '@/lib/api/types';
 
 const fetcher = (url: string) => apiClient.get<any>(url);
 
-export default function MyCardsPage() {
+function MyCardsContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const tabParam = searchParams?.get('tab');
@@ -251,5 +251,17 @@ export default function MyCardsPage() {
         <div className="p-3 sm:p-4 md:p-6">
             <ProfileCardsGrid cards={cards || []} />
         </div>
+    );
+}
+
+export default function MyCardsPage() {
+    return (
+        <Suspense fallback={
+            <div className="p-6 flex justify-center py-20">
+                <Spinner size="lg" />
+            </div>
+        }>
+            <MyCardsContent />
+        </Suspense>
     );
 }
