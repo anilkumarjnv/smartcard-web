@@ -100,22 +100,22 @@ export default function MyCardsPage() {
         return (
             <div>
                 <div className="border-b border-border bg-card/50">
-                    <div className="px-6 py-4">
+                    <div className="px-3 sm:px-6 py-3 sm:py-4">
                         <Link href="/mycards">
                             <Button variant="ghost" size="sm">
-                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-4 h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                                 </svg>
-                                Back to My Cards
+                                <span className="hidden xs:inline">Back to </span>My Cards
                             </Button>
                         </Link>
                     </div>
                     {/* Tab Navigation */}
-                    <div className="px-6 pb-4">
-                        <div className="bg-muted/50 rounded-2xl p-2 inline-flex gap-2">
+                    <div className="px-3 sm:px-6 pb-3 sm:pb-4 overflow-x-auto no-scrollbar">
+                        <div className="bg-muted/50 rounded-2xl p-1.5 sm:p-2 inline-flex gap-1 sm:gap-2 min-w-full sm:min-w-0">
                             <button
                                 onClick={() => router.push(`/mycards?tab=card${cardIdParam ? `&cardId=${cardIdParam}` : modeParam ? `&mode=${modeParam}` : ''}`)}
-                                className={`px-6 py-2.5 rounded-xl font-medium transition-all ${activeTab === 'card'
+                                className={`px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-xl font-medium text-sm sm:text-base transition-all whitespace-nowrap ${activeTab === 'card'
                                     ? 'bg-primary text-primary-foreground shadow-sm'
                                     : 'text-muted-foreground hover:text-foreground'
                                     }`}
@@ -124,7 +124,7 @@ export default function MyCardsPage() {
                             </button>
                             <button
                                 onClick={() => router.push(`/mycards?tab=theme${cardIdParam ? `&cardId=${cardIdParam}` : modeParam ? `&mode=${modeParam}` : ''}`)}
-                                className={`px-6 py-2.5 rounded-xl font-medium transition-all ${activeTab === 'theme'
+                                className={`px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-xl font-medium text-sm sm:text-base transition-all whitespace-nowrap ${activeTab === 'theme'
                                     ? 'bg-primary text-primary-foreground shadow-sm'
                                     : 'text-muted-foreground hover:text-foreground'
                                     }`}
@@ -133,7 +133,7 @@ export default function MyCardsPage() {
                             </button>
                             <button
                                 onClick={() => router.push(`/mycards?tab=share${cardIdParam ? `&cardId=${cardIdParam}` : modeParam ? `&mode=${modeParam}` : ''}`)}
-                                className={`px-6 py-2.5 rounded-xl font-medium transition-all ${activeTab === 'share'
+                                className={`px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-xl font-medium text-sm sm:text-base transition-all whitespace-nowrap ${activeTab === 'share'
                                     ? 'bg-primary text-primary-foreground shadow-sm'
                                     : 'text-muted-foreground hover:text-foreground'
                                     }`}
@@ -144,9 +144,9 @@ export default function MyCardsPage() {
                     </div>
                 </div>
 
-                <div className="grid lg:grid-cols-2 gap-8 p-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 p-3 sm:p-4 md:p-6">
                     {/* Editor Section */}
-                    <div>
+                    <div className="w-full">
                         {activeTab === 'card' && (
                             <CardEditorTab
                                 cardId={cardIdParam || undefined}
@@ -184,9 +184,9 @@ export default function MyCardsPage() {
 
                     {/* Live Preview Section */}
                     <div className="hidden lg:block sticky top-24 h-fit">
-                        <div className="bg-card rounded-3xl p-8 shadow-sm border border-border">
-                            <div className="flex items-center justify-between mb-6">
-                                <h4 className="text-lg font-semibold">Live Preview</h4>
+                        <div className="bg-card rounded-2xl lg:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-sm border border-border">
+                            <div className="flex items-center justify-between mb-4 sm:mb-6">
+                                <h4 className="text-base sm:text-lg font-semibold">Live Preview</h4>
                                 {cardData && (
                                     <Link
                                         href={`/${cardData.slug}`}
@@ -239,8 +239,8 @@ export default function MyCardsPage() {
     // Show card listing with ProfileCard themes
     if (isLoading) {
         return (
-            <div className="p-6">
-                <div className="flex justify-center py-20">
+            <div className="p-3 sm:p-4 md:p-6">
+                <div className="flex justify-center py-12 sm:py-16 md:py-20">
                     <Spinner size="lg" />
                 </div>
             </div>
@@ -248,7 +248,7 @@ export default function MyCardsPage() {
     }
 
     return (
-        <div className="p-6">
+        <div className="p-3 sm:p-4 md:p-6">
             <ProfileCardsGrid cards={cards || []} />
         </div>
     );

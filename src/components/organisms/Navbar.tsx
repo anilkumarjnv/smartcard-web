@@ -127,7 +127,7 @@ export function Navbar({ variant = 'default', isLandingPage = false, onLoginClic
           <div className="w-9 h-9 bg-neutral-900 dark:bg-white rounded-lg flex items-center justify-center">
             <span className="text-white dark:text-neutral-900 text-lg font-bold">S</span>
           </div>
-          <span className="text-lg font-semibold text-neutral-900 dark:text-white tracking-tight">SmartShare</span>
+          <span className="text-lg font-semibold text-neutral-900 dark:text-white tracking-tight hidden sm:inline-block">SmartShare</span>
         </Link>
 
         <div className="flex items-center gap-3">

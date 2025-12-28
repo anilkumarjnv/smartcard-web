@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Plus, Crown, Trash2, Share2, Copy, Check, Mail, X, Linkedin, Twitter, Facebook } from 'lucide-react';
+import { Plus, Crown, Trash2, Share2, Copy, Check, Mail, X, Linkedin, Twitter, Facebook, RefreshCw } from 'lucide-react';
 import { ProfileCard } from '@/components/profile/ProfileCard';
 import type { Card as CardType } from '@/lib/api/types';
 import { apiClient } from '@/lib/apiClient';
@@ -18,6 +18,7 @@ export function ProfileCardsGrid({ cards }: ProfileCardsGridProps) {
     const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
     const [shareCardId, setShareCardId] = useState<string | null>(null);
     const [copiedId, setCopiedId] = useState<string | null>(null);
+    const [flippedCards, setFlippedCards] = useState<Record<string, boolean>>({});
 
     const getShareUrl = (slug: string) => {
         if (typeof window === 'undefined') return '';
@@ -27,6 +28,13 @@ export function ProfileCardsGrid({ cards }: ProfileCardsGridProps) {
     const getShareText = (card: CardType) => {
         const url = getShareUrl(card.slug);
         return `Hey! Check out my digital business card.\n\n${card.name}\n${card.title} @ ${card.company || 'Freelance'}\n\n${url}`;
+    };
+
+    const toggleFlip = (cardId: string) => {
+        setFlippedCards(prev => ({
+            ...prev,
+            [cardId]: !prev[cardId]
+        }));
     };
 
     const handleCopyLink = async (card: CardType) => {
@@ -92,14 +100,14 @@ export function ProfileCardsGrid({ cards }: ProfileCardsGridProps) {
             {/* Compact Pro Banner */}
             {showProBanner && (
                 <div className="bg-gradient-to-r from-neutral-900 to-neutral-800 dark:from-neutral-800 dark:to-neutral-700 rounded-xl p-4 shadow-sm">
-                    <div className="flex items-center justify-between gap-4">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                         <div className="flex items-center gap-3 flex-1">
                             <Crown className="w-5 h-5 text-yellow-400 flex-shrink-0" />
                             <span className="text-sm text-white">
                                 Upgrade to Pro for unlimited cards, custom domains, and analytics
                             </span>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 w-full sm:w-auto mt-2 sm:mt-0 justify-end">
                             <button
                                 className="px-4 py-2 bg-white text-neutral-900 rounded-lg text-sm font-semibold hover:bg-neutral-100 transition-colors"
                             >
@@ -150,7 +158,8 @@ export function ProfileCardsGrid({ cards }: ProfileCardsGridProps) {
                             >
                                 {/* 3D Flip Card Container */}
                                 <div
-                                    className="relative w-full transition-transform duration-700 preserve-3d group-hover:rotate-y-180"
+                                    className={`relative w-full transition-transform duration-700 preserve-3d ${flippedCards[card.id] ? 'rotate-y-180' : 'lg:group-hover:rotate-y-180'
+                                        }`}
                                     style={{
                                         transformStyle: 'preserve-3d',
                                     }}
@@ -163,7 +172,17 @@ export function ProfileCardsGrid({ cards }: ProfileCardsGridProps) {
                                             WebkitBackfaceVisibility: 'hidden',
                                         }}
                                     >
-                                        <div className="transform scale-90 origin-top">
+                                        <div className="transform scale-90 origin-top relative">
+                                            {/* Flip Button - Mobile & Tablet */}
+                                            <button
+                                                onClick={() => toggleFlip(card.id)}
+                                                className="absolute top-4 right-4 z-30 lg:hidden w-10 h-10 rounded-full bg-white/90 dark:bg-black/50 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-white dark:hover:bg-black/70 transition-all"
+                                                aria-label="Flip card"
+                                            >
+                                                <RefreshCw className={`w-5 h-5 text-neutral-900 dark:text-white transition-transform duration-300 ${flippedCards[card.id] ? 'rotate-180' : ''
+                                                    }`} />
+                                            </button>
+
                                             <ProfileCard
                                                 user={userProfile}
                                                 theme={theme}
@@ -183,7 +202,17 @@ export function ProfileCardsGrid({ cards }: ProfileCardsGridProps) {
                                             transform: 'rotateY(180deg)',
                                         }}
                                     >
-                                        <div className="transform scale-90 origin-top h-full">
+                                        <div className="transform scale-90 origin-top h-full relative">
+                                            {/* Flip Button - Mobile & Tablet (Back face) */}
+                                            <button
+                                                onClick={() => toggleFlip(card.id)}
+                                                className="absolute top-4 right-4 z-30 lg:hidden w-10 h-10 rounded-full bg-white/90 dark:bg-black/50 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-white dark:hover:bg-black/70 transition-all"
+                                                aria-label="Flip card back"
+                                            >
+                                                <RefreshCw className={`w-5 h-5 text-neutral-900 dark:text-white transition-transform duration-300 ${flippedCards[card.id] ? 'rotate-180' : ''
+                                                    }`} />
+                                            </button>
+
                                             <div className="bg-gradient-to-br from-neutral-900 to-neutral-800 dark:from-neutral-100 dark:to-neutral-200 rounded-2xl shadow-lg h-full flex flex-col items-center justify-center p-8 space-y-4">
                                                 {/* In-Card Delete Confirmation */}
                                                 {confirmDeleteId === card.id ? (

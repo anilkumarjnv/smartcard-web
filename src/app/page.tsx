@@ -186,38 +186,38 @@ export default function Home() {
       />
 
       {/* 1. Hero Section - "Quiet Confidence" */}
-      <section className="pt-32 pb-24 px-6 overflow-hidden">
+      <section className="pt-24 pb-12 md:pt-32 md:pb-24 px-4 md:px-6 overflow-hidden">
         <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             {/* Text Content */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="max-w-2xl"
+              className="max-w-2xl mx-auto lg:mx-0 text-center lg:text-left"
             >
               {/* Tagline */}
-              <span className="tagline mb-6 block dark:text-neutral-400">PROFESSIONAL IDENTITY</span>
+              <span className="tagline mb-4 md:mb-6 block dark:text-neutral-400 text-sm md:text-base">PROFESSIONAL IDENTITY</span>
 
               {/* Headline */}
-              <h1 className="mb-6 text-neutral-900 dark:text-white text-5xl md:text-6xl font-bold tracking-tight">
+              <h1 className="mb-4 md:mb-6 text-neutral-900 dark:text-white text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-tight">
                 Your professional identity, in one link.
               </h1>
 
               {/* Subtext */}
-              <p className="text-xl text-secondary dark:text-neutral-400 mb-8 leading-relaxed">
+              <p className="text-lg md:text-xl text-secondary dark:text-neutral-400 mb-6 md:mb-8 leading-relaxed">
                 Replace Scattered PDFs and links with a single, permanent profile. Your work, contact details, and portfolio links in one place.
               </p>
 
               {/* CTAs */}
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <button
                   onClick={openSignup}
-                  className="btn-primary dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-100"
+                  className="btn-primary dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-100 w-full sm:w-auto"
                 >
                   Create your profile
                 </button>
-                <Link href="#" className="text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white font-medium flex items-center gap-2 transition-colors">
+                <Link href="#" className="text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white font-medium flex items-center justify-center gap-2 transition-colors w-full sm:w-auto py-2">
                   View example
                   <ArrowRight className="w-4 h-4" strokeWidth={2} />
                 </Link>
@@ -225,65 +225,68 @@ export default function Home() {
             </motion.div>
 
             {/* Mockup - Card Carousel */}
-            <div className="relative mx-auto w-full max-w-[420px] h-[900px] perspective-1000 scale-50 sm:scale-100 origin-top lg:origin-center">
-              <AnimatePresence mode="popLayout">
-                <motion.div
-                  key={SAMPLE_CARDS[currentCardIndex].id}
-                  initial={{ opacity: 0, x: 50, scale: 0.9 }}
-                  animate={{ opacity: 1, x: 0, scale: 1 }}
-                  exit={{ opacity: 0, x: -50, scale: 0.9 }}
-                  transition={{ duration: 0.5, ease: "easeInOut" }}
-                  className="absolute w-full shadow-2xl rounded-3xl"
-                >
-                  <CardPreview
-                    card={SAMPLE_CARDS[currentCardIndex] as any}
-                    theme={{
-                      ...SAMPLE_CARDS[currentCardIndex].theme,
-                      profileTheme: SAMPLE_CARDS[currentCardIndex].theme.name
-                    }}
-                    isPublicView={true}
-                    disableFlip={true}
-                    disableInteractions={true}
-                  />
-                </motion.div>
-              </AnimatePresence>
+            <div className="relative mx-auto w-full max-w-[420px] sm:max-w-[420px] h-[550px] sm:h-[800px] lg:h-[900px] perspective-1000">
+              <div className="scale-[0.9] sm:scale-90 lg:scale-100 origin-top lg:origin-center h-full w-full flex justify-center">
+                <AnimatePresence mode="popLayout">
+                  <motion.div
+                    key={SAMPLE_CARDS[currentCardIndex].id}
+                    initial={{ opacity: 0, x: 50, scale: 0.9 }}
+                    animate={{ opacity: 1, x: 0, scale: 1 }}
+                    exit={{ opacity: 0, x: -50, scale: 0.9 }}
+                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                    className="absolute w-full shadow-2xl rounded-3xl"
+                    style={{ maxWidth: '400px' }}
+                  >
+                    <CardPreview
+                      card={SAMPLE_CARDS[currentCardIndex] as any}
+                      theme={{
+                        ...SAMPLE_CARDS[currentCardIndex].theme,
+                        profileTheme: SAMPLE_CARDS[currentCardIndex].theme.name
+                      }}
+                      isPublicView={true}
+                      disableFlip={true}
+                      disableInteractions={true}
+                    />
+                  </motion.div>
+                </AnimatePresence>
 
-              {/* Decorative Elements around the card */}
-              <div className="absolute -z-10 top-10 -right-10 w-full h-full bg-gradient-to-br from-indigo-500/20 to-purple-500/20 blur-3xl rounded-full opacity-50 dark:opacity-30" />
-              <div className="absolute -z-10 -bottom-10 -left-10 w-3/4 h-3/4 bg-blue-500/20 blur-3xl rounded-full opacity-50 dark:opacity-30" />
+                {/* Decorative Elements around the card */}
+                <div className="absolute -z-10 top-10 -right-10 w-full h-full bg-gradient-to-br from-indigo-500/20 to-purple-500/20 blur-3xl rounded-full opacity-50 dark:opacity-30" />
+                <div className="absolute -z-10 -bottom-10 -left-10 w-3/4 h-3/4 bg-blue-500/20 blur-3xl rounded-full opacity-50 dark:opacity-30" />
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* 2. Before & After Section */}
-      <section className="py-24 px-6">
+      <section className="py-16 md:py-24 px-4 md:px-6">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-16"
+            className="text-center mb-12 md:mb-16"
           >
-            <h2 className="mb-4 text-neutral-900 dark:text-white">From scattered links to one profile</h2>
+            <h2 className="mb-4 text-2xl md:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white">From scattered links to one profile</h2>
           </motion.div>
           <BeforeAfter />
         </div>
       </section>
 
       {/* 3. Features Grid - "Premium Tool" Vibe */}
-      <section className="py-24 px-6 bg-neutral-50 dark:bg-neutral-900/50">
+      <section className="py-16 md:py-24 px-4 md:px-6 bg-neutral-50 dark:bg-neutral-900/50">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-16"
+            className="text-center mb-12 md:mb-16"
           >
-            <h2 className="mb-4 text-neutral-900 dark:text-white">Designed for professional visibility</h2>
-            <p className="text-xl text-secondary dark:text-neutral-400 max-w-2xl mx-auto">
+            <h2 className="mb-4 text-2xl md:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white">Designed for professional visibility</h2>
+            <p className="text-lg md:text-xl text-secondary dark:text-neutral-400 max-w-2xl mx-auto">
               Everything required to represent yourself clearly and professionally.
             </p>
           </motion.div>
@@ -292,46 +295,46 @@ export default function Home() {
       </section>
 
       {/* 4. Segmentation - Use Cases */}
-      <section className="py-24 px-6">
+      <section className="py-16 md:py-24 px-4 md:px-6">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-16"
+            className="text-center mb-12 md:mb-16"
           >
-            <h2 className="mb-4 text-neutral-900 dark:text-white">Built for the serious.</h2>
+            <h2 className="mb-4 text-2xl md:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white">Built for the serious.</h2>
           </motion.div>
           <UseCaseCards />
         </div>
       </section>
 
       {/* 5. Pricing */}
-      <section className="py-24 px-6 bg-neutral-50 dark:bg-neutral-900/50">
+      <section className="py-16 md:py-24 px-4 md:px-6 bg-neutral-50 dark:bg-neutral-900/50">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-16"
+            className="text-center mb-12 md:mb-16"
           >
-            <h2 className="mb-4 text-neutral-900 dark:text-white">Simple, transparent pricing</h2>
+            <h2 className="mb-4 text-2xl md:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white">Simple, transparent pricing</h2>
           </motion.div>
           <PricingSimple />
         </div>
       </section>
 
       {/* 6. Social Proof */}
-      <section className="py-16 px-6">
+      <section className="py-12 md:py-16 px-4 md:px-6">
         <div className="max-w-7xl mx-auto">
           <SocialProof />
         </div>
       </section>
 
       {/* 7. Final CTA - "The Closer" */}
-      <section className="py-24 px-6 bg-neutral-900 dark:bg-neutral-950 border-t border-neutral-800 text-white">
+      <section className="py-16 md:py-24 px-4 md:px-6 bg-neutral-900 dark:bg-neutral-950 border-t border-neutral-800 text-white">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -339,14 +342,14 @@ export default function Home() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-white mb-6">
+            <h2 className="text-white mb-6 text-3xl md:text-4xl font-bold">
               Be visible. Be credible. Be remembered.
             </h2>
-            <p className="text-xl text-neutral-300 dark:text-neutral-400 mb-8">
+            <p className="text-lg md:text-xl text-neutral-300 dark:text-neutral-400 mb-8">
               It takes 2 minutes to look professional.
             </p>
             <Link href="/signup">
-              <button className="bg-white text-neutral-900 hover:bg-neutral-100 px-8 py-4 rounded-md font-semibold transition-all duration-200 hover:-translate-y-0.5 active:scale-98">
+              <button className="bg-white text-neutral-900 hover:bg-neutral-100 px-8 py-4 rounded-md font-semibold transition-all duration-200 hover:-translate-y-0.5 active:scale-98 w-full sm:w-auto">
                 Claim your username
               </button>
             </Link>
@@ -355,7 +358,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-neutral-200 dark:border-neutral-800 py-12 px-6 bg-white dark:bg-neutral-950">
+      <footer className="border-t border-neutral-200 dark:border-neutral-800 py-8 md:py-12 px-4 md:px-6 bg-white dark:bg-neutral-950">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-2">

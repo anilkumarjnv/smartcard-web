@@ -65,8 +65,8 @@ export function ShareTab({ cardId }: ShareTabProps) {
   };
 
   return (
-    <div className="bg-card rounded-3xl p-6 md:p-8 shadow-sm border border-border">
-      <h3 className="text-2xl font-bold mb-8 text-foreground">Share Your Card</h3>
+    <div className="bg-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-sm border border-border">
+      <h3 className="text-xl sm:text-2xl font-bold mb-6 sm:mb-8 text-foreground">Share Your Card</h3>
 
       {!currentCard ? (
         <div className="text-center py-12">
@@ -95,7 +95,7 @@ export function ShareTab({ cardId }: ShareTabProps) {
             )}
           </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <Button onClick={handleShare} variant="primary" size="lg" fullWidth>
               <Share2 className="w-5 h-5 mr-2" />
               Share Card
@@ -111,8 +111,8 @@ export function ShareTab({ cardId }: ShareTabProps) {
             </Button>
           </div>
 
-          <div className="border-t border-border pt-6">
-            <h4 className="text-lg font-semibold mb-4 text-foreground">QR Code</h4>
+          <div className="border-t border-border pt-4 sm:pt-6">
+            <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-foreground">QR Code</h4>
             <div className="max-w-xs mx-auto">
               <QRCodeDisplay url={profileUrl} />
               <Button

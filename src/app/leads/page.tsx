@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import useSWR from 'swr';
 import { apiClient } from '@/lib/apiClient';
-import { AppTopbar } from '@/components/navigation/AppTopbar';
 import { Container } from '@/components/ui/Container';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -69,104 +68,139 @@ export default function LeadsPage() {
 
     if (isLoading) {
         return (
-            <div>
-                <AppTopbar title="Leads" subtitle="Manage contacts captured from your cards" />
-                <Container>
-                    <div className="flex justify-center py-20">
-                        <Spinner size="lg" />
-                    </div>
-                </Container>
-            </div>
+            <Container>
+                <div className="flex justify-center py-20">
+                    <Spinner size="lg" />
+                </div>
+            </Container>
         );
     }
 
     return (
-        <div>
-            <AppTopbar title="Leads" subtitle="Manage contacts captured from your cards" />
-            <Container>
-                <div className="flex justify-between items-center mb-8 mt-8">
-                    <div>
-                        <h2 className="text-lg font-semibold text-foreground">All Leads</h2>
-                        <p className="text-muted-foreground mt-1 text-sm">View and export your captured leads</p>
-                    </div>
-                    <Button variant="secondary" onClick={handleExportCSV} disabled={leads.length === 0}>
-                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                        </svg>
-                        Export CSV
-                    </Button>
+        <Container>
+            <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 sm:gap-0 mb-6 sm:mb-8 mt-6 sm:mt-8">
+                <div>
+                    <h2 className="text-base sm:text-lg font-semibold text-foreground">All Leads</h2>
+                    <p className="text-muted-foreground mt-1 text-xs sm:text-sm">View and export your captured leads</p>
                 </div>
+                <Button variant="secondary" onClick={handleExportCSV} disabled={leads.length === 0} className="w-full sm:w-auto">
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Export CSV
+                </Button>
+            </div>
 
-                <Card>
-                    <CardBody className="p-0">
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-800">
-                                <thead className="bg-gray-50 dark:bg-neutral-900">
-                                    <tr>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                            Name
-                                        </th>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                            Contact
-                                        </th>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                            Message
-                                        </th>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                            Date
-                                        </th>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                            Source
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody className="bg-white dark:bg-neutral-950 divide-y divide-gray-200 dark:divide-neutral-800">
-                                    {leads.length > 0 ? (
-                                        leads.map((lead) => (
-                                            <tr key={lead.id}>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{lead.name || 'Anonymous'}</div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="text-sm text-gray-900 dark:text-gray-100">{lead.email}</div>
-                                                    <div className="text-sm text-gray-500 dark:text-gray-400">{lead.phone}</div>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <div className="text-sm text-gray-900 dark:text-gray-100 max-w-xs truncate">{lead.message}</div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="text-sm text-gray-500 dark:text-gray-400">
-                                                        {formatDate(lead.created_at)}
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
-                                                        {lead.source || 'Card'}
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    ) : (
-                                        <tr>
-                                            <td colSpan={5} className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
-                                                <div className="flex flex-col items-center justify-center">
-                                                    <svg className="w-12 h-12 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                                    </svg>
-                                                    <p className="text-lg font-medium text-gray-900 dark:text-gray-100">No leads yet</p>
-                                                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                                        Share your card to start collecting leads.
-                                                    </p>
+            <Card>
+                <CardBody className="p-0">
+                    {/* Mobile Card View */}
+                    <div className="block md:hidden">
+                        {leads.length > 0 ? (
+                            <div className="divide-y divide-gray-200 dark:divide-neutral-800">
+                                {leads.map((lead) => (
+                                    <div key={lead.id} className="p-4 space-y-2">
+                                        <div className="flex items-start justify-between">
+                                            <div className="font-medium text-gray-900 dark:text-gray-100">{lead.name || 'Anonymous'}</div>
+                                            <span className="px-2 text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
+                                                {lead.source || 'Card'}
+                                            </span>
+                                        </div>
+                                        <div className="text-sm text-gray-900 dark:text-gray-100">{lead.email}</div>
+                                        {lead.phone && <div className="text-sm text-gray-500 dark:text-gray-400">{lead.phone}</div>}
+                                        {lead.message && (
+                                            <div className="text-sm text-gray-600 dark:text-gray-300 pt-2 border-t border-gray-100 dark:border-neutral-800">
+                                                {lead.message}
+                                            </div>
+                                        )}
+                                        <div className="text-xs text-gray-500 dark:text-gray-400 pt-1">
+                                            {formatDate(lead.created_at)}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                                <div className="flex flex-col items-center justify-center">
+                                    <svg className="w-12 h-12 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                    <p className="text-lg font-medium text-gray-900 dark:text-gray-100">No leads yet</p>
+                                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                        Share your card to start collecting leads.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Desktop Table View */}
+                    <div className="hidden md:block overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-800">
+                            <thead className="bg-gray-50 dark:bg-neutral-900">
+                                <tr>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        Name
+                                    </th>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        Contact
+                                    </th>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        Message
+                                    </th>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        Date
+                                    </th>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        Source
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white dark:bg-neutral-950 divide-y divide-gray-200 dark:divide-neutral-800">
+                                {leads.length > 0 ? (
+                                    leads.map((lead) => (
+                                        <tr key={lead.id}>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{lead.name || 'Anonymous'}</div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm text-gray-900 dark:text-gray-100">{lead.email}</div>
+                                                <div className="text-sm text-gray-500 dark:text-gray-400">{lead.phone}</div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="text-sm text-gray-900 dark:text-gray-100 max-w-xs truncate">{lead.message}</div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm text-gray-500 dark:text-gray-400">
+                                                    {formatDate(lead.created_at)}
                                                 </div>
                                             </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
+                                                    {lead.source || 'Card'}
+                                                </span>
+                                            </td>
                                         </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </CardBody>
-                </Card>
-            </Container>
-        </div>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan={5} className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                                            <div className="flex flex-col items-center justify-center">
+                                                <svg className="w-12 h-12 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                                </svg>
+                                                <p className="text-lg font-medium text-gray-900 dark:text-gray-100">No leads yet</p>
+                                                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                                    Share your card to start collecting leads.
+                                                </p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </CardBody>
+            </Card>
+        </Container>
     );
 }

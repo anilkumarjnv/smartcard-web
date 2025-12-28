@@ -131,10 +131,10 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
   };
 
   return (
-    <div className="bg-white dark:bg-card rounded-3xl p-6 md:p-8 shadow-sm">
-      <h3 className="text-2xl font-bold mb-8 text-neutral-900 dark:text-white">Settings</h3>
+    <div className="bg-white dark:bg-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-sm">
+      <h3 className="text-xl sm:text-2xl font-bold mb-6 sm:mb-8 text-neutral-900 dark:text-white">Settings</h3>
 
-      <div className="space-y-8">
+      <div className="space-y-6 sm:space-y-8">
         {saveMessage && (
           <div className={`p-4 rounded-2xl ${saveMessage.includes('✓')
             ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300'
@@ -145,8 +145,8 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
         )}
 
         <div>
-          <h4 className="text-lg font-semibold mb-4 text-neutral-900 dark:text-white">Profile Information</h4>
-          <div className="space-y-4">
+          <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-neutral-900 dark:text-white">Profile Information</h4>
+          <div className="space-y-3 sm:space-y-4">
             <Input
               label="Full Name"
               placeholder="Full Name"
@@ -170,10 +170,10 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
           </div>
         </div>
 
-        <div className="border-t border-gray-200 dark:border-neutral-800 pt-8">
-          <h4 className="text-lg font-semibold mb-4 text-neutral-900 dark:text-white">Role & Experience</h4>
-          <div className="p-6 bg-gray-50 dark:bg-neutral-800/50 rounded-2xl">
-            <div className="flex items-center justify-between mb-6">
+        <div className="border-t border-gray-200 dark:border-neutral-800 pt-6 sm:pt-8">
+          <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-neutral-900 dark:text-white">Role & Experience</h4>
+          <div className="p-4 sm:p-6 bg-gray-50 dark:bg-neutral-800/50 rounded-xl sm:rounded-2xl">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0 mb-4 sm:mb-6">
               <div>
                 <p className="font-medium text-neutral-900 dark:text-white">Current Role</p>
                 <p className="text-sm text-gray-600 dark:text-neutral-400 mt-1">Determines your card layout and fields</p>
@@ -213,8 +213,8 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
         </div>
 
         <div className="border-t border-gray-200 dark:border-neutral-800 pt-8">
-          <h4 className="text-lg font-semibold mb-4 text-neutral-900 dark:text-white">Subscription</h4>
-          <div className="grid md:grid-cols-2 gap-6">
+          <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-neutral-900 dark:text-white">Subscription</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             {plans.map((plan, index) => (
               <div
                 key={plan.name}

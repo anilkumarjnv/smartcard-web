@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Mail, Phone, Linkedin, Globe, Download, Share2, Edit, BarChart3, QrCode, Trash2, Github, Twitter, Instagram, Facebook, Youtube, Twitch, Disc as DiscordIcon, Figma, Code2, Link as LinkIcon, Dribbble, Palette } from 'lucide-react';
+import { Mail, Phone, Linkedin, Globe, Download, Share2, Edit, BarChart3, QrCode, Trash2, Github, Twitter, Instagram, Facebook, Youtube, Twitch, Disc as DiscordIcon, Figma, Code2, Link as LinkIcon, Dribbble, Palette, RefreshCw } from 'lucide-react';
 import { WaveShape } from './shapes/WaveShape';
 import { GeometricShape } from './shapes/GeometricShape';
 import { SoftArcShape } from './shapes/SoftArcShape';
@@ -188,9 +188,9 @@ export function ProfileCard({
 
     // Card content component (reusable for both flip and non-flip versions)
     const cardContent = (
-        <div className={`${currentTheme.bg} rounded-2xl overflow-hidden shadow-lg`}>
+        <div className={`${currentTheme.bg} rounded-xl sm:rounded-2xl overflow-hidden shadow-lg`}>
             {/* Identity Header - Background Image Section */}
-            <div className="relative h-96 overflow-visible">
+            <div className="relative h-72 sm:h-80 md:h-96 overflow-visible">
                 {/* Background Image or Gradient Fallback */}
                 <div
                     className="absolute inset-0"
@@ -217,34 +217,45 @@ export function ProfileCard({
                 />
 
                 {/* Name and Role - overlaid on image */}
-                <div className="absolute bottom-20 left-6 z-10">
-                    <h1 className={`text-3xl font-bold mb-1 tracking-tight ${theme === 'dark' ? 'text-neutral-900' : 'text-white'}`}>
+                <div className="absolute bottom-16 sm:bottom-20 left-4 sm:left-6 z-10 w-[calc(100%-2rem)] sm:w-[calc(100%-3rem)]">
+                    <h1 className={`text-xl sm:text-2xl md:text-3xl font-bold mb-1 tracking-tight break-words ${theme === 'dark' ? 'text-neutral-900' : 'text-white'}`}>
                         {user.name}
                     </h1>
-                    <p className={`text-lg font-medium ${theme === 'dark' ? 'text-neutral-900' : 'text-white'}`}>
+                    <p className={`text-sm sm:text-base md:text-lg font-medium ${theme === 'dark' ? 'text-neutral-900' : 'text-white'}`}>
                         {user.role}
                     </p>
                     {user.domain && (
-                        <p className={`text-sm font-medium mt-1 ${theme === 'dark' ? 'text-neutral-700' : 'text-white/90'}`}>
+                        <p className={`text-xs sm:text-sm font-medium mt-1 ${theme === 'dark' ? 'text-neutral-700' : 'text-white/90'}`}>
                             {user.domain}
                         </p>
                     )}
                 </div>
 
                 {/* Shape Divider - Overlaid at bottom */}
-                <div className="absolute bottom-0 left-0 right-0 h-16 z-20">
+                <div className="absolute bottom-0 left-0 right-0 h-12 sm:h-16 z-20">
                     {shape === 'wave' && <WaveShape color={currentTheme.dividerColor} />}
                     {shape === 'geometric' && <GeometricShape color={currentTheme.dividerColor} />}
                     {shape === 'soft-arc' && <SoftArcShape color={currentTheme.dividerColor} />}
                     {shape === 'layered-waves' && <LayeredWavesShape color={currentTheme.dividerColor} />}
                     {shape === 'slant' && <SlantShape color={currentTheme.dividerColor} />}
                 </div>
+
+                {/* Flip Button - Only on small screens */}
+                {!disableInteractions && !disableFlip && (
+                    <button
+                        onClick={() => setIsFlipped(!isFlipped)}
+                        className="absolute top-4 right-4 z-30 md:hidden w-10 h-10 rounded-full bg-white/90 dark:bg-black/50 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-white dark:hover:bg-black/70 transition-all"
+                        aria-label="Flip card"
+                    >
+                        <RefreshCw className={`w-5 h-5 text-neutral-900 dark:text-white transition-transform duration-300 ${isFlipped ? 'rotate-180' : ''}`} />
+                    </button>
+                )}
             </div>
 
             {/* Professional Details Section */}
-            <div className={`px-8 pb-6 ${currentTheme.bg}`}>
-                <div className="mb-6">
-                    <h2 className={`text-xl font-semibold ${currentTheme.text} mb-1`}>
+            <div className={`px-4 sm:px-6 md:px-8 pb-4 sm:pb-6 ${currentTheme.bg}`}>
+                <div className="mb-4 sm:mb-6">
+                    <h2 className={`text-lg sm:text-xl font-semibold ${currentTheme.text} mb-1`}>
                         {user.company}
                     </h2>
                     <p className={`text-sm ${currentTheme.secondary}`}>
@@ -259,10 +270,10 @@ export function ProfileCard({
 
                 {/* Custom Highlights */}
                 {user.custom_highlights && user.custom_highlights.length > 0 && (
-                    <div className="grid grid-cols-3 gap-3 mb-6">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mb-4 sm:mb-6">
                         {user.custom_highlights.map((highlight, idx) => (
-                            <div key={idx} className={`p-3 rounded-xl border ${currentTheme.border} ${currentTheme.highlightBg} text-center`}>
-                                <div className={`text-xs font-medium uppercase tracking-wider ${currentTheme.secondary} mb-1`}>
+                            <div key={idx} className={`p-2 sm:p-3 rounded-lg sm:rounded-xl border ${currentTheme.border} ${currentTheme.highlightBg} text-center`}>
+                                <div className={`text-xs font-medium uppercase tracking-wider ${currentTheme.secondary} mb-0.5 sm:mb-1`}>
                                     {highlight.label}
                                 </div>
                                 <div className={`text-sm font-bold ${currentTheme.text} truncate`}>
@@ -275,7 +286,7 @@ export function ProfileCard({
 
                 {/* Primary Call to Action */}
                 {user.cta_button && user.cta_button.text && (
-                    <div className="mb-6">
+                    <div className="mb-4 sm:mb-6">
                         <a
                             href={user.cta_button.link}
                             target="_blank"
@@ -289,14 +300,14 @@ export function ProfileCard({
                 )}
 
                 {/* Contact Actions */}
-                <div className="space-y-2 mb-6">
+                <div className="space-y-2 mb-4 sm:mb-6">
                     {user.contact.email && (
                         <a
                             href={`mailto:${user.contact.email}`}
                             className={`flex items-center gap-3 px-3 py-3 rounded-lg border ${currentTheme.border} ${currentTheme.hover} transition-colors ${interactionClass}`}
                         >
-                            <Mail className={`w-5 h-5 ${currentTheme.accent}`} strokeWidth={2} />
-                            <span className={`text-sm font-medium ${currentTheme.text}`}>
+                            <Mail className={`w-5 h-5 ${currentTheme.text} flex-shrink-0`} strokeWidth={2} />
+                            <span className={`text-sm font-medium ${currentTheme.text} truncate`}>
                                 {user.contact.email}
                             </span>
                         </a>
@@ -307,8 +318,8 @@ export function ProfileCard({
                             href={`tel:${user.contact.phone}`}
                             className={`flex items-center gap-3 px-3 py-3 rounded-lg border ${currentTheme.border} ${currentTheme.hover} transition-colors ${interactionClass}`}
                         >
-                            <Phone className={`w-5 h-5 ${currentTheme.accent}`} strokeWidth={2} />
-                            <span className={`text-sm font-medium ${currentTheme.text}`}>
+                            <Phone className={`w-5 h-5 ${currentTheme.text} flex-shrink-0`} strokeWidth={2} />
+                            <span className={`text-sm font-medium ${currentTheme.text} truncate`}>
                                 {user.contact.phone}
                             </span>
                         </a>
@@ -321,7 +332,7 @@ export function ProfileCard({
                             rel="noopener noreferrer"
                             className={`flex items-center gap-3 px-3 py-3 rounded-lg border ${currentTheme.border} ${currentTheme.hover} transition-colors ${interactionClass}`}
                         >
-                            <Linkedin className={`w-5 h-5 ${currentTheme.accent}`} strokeWidth={2} />
+                            <Linkedin className={`w-5 h-5 ${currentTheme.text} flex-shrink-0`} strokeWidth={2} />
                             <span className={`text-sm font-medium ${currentTheme.text}`}>
                                 LinkedIn
                             </span>
@@ -335,8 +346,8 @@ export function ProfileCard({
                             rel="noopener noreferrer"
                             className={`flex items-center gap-3 px-3 py-3 rounded-lg border ${currentTheme.border} ${currentTheme.hover} transition-colors ${interactionClass}`}
                         >
-                            <Globe className={`w-5 h-5 ${currentTheme.accent}`} strokeWidth={2} />
-                            <span className={`text-sm font-medium ${currentTheme.text}`}>
+                            <Globe className={`w-5 h-5 ${currentTheme.text} flex-shrink-0`} strokeWidth={2} />
+                            <span className={`text-sm font-medium ${currentTheme.text} truncate`}>
                                 Website
                             </span>
                         </a>
@@ -391,9 +402,9 @@ export function ProfileCard({
     // Otherwise, return with flip animation
     return (
         <div
-            className="max-w-md mx-auto perspective-1000"
-            onMouseEnter={() => setIsFlipped(true)}
-            onMouseLeave={() => setIsFlipped(false)}
+            className="w-full max-w-md mx-auto perspective-1000"
+            onMouseEnter={() => !window.matchMedia('(max-width: 768px)').matches && setIsFlipped(true)}
+            onMouseLeave={() => !window.matchMedia('(max-width: 768px)').matches && setIsFlipped(false)}
         >
             <div
                 className="relative w-full h-full transition-transform duration-700 transform-style-3d"

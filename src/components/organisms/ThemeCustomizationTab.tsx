@@ -116,11 +116,11 @@ export function ThemeCustomizationTab({ cardId, onThemeUpdate }: ThemeCustomizat
   };
 
   return (
-    <div className="bg-card rounded-3xl p-6 md:p-8 shadow-sm border border-border">
-      <h3 className="text-2xl font-bold mb-2 text-foreground">Customize Theme</h3>
-      <p className="text-muted-foreground mb-8">Choose a professional theme for your digital profile card</p>
+    <div className="bg-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-sm border border-border">
+      <h3 className="text-xl sm:text-2xl font-bold mb-2 text-foreground">Customize Theme</h3>
+      <p className="text-muted-foreground text-sm sm:text-base mb-6 sm:mb-8">Choose a professional theme for your digital profile card</p>
 
-      <div className="space-y-8">
+      <div className="space-y-6 sm:space-y-8">
         {/* New Theme Selector */}
         <div>
           <ThemeSelector
@@ -130,7 +130,7 @@ export function ThemeCustomizationTab({ cardId, onThemeUpdate }: ThemeCustomizat
         </div>
 
         {/* Shape Selector */}
-        <div className="border-t border-border pt-8">
+        <div className="border-t border-border pt-6 sm:pt-8">
           <ShapeSelector
             selectedShape={selectedShape}
             onShapeChange={handleShapeChange}
@@ -138,9 +138,9 @@ export function ThemeCustomizationTab({ cardId, onThemeUpdate }: ThemeCustomizat
         </div>
 
         {/* Theme Features */}
-        <div className="border-t border-border pt-8">
-          <h4 className="text-lg font-semibold mb-4 text-foreground">Theme Features</h4>
-          <div className="grid gap-4">
+        <div className="border-t border-border pt-6 sm:pt-8">
+          <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-foreground">Theme Features</h4>
+          <div className="grid gap-3 sm:gap-4">
             <div className="flex items-start gap-3 p-4 bg-muted/50 dark:bg-neutral-800/50 rounded-xl">
               <svg className="w-5 h-5 text-primary mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />

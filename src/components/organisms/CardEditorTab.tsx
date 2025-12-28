@@ -388,9 +388,9 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
   const isCreating = mode === 'create' || !currentCard;
 
   return (
-    <div className="bg-card rounded-3xl p-6 md:p-8 shadow-sm border border-border">
-      <div className="flex items-center justify-between mb-8">
-        <h3 className="text-2xl font-bold text-foreground">
+    <div className="bg-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-sm border border-border">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 mb-6 sm:mb-8">
+        <h3 className="text-xl sm:text-2xl font-bold text-foreground">
           {isCreating ? 'Create New Card' : 'Edit Your Card'}
         </h3>
         <Button onClick={handleSave} size="sm" disabled={isSaving} className="hidden md:flex">
@@ -399,7 +399,7 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
       </div>
 
       {saveMessage && (
-        <div className={`mb-6 p-4 rounded-2xl ${saveMessage.includes('✓')
+        <div className={`mb-4 sm:mb-6 p-3 sm:p-4 rounded-xl sm:rounded-2xl text-sm sm:text-base ${saveMessage.includes('✓')
           ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300'
           : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300'
           }`}>
@@ -407,10 +407,10 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
         </div>
       )}
 
-      <div className="space-y-8">
+      <div className="space-y-6 sm:space-y-8">
         {/* SECTION 1: Identity */}
-        <div className="space-y-4">
-          <h4 className="text-lg font-semibold text-foreground">Identity</h4>
+        <div className="space-y-3 sm:space-y-4">
+          <h4 className="text-base sm:text-lg font-semibold text-foreground">Identity</h4>
           <Input
             placeholder="Full Name *"
             value={formData.name}
@@ -428,9 +428,9 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
         </div>
 
         {/* SECTION 2: Visual Identity */}
-        <div className="border-t border-border pt-6">
+        <div className="border-t border-border pt-4 sm:pt-6">
           <label className="block text-sm font-medium text-foreground mb-3">Profile Photo</label>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col xs:flex-row items-start xs:items-center gap-3 sm:gap-4">
             <div className="relative">
               <div className={`w-24 h-24 rounded-lg border-4 ${errors.photo_url ? 'border-destructive' : 'border-border'} overflow-hidden bg-muted flex items-center justify-center`}>
                 {imagePreview ? (
@@ -462,14 +462,14 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
               />
             </label>
           </div>
-          {errors.photo_url && <p className="mt-2 text-sm text-destructive">{errors.photo_url}</p>}
-          <p className="mt-2 text-sm text-muted-foreground">Used as card background. Recommended: 800x800px or larger</p>
+          {errors.photo_url && <p className="mt-2 text-xs sm:text-sm text-destructive">{errors.photo_url}</p>}
+          <p className="mt-2 text-xs sm:text-sm text-muted-foreground">Used as card background. Recommended: 800x800px or larger</p>
         </div>
 
         {/* SECTION 3: Context & Credibility */}
-        <div className="border-t border-border pt-6 space-y-4">
-          <h4 className="text-lg font-semibold text-foreground">Context & Credibility</h4>
-          <p className="text-sm text-muted-foreground -mt-2">Optional but recommended</p>
+        <div className="border-t border-border pt-4 sm:pt-6 space-y-3 sm:space-y-4">
+          <h4 className="text-base sm:text-lg font-semibold text-foreground">Context & Credibility</h4>
+          <p className="text-xs sm:text-sm text-muted-foreground -mt-1 sm:-mt-2">Optional but recommended</p>
           <Input
             placeholder="Organization / Institution (e.g., Company name, University name, Independent / Freelancer)"
             value={formData.organization || ''}
@@ -498,13 +498,13 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
             rows={3}
             className={errors.summary ? 'border-destructive' : ''}
           />
-          {errors.summary && <p className="mt-2 text-sm text-destructive">{errors.summary}</p>}
-          <p className="mt-2 text-sm text-muted-foreground">Single paragraph, max 200 characters. No emojis.</p>
+          {errors.summary && <p className="mt-2 text-xs sm:text-sm text-destructive">{errors.summary}</p>}
+          <p className="mt-2 text-xs sm:text-sm text-muted-foreground">Single paragraph, max 200 characters. No emojis.</p>
         </div>
 
         {/* SECTION 5: Contact & Reach */}
-        <div className="border-t border-border pt-6 space-y-4">
-          <h4 className="text-lg font-semibold text-foreground">Contact & Reach</h4>
+        <div className="border-t border-border pt-4 sm:pt-6 space-y-3 sm:space-y-4">
+          <h4 className="text-base sm:text-lg font-semibold text-foreground">Contact & Reach</h4>
           <Input
             type="email"
             placeholder="Email Address *"
@@ -515,7 +515,7 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
           />
 
           <div className="space-y-1">
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <CountrySelect
                 value={formData.country_code}
                 onChange={(value) => handleFormChange({ country_code: value })}
@@ -533,7 +533,7 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
                 className="flex-1"
               />
             </div>
-            {errors.phone && <p className="text-sm text-destructive px-1">{errors.phone}</p>}
+            {errors.phone && <p className="text-xs sm:text-sm text-destructive px-1">{errors.phone}</p>}
           </div>
 
           <Input
@@ -548,10 +548,10 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
 
         {/* SECTION 6: Additional Links */}
         <div className="border-t border-border pt-6">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0 mb-3 sm:mb-4">
             <div>
-              <h4 className="text-lg font-semibold text-foreground">Additional Links</h4>
-              <p className="text-sm text-muted-foreground">Max 3 (e.g., GitHub, Portfolio, LinkedIn)</p>
+              <h4 className="text-base sm:text-lg font-semibold text-foreground">Additional Links</h4>
+              <p className="text-xs sm:text-sm text-muted-foreground">Max 3 (e.g., GitHub, Portfolio, LinkedIn)</p>
             </div>
             {formData.additional_links.length < 3 && (
               <Button onClick={addAdditionalLink} variant="outline" size="sm">
@@ -562,12 +562,12 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
           <div className="space-y-3">
             {formData.additional_links.map((link, idx) => (
               <div key={idx} className="flex flex-col gap-1">
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Select
                     value={link.label}
                     onValueChange={(value) => updateAdditionalLink(idx, 'label', value)}
                   >
-                    <SelectTrigger className="w-1/3 min-w-[140px]">
+                    <SelectTrigger className="w-full sm:w-1/3 min-w-[140px]">
                       <SelectValue placeholder="Platform" />
                     </SelectTrigger>
                     <SelectContent className="max-h-[300px] bg-white dark:bg-neutral-900">
@@ -590,17 +590,19 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
                       <SelectItem value="Dev.to">Dev.to</SelectItem>
                     </SelectContent>
                   </Select>
-                  <Input
-                    type="url"
-                    placeholder="URL"
-                    value={link.url}
-                    onChange={(e) => updateAdditionalLink(idx, 'url', e.target.value)}
-                    className="flex-1"
-                    error={errors[`link_${idx}`]}
-                  />
-                  <Button variant="ghost" size="sm" onClick={() => removeAdditionalLink(idx)}>
-                    <Trash className="w-4 h-4" />
-                  </Button>
+                  <div className="flex gap-2 flex-1">
+                    <Input
+                      type="url"
+                      placeholder="URL"
+                      value={link.url}
+                      onChange={(e) => updateAdditionalLink(idx, 'url', e.target.value)}
+                      className="flex-1"
+                      error={errors[`link_${idx}`]}
+                    />
+                    <Button variant="ghost" size="sm" onClick={() => removeAdditionalLink(idx)}>
+                      <Trash className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -635,8 +637,8 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
         <div className="border-t border-border pt-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h4 className="text-lg font-semibold text-foreground">Custom Highlights</h4>
-              <p className="text-sm text-muted-foreground">Max 3 key-value pairs (e.g., Projects → 5+ shipped apps, Experience → 3 years)</p>
+              <h4 className="text-base sm:text-lg font-semibold text-foreground">Custom Highlights</h4>
+              <p className="text-xs sm:text-sm text-muted-foreground">Max 3 key-value pairs (e.g., Projects → 5+ shipped apps, Experience → 3 years)</p>
             </div>
             {formData.custom_highlights.length < 3 && (
               <Button onClick={addCustomHighlight} variant="outline" size="sm">
@@ -644,9 +646,9 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
               </Button>
             )}
           </div>
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             {formData.custom_highlights.map((highlight, idx) => (
-              <div key={idx} className="flex gap-2">
+              <div key={idx} className="flex flex-col xs:flex-row gap-2">
                 <Input
                   placeholder="Label (max 20)"
                   value={highlight.label}
@@ -668,7 +670,7 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
         </div>
 
         {/* Mobile Save Button */}
-        <div className="md:hidden">
+        <div className="md:hidden pt-2">
           <Button onClick={handleSave} fullWidth size="lg" disabled={isSaving}>
             {isSaving ? 'Saving...' : isCreating ? 'Create Card' : 'Save Changes'}
           </Button>
