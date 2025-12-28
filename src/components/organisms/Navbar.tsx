@@ -3,18 +3,20 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/molecules/Button';
-import { createClient } from '@/lib/supabaseClient';
-import { User } from '@supabase/supabase-js';
+import { apiClient } from '@/lib/apiClient';
+import { signOut } from '@/lib/auth';
 import { LogOut, User as UserIcon, Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
 interface NavbarProps {
   variant?: 'default' | 'dashboard';
   isLandingPage?: boolean;
+  onLoginClick?: () => void;
+  onSignupClick?: () => void;
 }
 
-export function Navbar({ variant = 'default', isLandingPage = false }: NavbarProps) {
-  const [user, setUser] = useState<User | null>(null);
+export function Navbar({ variant = 'default', isLandingPage = false, onLoginClick, onSignupClick }: NavbarProps) {
+  const [user, setUser] = useState<any>(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -24,26 +26,25 @@ export function Navbar({ variant = 'default', isLandingPage = false }: NavbarPro
   }, []);
 
   useEffect(() => {
-    const supabase = createClient();
-
-    // Get initial user
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user);
-    });
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => {
-      subscription.unsubscribe();
+    const loadUser = async () => {
+      try {
+        const userData = await apiClient.get<any>('/api/v1/auth/me');
+        setUser(userData);
+      } catch (err) {
+        // User not logged in or error
+        console.error('Failed to load user in Navbar', err);
+      }
     };
+    loadUser();
   }, []);
 
   const handleSignOut = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
+    try {
+      await signOut(); // Clear local session
+      await apiClient.post('/api/v1/auth/logout', {}); // Notify backend
+    } catch (err) {
+      console.error('Logout error', err);
+    }
     window.location.href = '/';
   };
 
@@ -67,20 +68,20 @@ export function Navbar({ variant = 'default', isLandingPage = false }: NavbarPro
                 >
                   <div className="flex flex-col items-end">
                     <span className="text-sm font-medium text-foreground">
-                      {user.user_metadata?.full_name || user.email?.split('@')[0]}
+                      {user.full_name || user.name || user.email?.split('@')[0]}
                     </span>
                     <span className="text-xs text-muted-foreground">{user.email}</span>
                   </div>
                   <div className="w-9 h-9 bg-neutral-900 rounded-full flex items-center justify-center text-white overflow-hidden">
-                    {user.user_metadata?.avatar_url || user.user_metadata?.picture ? (
+                    {user.avatar_url || user.picture ? (
                       <img
-                        src={user.user_metadata?.avatar_url || user.user_metadata?.picture}
-                        alt={user.user_metadata?.full_name || user.email?.split('@')[0] || 'User'}
+                        src={user.avatar_url || user.picture}
+                        alt={user.full_name || user.name || user.email?.split('@')[0] || 'User'}
                         className="w-full h-full object-cover"
                       />
                     ) : (
                       <span className="text-sm font-medium">
-                        {(user.user_metadata?.full_name || user.email?.split('@')[0] || 'U').substring(0, 2).toUpperCase()}
+                        {(user.full_name || user.name || user.email?.split('@')[0] || 'U').substring(0, 2).toUpperCase()}
                       </span>
                     )}
                   </div>
@@ -92,10 +93,10 @@ export function Navbar({ variant = 'default', isLandingPage = false }: NavbarPro
                       className="fixed inset-0 z-10"
                       onClick={() => setShowUserMenu(false)}
                     />
-                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-neutral-200 py-2 z-20">
+                    <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-neutral-800 rounded-lg shadow-lg border border-neutral-200 dark:border-neutral-700 py-2 z-20">
                       <Link
                         href="/settings"
-                        className="flex items-center gap-3 px-4 py-2 hover:bg-neutral-100 transition-colors text-neutral-900"
+                        className="flex items-center gap-3 px-4 py-2 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors text-neutral-900 dark:text-neutral-200"
                         onClick={() => setShowUserMenu(false)}
                       >
                         <UserIcon className="w-4 h-4" />
@@ -103,7 +104,7 @@ export function Navbar({ variant = 'default', isLandingPage = false }: NavbarPro
                       </Link>
                       <button
                         onClick={handleSignOut}
-                        className="w-full flex items-center gap-3 px-4 py-2 hover:bg-neutral-100 transition-colors text-red-600"
+                        className="w-full flex items-center gap-3 px-4 py-2 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors text-red-600 dark:text-red-400"
                       >
                         <LogOut className="w-4 h-4" />
                         <span className="text-sm font-medium">Sign Out</span>
@@ -126,7 +127,7 @@ export function Navbar({ variant = 'default', isLandingPage = false }: NavbarPro
           <div className="w-9 h-9 bg-neutral-900 dark:bg-white rounded-lg flex items-center justify-center">
             <span className="text-white dark:text-neutral-900 text-lg font-bold">S</span>
           </div>
-          <span className="text-lg font-semibold text-neutral-900 dark:text-white tracking-tight">SmartShare</span>
+          <span className="text-lg font-semibold text-neutral-900 dark:text-white tracking-tight hidden sm:inline-block">SmartShare</span>
         </Link>
 
         <div className="flex items-center gap-3">
@@ -153,20 +154,20 @@ export function Navbar({ variant = 'default', isLandingPage = false }: NavbarPro
               >
                 <div className="flex flex-col items-end">
                   <span className="text-sm font-medium text-foreground dark:text-white">
-                    {user.user_metadata?.full_name || user.email?.split('@')[0]}
+                    {user.full_name || user.name || user.email?.split('@')[0]}
                   </span>
                   <span className="text-xs text-muted-foreground dark:text-neutral-400">{user.email}</span>
                 </div>
                 <div className="w-9 h-9 bg-neutral-900 dark:bg-neutral-100 rounded-full flex items-center justify-center text-white dark:text-neutral-900 overflow-hidden">
-                  {user.user_metadata?.avatar_url || user.user_metadata?.picture ? (
+                  {user.avatar_url || user.picture ? (
                     <img
-                      src={user.user_metadata?.avatar_url || user.user_metadata?.picture}
-                      alt={user.user_metadata?.full_name || user.email?.split('@')[0] || 'User'}
+                      src={user.avatar_url || user.picture}
+                      alt={user.full_name || user.name || user.email?.split('@')[0] || 'User'}
                       className="w-full h-full object-cover"
                     />
                   ) : (
                     <span className="text-sm font-medium">
-                      {(user.user_metadata?.full_name || user.email?.split('@')[0] || 'U').substring(0, 2).toUpperCase()}
+                      {(user.full_name || user.name || user.email?.split('@')[0] || 'U').substring(0, 2).toUpperCase()}
                     </span>
                   )}
                 </div>
@@ -178,10 +179,10 @@ export function Navbar({ variant = 'default', isLandingPage = false }: NavbarPro
                     className="fixed inset-0 z-10"
                     onClick={() => setShowUserMenu(false)}
                   />
-                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-20">
+                  <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-gray-200 dark:border-neutral-700 py-2 z-20">
                     <Link
                       href="/mycards"
-                      className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 transition-colors"
+                      className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors text-gray-900 dark:text-neutral-200"
                       onClick={() => setShowUserMenu(false)}
                     >
                       <UserIcon className="w-4 h-4" />
@@ -189,7 +190,7 @@ export function Navbar({ variant = 'default', isLandingPage = false }: NavbarPro
                     </Link>
                     <button
                       onClick={handleSignOut}
-                      className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-100 transition-colors text-red-600"
+                      className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors text-red-600 dark:text-red-400"
                     >
                       <LogOut className="w-4 h-4" />
                       <span className="text-sm">Sign Out</span>
@@ -200,16 +201,35 @@ export function Navbar({ variant = 'default', isLandingPage = false }: NavbarPro
             </div>
           ) : (
             <>
-              <Link href="/login">
-                <button className="px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white transition-colors">
+              {onLoginClick ? (
+                <button
+                  onClick={onLoginClick}
+                  className="px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white transition-colors"
+                >
                   Login
                 </button>
-              </Link>
-              <Link href="/signup">
-                <button className="px-4 py-2 text-sm font-medium bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-colors">
+              ) : (
+                <Link href="/login">
+                  <button className="px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white transition-colors">
+                    Login
+                  </button>
+                </Link>
+              )}
+
+              {onSignupClick ? (
+                <button
+                  onClick={onSignupClick}
+                  className="px-4 py-2 text-sm font-medium bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-colors"
+                >
                   Get Started
                 </button>
-              </Link>
+              ) : (
+                <Link href="/signup">
+                  <button className="px-4 py-2 text-sm font-medium bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-colors">
+                    Get Started
+                  </button>
+                </Link>
+              )}
             </>
           )}
         </div>

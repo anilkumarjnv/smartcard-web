@@ -20,16 +20,16 @@ export function ShareTab({ cardId }: ShareTabProps) {
     cardId ? `/api/v1/cards/${cardId}` : null,
     fetcher
   );
-  
+
   // Use specific card if cardId is provided, otherwise fall back to first card
   const currentCard = cardId ? specificCard : (cards && cards.length > 0 ? cards[0] : null);
 
   const [copied, setCopied] = useState(false);
   const [showBranding, setShowBranding] = useState(true);
-  
+
   // Generate the profile URL based on the card slug
-  const profileUrl = currentCard 
-    ? `${typeof window !== 'undefined' ? window.location.origin : ''}/${currentCard.slug}` 
+  const profileUrl = currentCard
+    ? `${typeof window !== 'undefined' ? window.location.origin : ''}/${currentCard.slug}`
     : 'https://smartcard.app/your-card';
 
   const handleCopyLink = () => {
@@ -65,25 +65,25 @@ export function ShareTab({ cardId }: ShareTabProps) {
   };
 
   return (
-    <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm">
-      <h3 className="text-2xl font-bold mb-8">Share Your Card</h3>
+    <div className="bg-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-sm border border-border">
+      <h3 className="text-xl sm:text-2xl font-bold mb-6 sm:mb-8 text-foreground">Share Your Card</h3>
 
       {!currentCard ? (
         <div className="text-center py-12">
-          <div className="mx-auto w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mb-4">
-            <Share2 className="w-8 h-8 text-indigo-600" />
+          <div className="mx-auto w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mb-4">
+            <Share2 className="w-8 h-8 text-accent" />
           </div>
-          <h4 className="text-lg font-semibold text-gray-900 mb-2">Create Your Card First</h4>
-          <p className="text-gray-600 mb-6">
+          <h4 className="text-lg font-semibold text-foreground mb-2">Create Your Card First</h4>
+          <p className="text-muted-foreground mb-6">
             Complete your card information in the "My Card" tab to get your shareable link.
           </p>
         </div>
       ) : (
         <div className="space-y-6">
           <div>
-            <label className="block mb-3 px-1 text-sm font-medium text-gray-700">Your Unique Link</label>
+            <label className="block mb-3 px-1 text-sm font-medium text-foreground-secondary">Your Unique Link</label>
             <div className="flex gap-2">
-              <div className="flex-1 px-4 py-3 bg-gray-50 rounded-2xl border-2 border-gray-200 text-gray-600 overflow-hidden">
+              <div className="flex-1 px-4 py-3 bg-muted rounded-2xl border-2 border-border text-muted-foreground overflow-hidden">
                 <p className="truncate">{profileUrl}</p>
               </div>
               <Button onClick={handleCopyLink} variant="outline">
@@ -95,66 +95,66 @@ export function ShareTab({ cardId }: ShareTabProps) {
             )}
           </div>
 
-        <div className="grid md:grid-cols-2 gap-4">
-          <Button onClick={handleShare} variant="primary" size="lg" fullWidth>
-            <Share2 className="w-5 h-5 mr-2" />
-            Share Card
-          </Button>
-          <Button 
-            onClick={() => window.open(profileUrl, '_blank')} 
-            variant="outline" 
-            size="lg" 
-            fullWidth
-          >
-            <Eye className="w-5 h-5 mr-2" />
-            Preview Card
-          </Button>
-        </div>
-
-        <div className="border-t border-gray-200 pt-6">
-          <h4 className="text-lg font-semibold mb-4">QR Code</h4>
-          <div className="max-w-xs mx-auto">
-            <QRCodeDisplay url={profileUrl} />
-            <Button 
-              onClick={handleDownloadQR} 
-              variant="outline" 
-              size="lg" 
-              fullWidth 
-              className="mt-4"
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <Button onClick={handleShare} variant="primary" size="lg" fullWidth>
+              <Share2 className="w-5 h-5 mr-2" />
+              Share Card
+            </Button>
+            <Button
+              onClick={() => window.open(profileUrl, '_blank')}
+              variant="outline"
+              size="lg"
+              fullWidth
             >
-              <Download className="w-5 h-5 mr-2" />
-              Download QR Code
+              <Eye className="w-5 h-5 mr-2" />
+              Preview Card
             </Button>
           </div>
-        </div>
 
-        <div className="border-t border-gray-200 pt-6">
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
-            <div>
-              <p className="text-sm font-medium">Show SmartCard Branding</p>
-              <p className="text-xs text-gray-500 mt-1">Remove with Pro plan</p>
+          <div className="border-t border-border pt-4 sm:pt-6">
+            <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-foreground">QR Code</h4>
+            <div className="max-w-xs mx-auto">
+              <QRCodeDisplay url={profileUrl} />
+              <Button
+                onClick={handleDownloadQR}
+                variant="outline"
+                size="lg"
+                fullWidth
+                className="mt-4"
+              >
+                <Download className="w-5 h-5 mr-2" />
+                Download QR Code
+              </Button>
             </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={showBranding}
-                onChange={(e) => setShowBranding(e.target.checked)}
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
-            </label>
           </div>
-        </div>
 
-        <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-6">
-          <h4 className="text-lg font-semibold mb-2">Track Your Card Performance</h4>
-          <p className="text-gray-600 mb-4">
-            See who views your card, track link clicks, and get detailed analytics with Pro.
-          </p>
-          <button className="px-6 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:opacity-90 transition-opacity font-medium">
-            Upgrade to Pro
-          </button>
-        </div>
+          <div className="border-t border-border pt-6">
+            <div className="flex items-center justify-between p-4 bg-muted dark:bg-neutral-800 rounded-2xl">
+              <div>
+                <p className="text-sm font-medium text-foreground">Show SmartCard Branding</p>
+                <p className="text-xs text-muted-foreground mt-1">Remove with Pro plan</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={showBranding}
+                  onChange={(e) => setShowBranding(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-300 dark:bg-neutral-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-neutral-300 dark:peer-focus:ring-neutral-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-neutral-900 dark:peer-checked:bg-neutral-100 dark:peer-checked:after:bg-neutral-900 dark:peer-checked:after:border-neutral-900"></div>
+              </label>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-accent/10 to-accent/5 rounded-2xl p-6 border border-accent/20">
+            <h4 className="text-lg font-semibold mb-2 text-foreground">Track Your Card Performance</h4>
+            <p className="text-muted-foreground mb-4">
+              See who views your card, track link clicks, and get detailed analytics with Pro.
+            </p>
+            <button className="px-6 py-2 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-xl hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-colors font-medium">
+              Upgrade to Pro
+            </button>
+          </div>
         </div>
       )}
     </div>

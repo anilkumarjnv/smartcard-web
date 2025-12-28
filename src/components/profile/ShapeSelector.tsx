@@ -50,10 +50,10 @@ export function ShapeSelector({ selectedShape = 'wave', onShapeChange }: ShapeSe
     return (
         <div className="space-y-4">
             <div>
-                <h3 className="text-lg font-semibold text-neutral-900 mb-2">
+                <h3 className="text-lg font-semibold text-neutral-900 dark:text-white mb-2">
                     Choose Your Shape
                 </h3>
-                <p className="text-sm text-neutral-600">
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">
                     Select a divider shape that matches your style
                 </p>
             </div>
@@ -69,35 +69,35 @@ export function ShapeSelector({ selectedShape = 'wave', onShapeChange }: ShapeSe
                             onClick={() => onShapeChange(shape.name)}
                             onMouseEnter={() => setHoveredShape(shape.name)}
                             onMouseLeave={() => setHoveredShape(null)}
-                            className={`relative p-4 rounded-xl border-2 transition-all duration-200 text-left ${isSelected
-                                    ? 'border-indigo-600 shadow-lg bg-indigo-50'
-                                    : 'border-neutral-200 hover:border-neutral-300 bg-white'
+                            className={`relative p-0 rounded-xl border-2 transition-all duration-200 text-left ${isSelected
+                                ? 'border-neutral-900 dark:border-neutral-100 shadow-lg bg-neutral-50 dark:bg-neutral-800/50'
+                                : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600 bg-white dark:bg-neutral-900'
                                 }`}
                         >
                             {/* Selected Indicator */}
-                            {isSelected && (
-                                <div className="absolute top-2 right-2 w-5 h-5 bg-indigo-600 rounded-full flex items-center justify-center">
-                                    <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                            {/* {isSelected && (
+                                <div className="absolute top-2 right-2 w-5 h-5 bg-neutral-900 dark:bg-neutral-100 rounded-full flex items-center justify-center">
+                                    <Check className="w-3 h-3 text-white dark:text-neutral-900" strokeWidth={3} />
                                 </div>
-                            )}
+                            )} */}
 
                             {/* Shape Preview */}
-                            <div className="mb-3 h-16 bg-neutral-100 rounded-lg overflow-hidden relative">
+                            <div className="mb-0 h-16 bg-neutral-100 dark:bg-neutral-800 rounded-lg overflow-hidden relative">
                                 <ShapePreview shape={shape.name} />
                             </div>
 
                             {/* Shape Info */}
-                            <div>
-                                <h4 className="font-semibold text-neutral-900 text-sm mb-1">
+                            {/* <div>
+                                <h4 className="font-semibold text-neutral-900 dark:text-white text-sm mb-1">
                                     {shape.displayName}
                                 </h4>
-                                <p className="text-xs text-neutral-600 mb-1">
+                                <p className="text-xs text-neutral-600 dark:text-neutral-400 mb-1">
                                     {shape.description}
                                 </p>
-                                <p className="text-xs text-indigo-600 font-medium">
+                                <p className="text-xs text-neutral-900 dark:text-neutral-200 font-medium">
                                     {shape.useCase}
                                 </p>
-                            </div>
+                            </div> */}
                         </button>
                     );
                 })}

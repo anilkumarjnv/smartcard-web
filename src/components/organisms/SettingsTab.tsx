@@ -1,59 +1,89 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { User, Mail, CreditCard, AlertTriangle, LogOut } from 'lucide-react';
+import { User, Mail, CreditCard, LogOut, Check } from 'lucide-react';
 import { Input } from '@/components/molecules/Input';
 import { Button } from '@/components/molecules/Button';
-import { Modal } from '@/components/molecules/Modal';
-import { createClient } from '@/lib/supabaseClient';
+import { apiClient } from '@/lib/apiClient';
+import { signOut } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
 
 interface SettingsTabProps {
   onLogout?: () => void;
 }
 
+const plans = [
+  {
+    name: 'The Basics',
+    price: '₹0',
+    featured: false,
+    features: [
+      'Profile photo',
+      '3 links',
+      'Default theme',
+      'QR code generation',
+    ],
+    isCurrent: true,
+  },
+  {
+    name: 'Professional',
+    price: '₹199',
+    originalPrice: '₹999',
+    period: 'lifetime',
+    badge: 'Most Popular',
+    featured: true,
+    features: [
+      'Portfolio section',
+      'Analytics dashboard',
+      'Custom QR codes',
+      'No watermark',
+      'All premium themes',
+      'Priority support',
+    ],
+    isCurrent: false,
+  },
+];
+
 export function SettingsTab({ onLogout }: SettingsTabProps) {
   const router = useRouter();
-  const supabase = createClient();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [role, setRole] = useState<string>('');
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
 
   // Load user data
   useEffect(() => {
     const loadUserData = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setEmail(user.email || '');
-        setName(user.user_metadata?.name || '');
-        setRole(user.user_metadata?.role || 'professional');
+      try {
+        const user = await apiClient.get<any>('/api/v1/auth/me');
+        if (user) {
+          setEmail(user.email || '');
+          // Backend returns flattened user object with metadata keys spread
+          setName(user.name || user.full_name || '');
+          setRole(user.role || 'professional');
+        }
+      } catch (error) {
+        console.error('Failed to load user data:', error);
       }
     };
     loadUserData();
-  }, [supabase]);
+  }, []);
 
   const handleRoleChange = async (newRole: string) => {
     if (newRole === role) return;
 
     setIsSaving(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('No user found');
-
-      const { error } = await supabase.rpc('update_user_role', {
-        user_id: user.id,
-        new_role: newRole
-      });
-
-      if (error) throw error;
+      await apiClient.patch('/api/v1/auth/me/role', { role: newRole });
 
       // Update local state and refresh session
       setRole(newRole);
-      await supabase.auth.refreshSession();
+
+      // We might need to refresh local token if claims changed, but reloading page handles app state sync
+      // signOut() then re-login is ideal for pure JWT claim update, but DB role update is sufficient for API checks if API checks DB.
+      // TopBar checks API.
 
       setSaveMessage(`✓ Role updated to ${newRole}`);
       setTimeout(() => setSaveMessage(''), 3000);
@@ -73,11 +103,7 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
     setSaveMessage('');
 
     try {
-      const { error } = await supabase.auth.updateUser({
-        data: { name }
-      });
-
-      if (error) throw error;
+      await apiClient.patch('/api/v1/auth/me', { name });
 
       setSaveMessage('✓ Profile updated successfully');
       setTimeout(() => setSaveMessage(''), 3000);
@@ -89,27 +115,14 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
     }
   };
 
-  const handleDeleteAccount = async () => {
-    try {
-      // Note: Supabase doesn't provide a direct user deletion API for security reasons
-      // This would typically be handled by a backend service
-      console.log('Account deletion requested');
-      setShowDeleteModal(false);
-
-      // Sign out after deletion request
-      await supabase.auth.signOut();
-      if (onLogout) {
-        onLogout();
-      } else {
-        router.push('/');
-      }
-    } catch (err) {
-      console.error('Error deleting account:', err);
-    }
-  };
-
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    try {
+      await signOut(); // Clears local session (using lib/auth)
+      await apiClient.post('/api/v1/auth/logout', {}); // Notify backend
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+
     if (onLogout) {
       onLogout();
     } else {
@@ -118,28 +131,28 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
   };
 
   return (
-    <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm">
-      <h3 className="text-2xl font-bold mb-8">Settings</h3>
+    <div className="bg-white dark:bg-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-sm">
+      <h3 className="text-xl sm:text-2xl font-bold mb-6 sm:mb-8 text-neutral-900 dark:text-white">Settings</h3>
 
-      <div className="space-y-8">
+      <div className="space-y-6 sm:space-y-8">
         {saveMessage && (
           <div className={`p-4 rounded-2xl ${saveMessage.includes('✓')
-            ? 'bg-green-50 text-green-700'
-            : 'bg-red-50 text-red-700'
+            ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300'
+            : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300'
             }`}>
             {saveMessage}
           </div>
         )}
 
         <div>
-          <h4 className="text-lg font-semibold mb-4">Profile Information</h4>
-          <div className="space-y-4">
+          <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-neutral-900 dark:text-white">Profile Information</h4>
+          <div className="space-y-3 sm:space-y-4">
             <Input
               label="Full Name"
               placeholder="Full Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              icon={<User className="w-5 h-5" />}
+              icon={<User className="w-5 h-5 text-muted-foreground" />}
             />
             <Input
               label="Email Address"
@@ -157,17 +170,17 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
           </div>
         </div>
 
-        <div className="border-t border-gray-200 pt-8">
-          <h4 className="text-lg font-semibold mb-4">Role & Experience</h4>
-          <div className="p-6 bg-gray-50 rounded-2xl">
-            <div className="flex items-center justify-between mb-6">
+        <div className="border-t border-gray-200 dark:border-neutral-800 pt-6 sm:pt-8">
+          <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-neutral-900 dark:text-white">Role & Experience</h4>
+          <div className="p-4 sm:p-6 bg-gray-50 dark:bg-neutral-800/50 rounded-xl sm:rounded-2xl">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0 mb-4 sm:mb-6">
               <div>
-                <p className="font-medium">Current Role</p>
-                <p className="text-sm text-gray-600 mt-1">Determines your card layout and fields</p>
+                <p className="font-medium text-neutral-900 dark:text-white">Current Role</p>
+                <p className="text-sm text-gray-600 dark:text-neutral-400 mt-1">Determines your card layout and fields</p>
               </div>
               <span className={`px-4 py-2 rounded-xl text-sm font-medium ${(role || 'professional') === 'student'
-                ? 'bg-blue-100 text-blue-700'
-                : 'bg-indigo-100 text-indigo-700'
+                ? 'bg-neutral-100 text-neutral-700'
+                : 'bg-neutral-100 text-neutral-700'
                 }`}>
                 {(role || 'Professional').charAt(0).toUpperCase() + (role || 'professional').slice(1)}
               </span>
@@ -177,78 +190,94 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
               <button
                 onClick={() => handleRoleChange('student')}
                 className={`p-4 rounded-xl border-2 text-left transition-all ${role === 'student'
-                  ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
-                  : 'border-gray-200 hover:border-blue-200 hover:bg-white'
+                  ? 'border-neutral-900 bg-neutral-50 ring-1 ring-neutral-900 dark:bg-neutral-800 dark:border-neutral-100 dark:ring-neutral-100'
+                  : 'border-gray-200 hover:border-neutral-200 hover:bg-white dark:border-neutral-700 dark:hover:bg-neutral-900 dark:hover:border-neutral-500'
                   }`}
               >
-                <div className="font-semibold mb-1 text-blue-900">Student</div>
-                <div className="text-xs text-blue-700">Academic focus, projects, GPA</div>
+                <div className="font-semibold mb-1 text-neutral-900 dark:text-white">Student</div>
+                <div className="text-xs text-neutral-700 dark:text-neutral-300">Academic focus, projects, GPA</div>
               </button>
 
               <button
                 onClick={() => handleRoleChange('professional')}
                 className={`p-4 rounded-xl border-2 text-left transition-all ${role === 'professional'
-                  ? 'border-indigo-500 bg-indigo-50 ring-1 ring-indigo-500'
-                  : 'border-gray-200 hover:border-indigo-200 hover:bg-white'
+                  ? 'border-neutral-900 bg-neutral-50 ring-1 ring-neutral-900 dark:bg-neutral-800 dark:border-neutral-100 dark:ring-neutral-100'
+                  : 'border-gray-200 hover:border-neutral-200 hover:bg-white dark:border-neutral-700 dark:hover:bg-neutral-900 dark:hover:border-neutral-500'
                   }`}
               >
-                <div className="font-semibold mb-1 text-indigo-900">Professional</div>
-                <div className="text-xs text-indigo-700">Career focus, experience, portfolio</div>
+                <div className="font-semibold mb-1 text-neutral-900 dark:text-white">Professional</div>
+                <div className="text-xs text-neutral-700 dark:text-neutral-300">Career focus, experience, portfolio</div>
               </button>
             </div>
           </div>
         </div>
 
-        <div className="border-t border-gray-200 pt-8">
-          <h4 className="text-lg font-semibold mb-4">Subscription</h4>
-          <div className="p-6 bg-gray-50 rounded-2xl">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <p className="font-medium">Free Plan</p>
-                <p className="text-sm text-gray-600 mt-1">Limited features</p>
+        <div className="border-t border-gray-200 dark:border-neutral-800 pt-8">
+          <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-neutral-900 dark:text-white">Subscription</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+            {plans.map((plan, index) => (
+              <div
+                key={plan.name}
+                className={`relative rounded-xl p-6 ${plan.featured
+                  ? 'bg-white dark:bg-neutral-900 border-2 border-neutral-900 dark:border-white shadow-lg'
+                  : 'bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800'
+                  }`}
+              >
+                {/* Badge */}
+                {plan.badge && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <span className="bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-white text-xs font-semibold px-3 py-1 rounded-full border border-neutral-200 dark:border-neutral-700 whitespace-nowrap">
+                      {plan.badge}
+                    </span>
+                  </div>
+                )}
+
+                <div className="space-y-4">
+                  {/* Plan name */}
+                  <h3 className="text-xl font-bold text-neutral-900 dark:text-white">{plan.name}</h3>
+
+                  {/* Price */}
+                  <div className="flex items-baseline gap-2">
+                    {plan.originalPrice && (
+                      <span className="text-sm text-neutral-400 dark:text-neutral-500 line-through">
+                        {plan.originalPrice}
+                      </span>
+                    )}
+                    <span className="text-3xl font-bold text-neutral-900 dark:text-white">{plan.price}</span>
+                    {plan.period && (
+                      <span className="text-sm text-neutral-600 dark:text-neutral-400">/ {plan.period}</span>
+                    )}
+                  </div>
+
+                  {/* Features */}
+                  <ul className="space-y-2">
+                    {plan.features.map((feature) => (
+                      <li key={feature} className="flex items-center gap-2">
+                        <Check className="w-4 h-4 text-neutral-900 dark:text-white flex-shrink-0" strokeWidth={2} />
+                        <span className="text-sm text-neutral-700 dark:text-neutral-300">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  {/* CTA Button */}
+                  <button
+                    disabled={plan.isCurrent}
+                    className={`w-full py-2.5 px-4 rounded-lg font-medium transition-all duration-200 ${plan.isCurrent
+                      ? 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 cursor-default'
+                      : plan.featured
+                        ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:opacity-90 active:scale-95'
+                        : 'bg-white dark:bg-neutral-950 text-neutral-900 dark:text-white border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900'
+                      }`}
+                  >
+                    {plan.isCurrent ? 'Current Plan' : 'Upgrade'}
+                  </button>
+                </div>
               </div>
-              <span className="px-4 py-2 bg-gray-200 text-gray-700 rounded-xl text-sm font-medium">Current</span>
-            </div>
-            <Button variant="primary" fullWidth>
-              <CreditCard className="w-5 h-5 mr-2" />
-              {role === 'student' ? 'Upgrade to Student Pro ($3/mo)' : 'Upgrade to Pro ($9/mo)'}
-            </Button>
+            ))}
           </div>
         </div>
 
-        <div className="border-t border-gray-200 pt-8">
-          <h4 className="text-lg font-semibold mb-4">Password</h4>
-          <Button variant="outline" onClick={() => {
-            // This would open a password change modal or redirect to a password change page
-            alert('Password change functionality would be implemented here');
-          }}>
-            Change Password
-          </Button>
-        </div>
-
-        <div className="border-t border-gray-200 pt-8">
-          <h4 className="text-lg font-semibold mb-4 text-red-600">Danger Zone</h4>
-          <div className="p-6 bg-red-50 border-2 border-red-200 rounded-2xl">
-            <div className="flex items-start gap-4">
-              <AlertTriangle className="w-6 h-6 text-red-600 flex-shrink-0 mt-1" />
-              <div className="flex-1">
-                <p className="font-medium mb-2">Delete Account</p>
-                <p className="text-sm text-gray-600 mb-4">
-                  Once you delete your account, there is no going back. All your data will be permanently removed.
-                </p>
-                <Button
-                  variant="outline"
-                  onClick={() => setShowDeleteModal(true)}
-                  className="border-red-300 text-red-600 hover:bg-red-50"
-                >
-                  Delete Account
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="border-t border-gray-200 pt-8">
+        <div className="border-t border-gray-200 dark:border-neutral-800 pt-8">
           <Button
             variant="outline"
             onClick={handleLogout}
@@ -260,39 +289,6 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
           </Button>
         </div>
       </div>
-
-      <Modal
-        isOpen={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        title="Delete Account"
-        size="sm"
-      >
-        <div className="text-center py-4">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <AlertTriangle className="w-8 h-8 text-red-600" />
-          </div>
-          <h4 className="text-lg font-semibold mb-2">Are you sure?</h4>
-          <p className="text-gray-600 mb-6">
-            This action cannot be undone. All your data will be permanently deleted.
-          </p>
-          <div className="flex gap-3">
-            <Button
-              variant="outline"
-              onClick={() => setShowDeleteModal(false)}
-              fullWidth
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleDeleteAccount}
-              fullWidth
-              className="bg-red-600 hover:bg-red-700"
-            >
-              Delete Account
-            </Button>
-          </div>
-        </div>
-      </Modal>
     </div >
   );
 }

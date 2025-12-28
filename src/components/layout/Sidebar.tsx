@@ -52,7 +52,7 @@ export function Sidebar() {
             {/* Logo */}
             <div className="p-6 border-b border-gray-200">
                 <Link href="/mycards" className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center">
+                    <div className="w-10 h-10 bg-neutral-900 rounded-xl flex items-center justify-center">
                         <span className="text-white text-xl font-bold">S</span>
                     </div>
                     <span className="text-xl font-semibold text-gray-900">SmartCard</span>
@@ -70,8 +70,8 @@ export function Sidebar() {
                             key={item.href}
                             href={item.href}
                             className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${isActive
-                                ? 'bg-indigo-50 text-indigo-600'
-                                : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600'
+                                ? 'bg-neutral-100 text-neutral-900'
+                                : 'text-gray-700 hover:bg-gray-50 hover:text-neutral-900'
                                 }`}
                         >
                             <Icon className="w-5 h-5" />
@@ -94,7 +94,7 @@ export function Sidebar() {
                 ) : user ? (
                     <>
                         <div className="flex items-center gap-3 px-4 py-3 mb-2">
-                            <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-full flex items-center justify-center">
+                            <div className="w-10 h-10 bg-neutral-900 rounded-full flex items-center justify-center">
                                 <span className="text-white text-sm font-medium">
                                     {user.email?.substring(0, 2).toUpperCase()}
                                 </span>

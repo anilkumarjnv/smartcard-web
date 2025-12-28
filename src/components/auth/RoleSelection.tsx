@@ -42,14 +42,14 @@ export function RoleSelection({ onRoleSelect, selectedRole, isLoading }: RoleSel
               className={`
                 relative p-6 rounded-2xl border-2 transition-all text-left
                 ${isSelected
-                  ? 'border-indigo-600 bg-indigo-50 ring-2 ring-indigo-200'
+                  ? 'border-neutral-900 bg-neutral-50 ring-2 ring-neutral-200'
                   : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                 }
                 ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
               `}
             >
               {isSelected && (
-                <div className="absolute top-4 right-4 bg-indigo-600 rounded-full p-1">
+                <div className="absolute top-4 right-4 bg-neutral-900 rounded-full p-1">
                   <Check className="w-4 h-4 text-white" />
                 </div>
               )}
@@ -57,7 +57,7 @@ export function RoleSelection({ onRoleSelect, selectedRole, isLoading }: RoleSel
               <div className="flex items-start gap-4">
                 <div className={`
                   w-12 h-12 rounded-xl flex items-center justify-center text-2xl
-                  ${isSelected ? 'bg-indigo-600' : 'bg-gray-100'}
+                  ${isSelected ? 'bg-neutral-900' : 'bg-gray-100'}
                 `}>
                   <Icon className={`w-6 h-6 ${isSelected ? 'text-white' : 'text-gray-600'}`} />
                 </div>

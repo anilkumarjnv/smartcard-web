@@ -25,7 +25,7 @@ export function ThemeCustomizationTab({ cardId, onThemeUpdate }: ThemeCustomizat
   const currentCard = cardId ? specificCard : (cards && cards.length > 0 ? cards[0] : null);
 
   // Theme state using new simple format
-  const [selectedTheme, setSelectedTheme] = useState<'light' | 'dark' | 'accent'>('light');
+  const [selectedTheme, setSelectedTheme] = useState<'light' | 'dark' | 'accent' | 'neutral'>('light');
   const [selectedShape, setSelectedShape] = useState<ProfileCardShape>('wave');
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -37,7 +37,7 @@ export function ThemeCustomizationTab({ cardId, onThemeUpdate }: ThemeCustomizat
 
       // Check if it's the new format with profileTheme
       if (theme.profileTheme) {
-        setSelectedTheme(theme.profileTheme as 'light' | 'dark' | 'accent');
+        setSelectedTheme(theme.profileTheme as 'light' | 'dark' | 'accent' | 'neutral');
       }
       // Default to light theme for legacy cards
       else {
@@ -63,7 +63,7 @@ export function ThemeCustomizationTab({ cardId, onThemeUpdate }: ThemeCustomizat
     }
   }, []); // Only run once on mount
 
-  const handleThemeChange = async (theme: 'light' | 'dark' | 'accent') => {
+  const handleThemeChange = async (theme: 'light' | 'dark' | 'accent' | 'neutral') => {
     setSelectedTheme(theme);
     await saveThemeAndShape(theme, selectedShape);
   };
@@ -73,7 +73,7 @@ export function ThemeCustomizationTab({ cardId, onThemeUpdate }: ThemeCustomizat
     await saveThemeAndShape(selectedTheme, shape);
   };
 
-  const saveThemeAndShape = async (theme: 'light' | 'dark' | 'accent', shape: ProfileCardShape) => {
+  const saveThemeAndShape = async (theme: 'light' | 'dark' | 'accent' | 'neutral', shape: ProfileCardShape) => {
     const updatedTheme = {
       profileTheme: theme,
       shape: shape,
@@ -116,11 +116,11 @@ export function ThemeCustomizationTab({ cardId, onThemeUpdate }: ThemeCustomizat
   };
 
   return (
-    <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm">
-      <h3 className="text-2xl font-bold mb-2">Customize Theme</h3>
-      <p className="text-gray-600 mb-8">Choose a professional theme for your digital profile card</p>
+    <div className="bg-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-sm border border-border">
+      <h3 className="text-xl sm:text-2xl font-bold mb-2 text-foreground">Customize Theme</h3>
+      <p className="text-muted-foreground text-sm sm:text-base mb-6 sm:mb-8">Choose a professional theme for your digital profile card</p>
 
-      <div className="space-y-8">
+      <div className="space-y-6 sm:space-y-8">
         {/* New Theme Selector */}
         <div>
           <ThemeSelector
@@ -130,7 +130,7 @@ export function ThemeCustomizationTab({ cardId, onThemeUpdate }: ThemeCustomizat
         </div>
 
         {/* Shape Selector */}
-        <div className="border-t border-gray-200 pt-8">
+        <div className="border-t border-border pt-6 sm:pt-8">
           <ShapeSelector
             selectedShape={selectedShape}
             onShapeChange={handleShapeChange}
@@ -138,36 +138,36 @@ export function ThemeCustomizationTab({ cardId, onThemeUpdate }: ThemeCustomizat
         </div>
 
         {/* Theme Features */}
-        <div className="border-t border-gray-200 pt-8">
-          <h4 className="text-lg font-semibold mb-4">Theme Features</h4>
-          <div className="grid gap-4">
-            <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl">
-              <svg className="w-5 h-5 text-indigo-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="border-t border-border pt-6 sm:pt-8">
+          <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-foreground">Theme Features</h4>
+          <div className="grid gap-3 sm:gap-4">
+            <div className="flex items-start gap-3 p-4 bg-muted/50 dark:bg-neutral-800/50 rounded-xl">
+              <svg className="w-5 h-5 text-primary mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
               <div>
-                <h5 className="font-medium text-gray-900">Background Image Hero</h5>
-                <p className="text-sm text-gray-600">Your profile photo serves as an editorial-style header</p>
+                <h5 className="font-medium text-foreground">Background Image Hero</h5>
+                <p className="text-sm text-muted-foreground">Your profile photo serves as an editorial-style header</p>
               </div>
             </div>
 
-            <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl">
-              <svg className="w-5 h-5 text-indigo-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex items-start gap-3 p-4 bg-muted/50 dark:bg-neutral-800/50 rounded-xl">
+              <svg className="w-5 h-5 text-primary mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
               </svg>
               <div>
-                <h5 className="font-medium text-gray-900">Wave Shape Dividers</h5>
-                <p className="text-sm text-gray-600">Smooth, professional transitions between sections</p>
+                <h5 className="font-medium text-foreground">Wave Shape Dividers</h5>
+                <p className="text-sm text-muted-foreground">Smooth, professional transitions between sections</p>
               </div>
             </div>
 
-            <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl">
-              <svg className="w-5 h-5 text-indigo-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex items-start gap-3 p-4 bg-muted/50 dark:bg-neutral-800/50 rounded-xl">
+              <svg className="w-5 h-5 text-primary mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
               </svg>
               <div>
-                <h5 className="font-medium text-gray-900">Mobile Optimized</h5>
-                <p className="text-sm text-gray-600">Perfect for sharing via NFC, QR codes, and messaging apps</p>
+                <h5 className="font-medium text-foreground">Mobile Optimized</h5>
+                <p className="text-sm text-muted-foreground">Perfect for sharing via NFC, QR codes, and messaging apps</p>
               </div>
             </div>
           </div>

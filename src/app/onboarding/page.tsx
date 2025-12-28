@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabaseClient';
+import { apiClient } from '@/lib/apiClient';
 import { getAvailableRoles, UserRole } from '@/lib/roles';
 import { Button } from '@/components/molecules/Button';
 import { Check, GraduationCap, Briefcase } from 'lucide-react';
@@ -22,21 +22,7 @@ export default function OnboardingPage() {
 
         setLoading(true);
         try {
-            const supabase = createClient();
-            const { data: { user } } = await supabase.auth.getUser();
-
-            if (!user) throw new Error('No user found');
-
-            // Call the RPC function to update role in both profiles and auth.users
-            const { error } = await supabase.rpc('update_user_role', {
-                user_id: user.id,
-                new_role: selectedRole
-            });
-
-            if (error) throw error;
-
-            // Force refresh session to get new metadata
-            await supabase.auth.refreshSession();
+            await apiClient.patch('/api/v1/auth/me/role', { role: selectedRole });
 
             router.push('/mycards');
         } catch (error) {
@@ -48,40 +34,40 @@ export default function OnboardingPage() {
     };
 
     return (
-        <div className="min-h-screen bg-background flex items-center justify-center p-6">
+        <div className="min-h-screen bg-background flex items-center justify-center p-3 sm:p-4 md:p-6 py-8 sm:py-10">
             <div className="max-w-2xl w-full">
-                <div className="text-center mb-12">
-                    <h1 className="text-3xl font-bold mb-4">Welcome to SmartCard!</h1>
-                    <p className="text-muted-foreground text-lg">
+                <div className="text-center mb-6 sm:mb-8 md:mb-12">
+                    <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4">Welcome to SmartCard!</h1>
+                    <p className="text-muted-foreground text-sm sm:text-base md:text-lg px-2 sm:px-0">
                         To get started, please tell us how you plan to use SmartCard.
-                        <br />
+                        <br className="hidden sm:block" />
                         This helps us customize your experience.
                     </p>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-6 mb-10">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8 md:mb-10">
                     {roles.map((role) => (
                         <div
                             key={role.id}
                             onClick={() => handleRoleSelect(role.id)}
-                            className={`relative p-6 rounded-2xl border-2 cursor-pointer transition-all hover:border-primary/50 hover:bg-accent/50 ${selectedRole === role.id
-                                    ? 'border-primary bg-primary/5 ring-2 ring-primary/20'
-                                    : 'border-border bg-card'
+                            className={`relative p-4 sm:p-5 md:p-6 rounded-xl sm:rounded-2xl border-2 cursor-pointer transition-all hover:border-primary/50 hover:bg-accent/50 ${selectedRole === role.id
+                                ? 'border-primary bg-primary/5 ring-2 ring-primary/20'
+                                : 'border-border bg-card'
                                 }`}
                         >
                             {selectedRole === role.id && (
-                                <div className="absolute top-4 right-4 w-6 h-6 bg-primary rounded-full flex items-center justify-center text-primary-foreground">
-                                    <Check className="w-4 h-4" />
+                                <div className="absolute top-3 sm:top-4 right-3 sm:right-4 w-5 h-5 sm:w-6 sm:h-6 bg-primary rounded-full flex items-center justify-center text-primary-foreground">
+                                    <Check className="w-3 h-3 sm:w-4 sm:h-4" />
                                 </div>
                             )}
 
-                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl mb-4 ${role.id === 'student' ? 'bg-blue-100 text-blue-600' : 'bg-indigo-100 text-indigo-600'
+                            <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center text-xl sm:text-2xl mb-3 sm:mb-4 ${role.id === 'student' ? 'bg-neutral-100 text-neutral-900' : 'bg-neutral-100 text-neutral-900'
                                 }`}>
                                 {role.id === 'student' ? <GraduationCap /> : <Briefcase />}
                             </div>
 
-                            <h3 className="text-xl font-semibold mb-2">{role.name}</h3>
-                            <p className="text-muted-foreground text-sm">{role.description}</p>
+                            <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-1 sm:mb-2">{role.name}</h3>
+                            <p className="text-muted-foreground text-xs sm:text-sm">{role.description}</p>
                         </div>
                     ))}
                 </div>
@@ -91,7 +77,7 @@ export default function OnboardingPage() {
                         size="lg"
                         onClick={handleSubmit}
                         disabled={!selectedRole || loading}
-                        className="w-full md:w-auto min-w-[200px]"
+                        className="w-full sm:w-auto min-w-[200px]"
                     >
                         {loading ? 'Setting up...' : 'Continue'}
                     </Button>

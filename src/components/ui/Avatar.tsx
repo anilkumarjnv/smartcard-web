@@ -44,7 +44,7 @@ export function Avatar({
             className={`
         relative inline-flex items-center justify-center
         rounded-full overflow-hidden
-        bg-gradient-to-br from-blue-500 to-purple-600
+        bg-gradient-to-br from-neutral-900 to-neutral-800
         ${sizeStyles[size]}
         ${className}
       `}

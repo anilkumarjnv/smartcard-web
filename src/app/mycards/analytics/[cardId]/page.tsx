@@ -3,7 +3,6 @@ import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import CardAnalyticsClient from "@/components/CardAnalyticsClient";
-import { AppTopbar } from '@/components/navigation/AppTopbar';
 
 interface Props {
   params: { cardId: string } | Promise<{ cardId: string }>;
@@ -87,11 +86,8 @@ export default async function CardAnalyticsPage(props: Props) {
   }
 
   return (
-    <div>
-      <AppTopbar title="Analytics" subtitle="View your card performance and insights" />
-      <div className="p-6">
-        <CardAnalyticsClient cardId={cardId} />
-      </div>
+    <div className="p-3 sm:p-4 md:p-6">
+      <CardAnalyticsClient cardId={cardId} />
     </div>
   );
 }

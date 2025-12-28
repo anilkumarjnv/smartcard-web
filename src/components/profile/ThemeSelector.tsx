@@ -5,8 +5,8 @@ import { Check } from 'lucide-react';
 import { PROFILE_THEMES, type ProfileCardTheme } from '../CardPreview';
 
 interface ThemeSelectorProps {
-    selectedTheme?: 'light' | 'dark' | 'accent';
-    onThemeChange: (theme: 'light' | 'dark' | 'accent') => void;
+    selectedTheme?: 'light' | 'dark' | 'accent' | 'neutral';
+    onThemeChange: (theme: 'light' | 'dark' | 'accent' | 'neutral') => void;
 }
 
 /**
@@ -32,6 +32,11 @@ export function ThemeSelector({ selectedTheme = 'light', onThemeChange }: ThemeS
             background: '#FFFFFF',
             border: '#DDD6FE',
         },
+        neutral: {
+            primary: '#111111',
+            background: '#FFFFFF',
+            border: '#E5E5E5',
+        },
     };
 
     return (
@@ -45,7 +50,7 @@ export function ThemeSelector({ selectedTheme = 'light', onThemeChange }: ThemeS
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {PROFILE_THEMES.map((theme) => {
                     const colors = themeColors[theme.name];
                     const isSelected = selectedTheme === theme.name;
@@ -58,16 +63,16 @@ export function ThemeSelector({ selectedTheme = 'light', onThemeChange }: ThemeS
                             onMouseEnter={() => setHoveredTheme(theme.name)}
                             onMouseLeave={() => setHoveredTheme(null)}
                             className={`relative p-4 rounded-xl border-2 transition-all duration-200 text-left ${isSelected
-                                ? 'border-indigo-600 dark:border-indigo-400 shadow-lg'
-                                : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600'
+                                ? 'border-neutral-900 dark:border-neutral-100 shadow-lg'
+                                : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-600 dark:hover:border-neutral-600'
                                 }`}
                         >
                             {/* Selected Indicator */}
-                            {isSelected && (
-                                <div className="absolute top-3 right-3 w-6 h-6 bg-indigo-600 dark:bg-indigo-400 rounded-full flex items-center justify-center">
+                            {/* {isSelected && (
+                                <div className="absolute top-3 right-3 w-6 h-6 bg-neutral-900 dark:bg-neutral-100 rounded-full flex items-center justify-center">
                                     <Check className="w-4 h-4 text-white" strokeWidth={3} />
                                 </div>
-                            )}
+                            )} */}
 
                             {/* Theme Preview */}
                             <div className="mb-3">
@@ -113,7 +118,7 @@ export function ThemeSelector({ selectedTheme = 'light', onThemeChange }: ThemeS
 
                             {/* Hover effect */}
                             {isHovered && !isSelected && (
-                                <div className="absolute inset-0 bg-neutral-50 dark:bg-neutral-800/20 rounded-xl pointer-events-none" />
+                                <div className="absolute inset-0 bg-neutral-900/5 dark:bg-neutral-800/20 rounded-xl pointer-events-none" />
                             )}
                         </button>
                     );

@@ -38,13 +38,13 @@ export function Nav() {
     }
 
     return (
-        <nav className="bg-white border-b border-gray-200">
+        <nav className="bg-white border-b border-gray-200 dark:bg-neutral-900 dark:border-neutral-800">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16">
                     {/* Logo */}
                     <Link href="/" className="flex items-center space-x-2">
-                        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg" />
-                        <span className="text-xl font-bold text-gray-900">SmartCard</span>
+                        <div className="w-8 h-8 bg-neutral-900 dark:bg-white rounded-lg" />
+                        <span className="text-xl font-bold text-gray-900 dark:text-white">SmartCard</span>
                     </Link>
 
                     {/* Navigation Links */}
@@ -54,8 +54,8 @@ export function Nav() {
                                 <Link
                                     href="/mycards"
                                     className={`text-sm font-medium transition-colors ${pathname.startsWith('/mycards')
-                                        ? 'text-blue-600'
-                                        : 'text-gray-700 hover:text-blue-600'
+                                        ? 'text-neutral-900 dark:text-white'
+                                        : 'text-gray-700 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'
                                         }`}
                                 >
                                     My Cards
@@ -63,8 +63,8 @@ export function Nav() {
                                 <Link
                                     href="/leads"
                                     className={`text-sm font-medium transition-colors ${pathname.startsWith('/leads')
-                                        ? 'text-blue-600'
-                                        : 'text-gray-700 hover:text-blue-600'
+                                        ? 'text-neutral-900 dark:text-white'
+                                        : 'text-gray-700 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'
                                         }`}
                                 >
                                     Leads
@@ -74,13 +74,13 @@ export function Nav() {
                             <>
                                 <Link
                                     href="#features"
-                                    className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
+                                    className="text-sm font-medium text-gray-700 hover:text-neutral-900 transition-colors dark:text-neutral-400 dark:hover:text-white"
                                 >
                                     Features
                                 </Link>
                                 <Link
                                     href="#pricing"
-                                    className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
+                                    className="text-sm font-medium text-gray-700 hover:text-neutral-900 transition-colors dark:text-neutral-400 dark:hover:text-white"
                                 >
                                     Pricing
                                 </Link>
