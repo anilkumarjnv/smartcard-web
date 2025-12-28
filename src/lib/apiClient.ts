@@ -10,7 +10,7 @@
  * needed for Supabase public endpoints.
  */
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8080';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
 /**
  * Standard API error response
