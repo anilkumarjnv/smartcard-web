@@ -104,7 +104,7 @@ export default function EditCardPage({ params }: PageProps) {
         }
     };
 
-    const handleThemeChange = (theme: 'light' | 'dark' | 'accent') => {
+    const handleThemeChange = (theme: 'light' | 'dark' | 'accent' | 'neutral') => {
         setFormData(prev => ({
             ...prev,
             theme: {
