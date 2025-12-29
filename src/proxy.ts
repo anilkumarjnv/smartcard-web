@@ -37,6 +37,21 @@ export async function proxy(request: NextRequest) {
         data: { user },
     } = await supabase.auth.getUser();
 
+    // Admin routes (strictest protection)
+    if (request.nextUrl.pathname.startsWith('/admin')) {
+        if (!user) {
+            return NextResponse.redirect(new URL('/login', request.url));
+        }
+
+        // Check if user is admin
+        const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim().toLowerCase()) || [];
+        const userEmail = user.email?.toLowerCase();
+
+        if (!userEmail || !adminEmails.includes(userEmail)) {
+            return NextResponse.redirect(new URL('/', request.url));
+        }
+    }
+
     // Protected routes
     if (request.nextUrl.pathname.startsWith('/mycards') ||
         request.nextUrl.pathname.startsWith('/settings') ||
