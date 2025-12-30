@@ -153,7 +153,11 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onC
   useEffect(() => {
     if (initialFormData && initialFormData._cardId === cardId) {
       const { _cardId, ...formDataWithoutId } = initialFormData;
-      setFormData(formDataWithoutId);
+      setFormData({
+        ...formDataWithoutId,
+        additional_links: formDataWithoutId.additional_links || [],
+        custom_highlights: formDataWithoutId.custom_highlights || []
+      });
       setImagePreview(formDataWithoutId.photo_url || '');
       onFormChange?.(formDataWithoutId);
       return;

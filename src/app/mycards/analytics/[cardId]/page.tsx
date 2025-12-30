@@ -56,8 +56,11 @@ export default async function CardAnalyticsPage(props: Props) {
   }
 
   try {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+    console.log(`Fetching card from: ${apiUrl}/api/v1/cards/${cardId}`); // Debug log
+
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/cards/${cardId}`,
+      `${apiUrl}/api/v1/cards/${cardId}`,
       {
         headers: {
           'Authorization': `Bearer ${token}`,

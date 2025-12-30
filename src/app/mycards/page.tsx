@@ -61,7 +61,12 @@ function MyCardsContent() {
                         twitter: (currentCard.social_links as Record<string, string>)?.twitter || '',
                         github: (currentCard.social_links as Record<string, string>)?.github || '',
                         whatsapp: (currentCard.social_links as Record<string, string>)?.whatsapp || ''
-                    }
+                    },
+                    additional_links: cardData.custom_data?.additional_links || [],
+                    custom_highlights: cardData.custom_data?.custom_highlights || [],
+                    cta_button: cardData.custom_data?.cta_button,
+                    domain: cardData.custom_data?.domain || '',
+                    country_code: cardData.custom_data?.country_code || '+91'
                 };
                 setPersistedFormData(initialFormData);
                 setLiveFormData(initialFormData);
