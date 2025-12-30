@@ -10,7 +10,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "SmartCard - Digital Business Cards",
+  title: "Cardfil - Digital Business Cards",
   description: "Create and share professional digital business cards instantly",
 };
 

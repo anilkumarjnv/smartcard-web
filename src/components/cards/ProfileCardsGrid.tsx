@@ -63,7 +63,7 @@ export function ProfileCardsGrid({ cards }: ProfileCardsGridProps) {
             // Create download link
             const link = document.createElement('a');
             link.href = blobUrl;
-            link.download = `smartcard-${card.slug || 'qr'}.png`;
+            link.download = `cardfil-${card.slug || 'qr'}.png`;
 
             // Trigger download
             document.body.appendChild(link);

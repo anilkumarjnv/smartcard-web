@@ -55,7 +55,7 @@ export function Sidebar() {
                     <div className="w-10 h-10 bg-neutral-900 rounded-xl flex items-center justify-center">
                         <span className="text-white text-xl font-bold">S</span>
                     </div>
-                    <span className="text-xl font-semibold text-gray-900">SmartCard</span>
+                    <span className="text-xl font-semibold text-gray-900">Cardfil</span>
                 </Link>
             </div>
 

@@ -27,10 +27,12 @@ export function ShareTab({ cardId }: ShareTabProps) {
   const [copied, setCopied] = useState(false);
   const [showBranding, setShowBranding] = useState(true);
 
+  const [isDownloadingQR, setIsDownloadingQR] = useState(false);
+
   // Generate the profile URL based on the card slug
   const profileUrl = currentCard
     ? `${typeof window !== 'undefined' ? window.location.origin : ''}/${currentCard.slug}`
-    : 'https://smartcard.app/your-card';
+    : 'https://cardfil.com/your-card';
 
   const handleCopyLink = () => {
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
@@ -41,6 +43,7 @@ export function ShareTab({ cardId }: ShareTabProps) {
   };
 
   const handleDownloadQR = async () => {
+    setIsDownloadingQR(true);
     try {
       // Generate QR code URL
       const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(profileUrl)}`;
@@ -55,7 +58,7 @@ export function ShareTab({ cardId }: ShareTabProps) {
       // Create download link
       const link = document.createElement('a');
       link.href = blobUrl;
-      link.download = `smartcard-${currentCard?.slug || 'qr'}.png`;
+      link.download = `cardfil-${currentCard?.slug || 'qr'}.png`;
 
       // Trigger download
       document.body.appendChild(link);
@@ -67,6 +70,8 @@ export function ShareTab({ cardId }: ShareTabProps) {
     } catch (error) {
       console.error('Failed to download QR code:', error);
       alert('Failed to download QR code. Please try again.');
+    } finally {
+      setIsDownloadingQR(false);
     }
   };
 
@@ -142,6 +147,7 @@ export function ShareTab({ cardId }: ShareTabProps) {
                 variant="outline"
                 size="lg"
                 fullWidth
+                isLoading={isDownloadingQR}
                 className="mt-4"
               >
                 <Download className="w-5 h-5 mr-2" />
@@ -153,7 +159,7 @@ export function ShareTab({ cardId }: ShareTabProps) {
           <div className="border-t border-border pt-6">
             <div className="flex items-center justify-between p-4 bg-muted dark:bg-neutral-800 rounded-2xl">
               <div>
-                <p className="text-sm font-medium text-foreground">Show SmartCard Branding</p>
+                <p className="text-sm font-medium text-foreground">Show Cardfil Branding</p>
                 <p className="text-xs text-muted-foreground mt-1">Remove with Pro plan</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">

@@ -25,9 +25,9 @@ function LoginContent() {
                     {/* Logo */}
                     <div className="flex items-center gap-3 mb-8">
                         <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center">
-                            <span className="text-primary-foreground text-xl font-bold">S</span>
+                            <span className="text-primary-foreground text-xl font-bold">C</span>
                         </div>
-                        <span className="text-2xl font-semibold">SmartCard</span>
+                        <span className="text-2xl font-semibold">Cardfil</span>
                     </div>
 
                     {/* Header */}
@@ -68,7 +68,7 @@ function LoginContent() {
                             <div className="w-full border-t border-border" />
                         </div>
                         <div className="relative flex justify-center text-sm">
-                            <span className="px-4 bg-card text-muted-foreground">New to SmartCard?</span>
+                            <span className="px-4 bg-card text-muted-foreground">New to Cardfil?</span>
                         </div>
                     </div>
 

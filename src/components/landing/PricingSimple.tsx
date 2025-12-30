@@ -18,8 +18,8 @@ const plans = [
     },
     {
         name: 'Professional',
-        price: '₹199',
-        originalPrice: '₹999',
+        price: '₹299',
+        originalPrice: '₹799',
         period: 'lifetime',
         badge: 'Most Popular',
         featured: true,
@@ -45,8 +45,8 @@ export function PricingSimple() {
                     viewport={{ once: true }}
                     transition={{ duration: 0.6, delay: index * 0.1 }}
                     className={`rounded-lg p-8 relative ${plan.featured
-                            ? 'bg-white dark:bg-neutral-900 border-2 border-neutral-900 dark:border-white shadow-lg'
-                            : 'bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700'
+                        ? 'bg-white dark:bg-neutral-900 border-2 border-neutral-900 dark:border-white shadow-lg'
+                        : 'bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700'
                         }`}
                 >
                     {/* Badge */}
@@ -89,8 +89,8 @@ export function PricingSimple() {
                         <Link href="/signup" className="block">
                             <button
                                 className={`w-full py-3 px-6 rounded-md font-medium transition-all duration-200 ${plan.featured
-                                        ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:-translate-y-0.5 active:scale-98'
-                                        : 'bg-transparent border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white hover:-translate-y-0.5 active:scale-98'
+                                    ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:-translate-y-0.5 active:scale-98'
+                                    : 'bg-transparent border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white hover:-translate-y-0.5 active:scale-98'
                                     }`}
                             >
                                 {plan.featured ? 'Get Early Access' : 'Get Started'}

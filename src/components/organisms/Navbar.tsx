@@ -55,9 +55,9 @@ export function Navbar({ variant = 'default', isLandingPage = false, onLoginClic
           <div className="flex items-center justify-between">
             <Link href="/mycards" className="flex items-center gap-3">
               <div className="w-9 h-9 bg-neutral-900 rounded-lg flex items-center justify-center">
-                <span className="text-white text-lg font-bold">S</span>
+                <span className="text-white text-lg font-bold">C</span>
               </div>
-              <span className="text-lg font-semibold text-neutral-900 tracking-tight hidden sm:block">SmartShare</span>
+              <span className="text-lg font-semibold text-neutral-900 tracking-tight hidden sm:block">Cardfil</span>
             </Link>
 
             {user && (
@@ -125,9 +125,9 @@ export function Navbar({ variant = 'default', isLandingPage = false, onLoginClic
       <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3">
           <div className="w-9 h-9 bg-neutral-900 dark:bg-white rounded-lg flex items-center justify-center">
-            <span className="text-white dark:text-neutral-900 text-lg font-bold">S</span>
+            <span className="text-white dark:text-neutral-900 text-lg font-bold">C</span>
           </div>
-          <span className="text-lg font-semibold text-neutral-900 dark:text-white tracking-tight hidden sm:inline-block">SmartShare</span>
+          <span className="text-lg font-semibold text-neutral-900 dark:text-white tracking-tight hidden sm:inline-block">Cardfil</span>
         </Link>
 
         <div className="flex items-center gap-3">

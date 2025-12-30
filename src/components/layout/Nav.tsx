@@ -44,7 +44,7 @@ export function Nav() {
                     {/* Logo */}
                     <Link href="/" className="flex items-center space-x-2">
                         <div className="w-8 h-8 bg-neutral-900 dark:bg-white rounded-lg" />
-                        <span className="text-xl font-bold text-gray-900 dark:text-white">SmartCard</span>
+                        <span className="text-xl font-bold text-gray-900 dark:text-white">Cardfil</span>
                     </Link>
 
                     {/* Navigation Links */}
