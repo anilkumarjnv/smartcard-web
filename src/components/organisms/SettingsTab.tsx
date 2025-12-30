@@ -29,7 +29,7 @@ const plans = [
   },
   {
     name: 'Professional',
-    price: '₹199',
+    price: '₹299',
     originalPrice: '₹999',
     period: 'lifetime',
     badge: 'Most Popular',
@@ -182,8 +182,8 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
               disabled
             />
             <p className="text-xs text-gray-500 px-1">Email cannot be changed for security reasons</p>
-            <Button onClick={handleSaveProfile} disabled={isSaving}>
-              {isSaving ? 'Saving...' : 'Save Changes'}
+            <Button onClick={handleSaveProfile} isLoading={isSaving}>
+              Save Changes
             </Button>
           </div>
         </div>
@@ -232,66 +232,23 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
 
         <div className="border-t border-gray-200 dark:border-neutral-800 pt-8">
           <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-neutral-900 dark:text-white">Subscription</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-            {plans.map((plan, index) => (
-              <div
-                key={plan.name}
-                className={`relative rounded-xl p-6 ${plan.featured
-                  ? 'bg-white dark:bg-neutral-900 border-2 border-neutral-900 dark:border-white shadow-lg'
-                  : 'bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800'
-                  }`}
-              >
-                {/* Badge */}
-                {plan.badge && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-white text-xs font-semibold px-3 py-1 rounded-full border border-neutral-200 dark:border-neutral-700 whitespace-nowrap">
-                      {plan.badge}
-                    </span>
-                  </div>
-                )}
-
-                <div className="space-y-4">
-                  {/* Plan name */}
-                  <h3 className="text-xl font-bold text-neutral-900 dark:text-white">{plan.name}</h3>
-
-                  {/* Price */}
-                  <div className="flex items-baseline gap-2">
-                    {plan.originalPrice && (
-                      <span className="text-sm text-neutral-400 dark:text-neutral-500 line-through">
-                        {plan.originalPrice}
-                      </span>
-                    )}
-                    <span className="text-3xl font-bold text-neutral-900 dark:text-white">{plan.price}</span>
-                    {plan.period && (
-                      <span className="text-sm text-neutral-600 dark:text-neutral-400">/ {plan.period}</span>
-                    )}
-                  </div>
-
-                  {/* Features */}
-                  <ul className="space-y-2">
-                    {plan.features.map((feature) => (
-                      <li key={feature} className="flex items-center gap-2">
-                        <Check className="w-4 h-4 text-neutral-900 dark:text-white flex-shrink-0" strokeWidth={2} />
-                        <span className="text-sm text-neutral-700 dark:text-neutral-300">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  {/* CTA Button */}
-                  <button
-                    disabled={plan.isCurrent}
-                    className={`w-full py-2.5 px-4 rounded-lg font-medium transition-all duration-200 ${plan.isCurrent
-                      ? 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 cursor-default'
-                      : plan.featured
-                        ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:opacity-90 active:scale-95'
-                        : 'bg-white dark:bg-neutral-950 text-neutral-900 dark:text-white border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900'
-                      }`}
-                  >
-                    {plan.isCurrent ? 'Current Plan' : 'Upgrade'}
-                  </button>
+          <div className="p-6 bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-200 dark:border-yellow-900/30 rounded-xl">
+            <div className="flex items-start gap-4">
+              <div className="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
+                <CreditCard className="w-6 h-6 text-yellow-700 dark:text-yellow-500" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-neutral-900 dark:text-white mb-1">Free Public Beta</h3>
+                <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed max-w-2xl">
+                  You are currently using the <span className="font-medium text-neutral-900 dark:text-white">Professional Plan</span> features for free as part of our beta program.
+                  Enjoy full access to analytics, custom domains (coming soon), and premium themes without any charge.
+                </p>
+                <div className="mt-4 flex items-center gap-2 text-sm text-yellow-800 dark:text-yellow-500 font-medium">
+                  <Check className="w-4 h-4" />
+                  <span>No credit card required during beta</span>
                 </div>
               </div>
-            ))}
+            </div>
           </div>
         </div>
 

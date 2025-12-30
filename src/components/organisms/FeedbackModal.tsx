@@ -138,8 +138,8 @@ export function FeedbackModal({ isOpen, onClose, trigger = 'manual' }: FeedbackM
                                             }
                                         }}
                                         className={`flex items-center gap-2 p-3 rounded-lg border-2 transition-all ${isSelected
-                                                ? 'border-neutral-900 dark:border-neutral-100 bg-neutral-100 dark:bg-neutral-800'
-                                                : 'border-border hover:border-neutral-400 dark:hover:border-neutral-600'
+                                            ? 'border-neutral-900 dark:border-neutral-100 bg-neutral-100 dark:bg-neutral-800'
+                                            : 'border-border hover:border-neutral-400 dark:hover:border-neutral-600'
                                             }`}
                                     >
                                         <Icon className={`w-4 h-4 ${isSelected ? 'text-foreground' : 'text-muted-foreground'}`} />
@@ -180,8 +180,8 @@ export function FeedbackModal({ isOpen, onClose, trigger = 'manual' }: FeedbackM
                                 >
                                     <Star
                                         className={`w-8 h-8 ${formData.rating && star <= formData.rating
-                                                ? 'fill-yellow-400 text-yellow-400'
-                                                : 'text-neutral-300 dark:text-neutral-600'
+                                            ? 'fill-yellow-400 text-yellow-400'
+                                            : 'text-neutral-300 dark:text-neutral-600'
                                             }`}
                                     />
                                 </button>
@@ -207,9 +207,9 @@ export function FeedbackModal({ isOpen, onClose, trigger = 'manual' }: FeedbackM
                         <Button
                             type="submit"
                             className="w-full"
-                            disabled={loading}
+                            isLoading={loading}
                         >
-                            {loading ? 'Submitting...' : 'Submit Feedback'}
+                            Submit Feedback
                         </Button>
                     </div>
                 </form>

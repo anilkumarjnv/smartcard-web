@@ -15,7 +15,6 @@ const navItems = [
 
 const bottomNavItems = [
     { href: "/settings", icon: Settings, label: "Settings" },
-    { href: "/help", icon: HelpCircle, label: "Help" },
 ]
 
 export function AppSidebar() {

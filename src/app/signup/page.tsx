@@ -58,7 +58,7 @@ function SignupContent() {
                         <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center">
                             <span className="text-primary-foreground text-xl font-bold">S</span>
                         </div>
-                        <span className="text-2xl font-semibold">SmartCard</span>
+                        <span className="text-2xl font-semibold">Cardfil</span>
                     </div>
 
                     {/* Header */}

@@ -66,9 +66,9 @@ export default function OnboardingPage() {
         <div className="min-h-screen bg-background flex items-center justify-center p-3 sm:p-4 md:p-6 py-8 sm:py-10">
             <div className="max-w-2xl w-full">
                 <div className="text-center mb-6 sm:mb-8 md:mb-12">
-                    <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4">Welcome to SmartCard!</h1>
+                    <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4">Welcome to Cardfil!</h1>
                     <p className="text-muted-foreground text-sm sm:text-base md:text-lg px-2 sm:px-0">
-                        To get started, please tell us how you plan to use SmartCard.
+                        To get started, please tell us how you plan to use Cardfil.
                         <br className="hidden sm:block" />
                         This helps us customize your experience.
                     </p>

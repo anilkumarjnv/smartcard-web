@@ -198,9 +198,10 @@ export function LeadCaptureModal({ isOpen, onClose, card }: LeadCaptureModalProp
                         <Button
                             type="submit"
                             className="w-full"
-                            disabled={loading || (!formData.name && !formData.email && !formData.phone)}
+                            disabled={!formData.name && !formData.email && !formData.phone}
+                            isLoading={loading}
                         >
-                            {loading ? 'Sending...' : 'Share Contact Info'}
+                            Share Contact Info
                         </Button>
                     </div>
                 </form>

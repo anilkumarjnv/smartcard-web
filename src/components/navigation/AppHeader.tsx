@@ -10,7 +10,7 @@ export function AppHeader() {
                     <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
                         <CreditCard className="w-4 h-4 text-primary-foreground" />
                     </div>
-                    <span className="text-lg font-bold text-foreground tracking-tight">SmartCard</span>
+                    <span className="text-lg font-bold text-foreground tracking-tight">Cardfil</span>
                 </div>
             </div>
         </header>

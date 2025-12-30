@@ -475,8 +475,8 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onC
         <h3 className="text-xl sm:text-2xl font-bold text-foreground">
           {isCreating ? 'Create New Card' : 'Edit Your Card'}
         </h3>
-        <Button onClick={handleSave} size="sm" disabled={isSaving} className="hidden md:flex">
-          {isSaving ? 'Saving...' : isCreating ? 'Create Card' : 'Save Changes'}
+        <Button onClick={handleSave} size="sm" isLoading={isSaving} className="hidden md:flex">
+          {isCreating ? 'Create Card' : 'Save Changes'}
         </Button>
       </div>
 

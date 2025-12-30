@@ -11,7 +11,7 @@ import { BeforeAfter } from "@/components/landing/BeforeAfter";
 import { FeatureGrid } from "@/components/landing/FeatureGrid";
 import { UseCaseCards } from "@/components/landing/UseCaseCards";
 import { PricingSimple } from "@/components/landing/PricingSimple";
-import { SocialProof } from "@/components/landing/SocialProof";
+// import { SocialProof } from "@/components/landing/SocialProof";
 
 const SAMPLE_CARDS = [
   {
@@ -236,12 +236,12 @@ export default function Home() {
 
               {/* Headline */}
               <h1 className="mb-4 md:mb-6 text-neutral-900 dark:text-white text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-tight">
-                Your professional identity, in one link.
+                Your professional identity, in one Card.
               </h1>
 
               {/* Subtext */}
               <p className="text-lg md:text-xl text-secondary dark:text-neutral-400 mb-6 md:mb-8 leading-relaxed">
-                Replace Scattered PDFs and links with a single, permanent profile. Your work, contact details, and portfolio links in one place.
+                Replace Scattered PDFs and links with a single, permanent Card. Your work, contact details, and portfolio links in one place.
               </p>
 
               {/* CTAs */}
@@ -268,7 +268,7 @@ export default function Home() {
                       onClick={openSignup}
                       className="btn-primary dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-100 w-full sm:w-auto"
                     >
-                      Create your profile
+                      Create your Card
                       {betaStatus?.isBetaMode && betaStatus.spotsRemaining <= 5 && !betaStatus.limitReached && (
                         <span className="ml-2 text-xs">({betaStatus.spotsRemaining} left)</span>
                       )}
@@ -368,28 +368,40 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 5. Pricing */}
+      {/* 5. Pricing (Hidden for Beta) */}
       <section className="py-16 md:py-24 px-4 md:px-6 bg-neutral-50 dark:bg-neutral-900/50">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-12 md:mb-16"
+            className="max-w-3xl mx-auto"
           >
-            <h2 className="mb-4 text-2xl md:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white">Simple, transparent pricing</h2>
+            <span className="inline-block py-1 px-3 rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400 text-sm font-semibold mb-6">
+              BETA ACCESS
+            </span>
+            <h2 className="mb-6 text-2xl md:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white">
+              Currently in Free Public Beta
+            </h2>
+            <p className="text-lg md:text-xl text-secondary dark:text-neutral-400 leading-relaxed">
+              We are currently in a public beta phase. All features, including premium themes and analytics, are
+              <span className="font-semibold text-neutral-900 dark:text-white"> completely free </span>
+              for early adopters.
+            </p>
+            <p className="mt-4 text-base text-secondary dark:text-neutral-500">
+              Pricing plans will be introduced later as we mature. Early users will be notified in advance.
+            </p>
           </motion.div>
-          <PricingSimple />
         </div>
       </section>
 
       {/* 6. Social Proof */}
-      <section className="py-12 md:py-16 px-4 md:px-6">
+      {/* <section className="py-12 md:py-16 px-4 md:px-6">
         <div className="max-w-7xl mx-auto">
           <SocialProof />
         </div>
-      </section>
+      </section> */}
 
       {/* 7. Final CTA - "The Closer" */}
       <section className="py-16 md:py-24 px-4 md:px-6 bg-neutral-900 dark:bg-neutral-950 border-t border-neutral-800 text-white">
@@ -438,10 +450,10 @@ export default function Home() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-neutral-900 dark:bg-white rounded-lg flex items-center justify-center">
-                <span className="text-white dark:text-neutral-900 text-sm font-bold">S</span>
+                <span className="text-white dark:text-neutral-900 text-sm font-bold">C</span>
               </div>
               <span className="text-neutral-600 dark:text-neutral-400 text-sm">
-                © 2025 SmartShare. All rights reserved.
+                © 2025 Cardfil. All rights reserved.
               </span>
             </div>
             <div className="flex items-center gap-8">
