@@ -7,6 +7,7 @@ import { ProfileCardsGrid } from '@/components/cards/ProfileCardsGrid';
 import { CardEditorTab } from '@/components/organisms/CardEditorTab';
 import { ThemeCustomizationTab } from '@/components/organisms/ThemeCustomizationTab';
 import { ShareTab } from '@/components/organisms/ShareTab';
+import { FeedbackModal } from '@/components/organisms/FeedbackModal';
 import { CardPreview } from '@/components/CardPreview';
 import { Button } from '@/components/ui/Button';
 import { Spinner } from '@/components/ui/Spinner';
@@ -27,6 +28,7 @@ function MyCardsContent() {
     const [liveFormData, setLiveFormData] = useState<any>(null);
     const [persistedFormData, setPersistedFormData] = useState<any>(null);
     const [liveTheme, setLiveTheme] = useState<Record<string, unknown> | undefined>(undefined);
+    const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
     // Fetch user's card data
     const { data: cards, isLoading } = useSWR<CardType[]>('/api/v1/cards/user', fetcher);
@@ -158,6 +160,10 @@ function MyCardsContent() {
                                         setPersistedFormData({ ...persistedFormData, _cardId: card.id });
                                     }
                                 }}
+                                onCardCreation={(card) => {
+                                    // Trigger feedback modal after successful card creation
+                                    setShowFeedbackModal(true);
+                                }}
                                 onFormChange={(formData) => {
                                     setLiveFormData(formData);
                                     if (formData) {
@@ -248,9 +254,18 @@ function MyCardsContent() {
     }
 
     return (
-        <div className="p-3 sm:p-4 md:p-6">
-            <ProfileCardsGrid cards={cards || []} />
-        </div>
+        <>
+            <div className="p-3 sm:p-4 md:p-6">
+                <ProfileCardsGrid cards={cards || []} />
+            </div>
+
+            {/* Feedback Modal */}
+            <FeedbackModal
+                isOpen={showFeedbackModal}
+                onClose={() => setShowFeedbackModal(false)}
+                trigger="after_card_creation"
+            />
+        </>
     );
 }
 

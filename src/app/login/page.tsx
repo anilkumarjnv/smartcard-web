@@ -47,7 +47,7 @@ function LoginContent() {
                         </div>
                     )}
 
-                    {/* OAuth Button */}
+                    {/* OAuth Button - Always show for existing users */}
                     <OAuthButton provider="google" />
 
                     {/* Terms */}

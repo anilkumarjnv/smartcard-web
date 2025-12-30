@@ -37,6 +37,41 @@ export async function proxy(request: NextRequest) {
         data: { user },
     } = await supabase.auth.getUser();
 
+    // Beta limit check for onboarding
+    if (request.nextUrl.pathname.startsWith('/onboarding')) {
+        // Check if beta limit is reached
+        const maxBetaUsers = process.env.MAX_BETA_USERS ? parseInt(process.env.MAX_BETA_USERS) : null;
+
+        if (maxBetaUsers) {
+            try {
+                // Count total users in profiles table
+                const { count } = await supabase
+                    .from('profiles')
+                    .select('*', { count: 'exact', head: true });
+
+                // If limit reached and user doesn't have a profile yet, redirect
+                if (count !== null && count >= maxBetaUsers) {
+                    // Check if current user already has a profile (existing beta user)
+                    if (user) {
+                        const { data: profile } = await supabase
+                            .from('profiles')
+                            .select('id')
+                            .eq('id', user.id)
+                            .single();
+
+                        // No profile = new user, redirect to beta-limit page
+                        if (!profile) {
+                            return NextResponse.redirect(new URL('/beta-limit', request.url));
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Beta limit check failed:', error);
+                // On error, allow through (fail open)
+            }
+        }
+    }
+
     // Admin routes (strictest protection)
     if (request.nextUrl.pathname.startsWith('/admin')) {
         if (!user) {

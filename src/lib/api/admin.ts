@@ -132,4 +132,17 @@ export const adminAPI = {
     async getGrowth(days: number = 30): Promise<GrowthMetrics> {
         return apiClient.get<GrowthMetrics>(`/api/v1/admin/growth?days=${days}`);
     },
+
+    /**
+     * Get beta testing status
+     */
+    async getBetaStatus(): Promise<{
+        isBetaMode: boolean;
+        maxUsers: number | null;
+        currentUsers: number;
+        spotsRemaining: number;
+        limitReached: boolean;
+    }> {
+        return apiClient.get(`/api/v1/admin/beta-status`);
+    },
 };
