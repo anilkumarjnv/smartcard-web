@@ -40,12 +40,34 @@ export function ShareTab({ cardId }: ShareTabProps) {
     }
   };
 
-  const handleDownloadQR = () => {
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(profileUrl)}`;
-    const link = document.createElement('a');
-    link.href = qrUrl;
-    link.download = `smartcard-${currentCard?.slug || 'qr'}.png`;
-    link.click();
+  const handleDownloadQR = async () => {
+    try {
+      // Generate QR code URL
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(profileUrl)}`;
+
+      // Fetch the image as a blob to avoid CORS issues
+      const response = await fetch(qrUrl);
+      const blob = await response.blob();
+
+      // Create a local object URL
+      const blobUrl = URL.createObjectURL(blob);
+
+      // Create download link
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = `smartcard-${currentCard?.slug || 'qr'}.png`;
+
+      // Trigger download
+      document.body.appendChild(link);
+      link.click();
+
+      // Cleanup
+      document.body.removeChild(link);
+      URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error('Failed to download QR code:', error);
+      alert('Failed to download QR code. Please try again.');
+    }
   };
 
   const handleShare = async () => {

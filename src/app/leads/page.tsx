@@ -9,7 +9,9 @@ import { Button } from '@/components/ui/Button';
 import { Spinner } from '@/components/ui/Spinner';
 import { Alert } from '@/components/ui/Alert';
 import { formatDate } from '@/utils/formatters';
+import { downloadLeadVCard } from '@/utils/vcard';
 import type { Lead } from '@/lib/api/types';
+import { Download } from 'lucide-react';
 
 // SWR fetcher
 const fetcher = (url: string) => apiClient.get(url);
@@ -66,6 +68,10 @@ export default function LeadsPage() {
         link.click();
     };
 
+    const handleSaveContact = (lead: Lead) => {
+        downloadLeadVCard(lead);
+    };
+
     if (isLoading) {
         return (
             <Container>
@@ -98,7 +104,7 @@ export default function LeadsPage() {
                         {leads.length > 0 ? (
                             <div className="divide-y divide-gray-200 dark:divide-neutral-800">
                                 {leads.map((lead) => (
-                                    <div key={lead.id} className="p-4 space-y-2">
+                                    <div key={lead.id} className="p-4 space-y-3">
                                         <div className="flex items-start justify-between">
                                             <div className="font-medium text-gray-900 dark:text-gray-100">{lead.name || 'Anonymous'}</div>
                                             <span className="px-2 text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
@@ -112,8 +118,17 @@ export default function LeadsPage() {
                                                 {lead.message}
                                             </div>
                                         )}
-                                        <div className="text-xs text-gray-500 dark:text-gray-400 pt-1">
-                                            {formatDate(lead.created_at)}
+                                        <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-neutral-800">
+                                            <div className="text-xs text-gray-500 dark:text-gray-400">
+                                                {formatDate(lead.created_at)}
+                                            </div>
+                                            <button
+                                                onClick={() => handleSaveContact(lead)}
+                                                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-800 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+                                            >
+                                                <Download className="w-3.5 h-3.5" />
+                                                Save Contact
+                                            </button>
                                         </div>
                                     </div>
                                 ))}
@@ -153,6 +168,9 @@ export default function LeadsPage() {
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                         Source
                                     </th>
+                                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        Actions
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white dark:bg-neutral-950 divide-y divide-gray-200 dark:divide-neutral-800">
@@ -179,11 +197,20 @@ export default function LeadsPage() {
                                                     {lead.source || 'Card'}
                                                 </span>
                                             </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-right">
+                                                <button
+                                                    onClick={() => handleSaveContact(lead)}
+                                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-800 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+                                                >
+                                                    <Download className="w-3.5 h-3.5" />
+                                                    Save Contact
+                                                </button>
+                                            </td>
                                         </tr>
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan={5} className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                                        <td colSpan={6} className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
                                             <div className="flex flex-col items-center justify-center">
                                                 <svg className="w-12 h-12 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />

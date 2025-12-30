@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { User, Briefcase, Building, Phone, Mail, Globe, Upload, X, Plus, Trash } from 'lucide-react';
+import { User, Briefcase, Building, Phone, Mail, Globe, Upload, X, Plus, Trash, Check, Loader2 } from 'lucide-react';
 import { Input } from '@/components/molecules/Input';
 import { Textarea } from '@/components/molecules/Textarea';
 import { Button } from '@/components/molecules/Button';
@@ -9,6 +9,7 @@ import useSWR, { mutate } from 'swr';
 import { apiClient } from '@/lib/apiClient';
 import type { Card } from '@/lib/api/types';
 import { z } from 'zod';
+
 
 import { countryCodes } from '@/lib/constants/countryCodes';
 import { CountrySelect } from '@/components/molecules/CountrySelect';
@@ -19,8 +20,15 @@ const sanitizedString = z.string()
   .transform((str) => str.replace(/[<>]/g, "")) // Remove potentially malacious HTML tags
   .pipe(z.string().trim());
 
+const urlSchema = z.string().url().safeParse(''); // Helper
+
+const slugSchema = z.string()
+  .transform((str) => str.toLowerCase().replace(/[^a-z0-9-]/g, ''))
+  .pipe(z.string().min(3, 'Username must be at least 3 characters').regex(/^[a-z0-9-]+$/, 'Only lowercase letters, numbers, and hyphens'));
+
 const formSchema = z.object({
   name: sanitizedString.pipe(z.string().min(1, 'Name is required').max(50, 'Name must be 50 characters or less')),
+  slug: slugSchema.optional().or(z.literal('')),
   role: sanitizedString.pipe(z.string().min(1, 'Role/Title is required').max(50, 'Role must be 50 characters or less')),
   photo_url: z.string().optional(),
   organization: z.string().optional()
@@ -55,6 +63,7 @@ const formSchema = z.object({
 interface FormData {
   //Section 1: Identity (Required)
   name: string;
+  slug?: string;
   role: string;
 
   // Section 2: Visual Identity (Optional)
@@ -97,12 +106,13 @@ interface CardEditorTabProps {
   mode?: 'create';
   initialFormData?: any;
   onCardUpdate?: (card: Card) => void;
+  onCardCreation?: (card: Card) => void;
   onFormChange?: (formData: FormData) => void;
 }
 
 const fetcher = (url: string) => apiClient.get<Card[]>(url);
 
-export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onFormChange }: CardEditorTabProps) {
+export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onCardCreation, onFormChange }: CardEditorTabProps) {
   const { data: cards, error } = useSWR<Card[]>('/api/v1/cards/user', fetcher);
 
   const currentCard = mode === 'create'
@@ -113,6 +123,7 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
 
   const [formData, setFormData] = useState<FormData>({
     name: '',
+    slug: '',
     role: '',
     photo_url: '',
     organization: '',
@@ -132,11 +143,21 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
   const [imagePreview, setImagePreview] = useState<string>('');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // Slug states
+  const [isCheckingSlug, setIsCheckingSlug] = useState(false);
+  const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
+  const [slugCheckMessage, setSlugCheckMessage] = useState('');
+  const [touchedSlug, setTouchedSlug] = useState(false);
+
   // Initialize form data
   useEffect(() => {
     if (initialFormData && initialFormData._cardId === cardId) {
       const { _cardId, ...formDataWithoutId } = initialFormData;
-      setFormData(formDataWithoutId);
+      setFormData({
+        ...formDataWithoutId,
+        additional_links: formDataWithoutId.additional_links || [],
+        custom_highlights: formDataWithoutId.custom_highlights || []
+      });
       setImagePreview(formDataWithoutId.photo_url || '');
       onFormChange?.(formDataWithoutId);
       return;
@@ -145,6 +166,7 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
     if (mode === 'create') {
       const emptyData: FormData = {
         name: '',
+        slug: '',
         role: '',
         photo_url: '',
         organization: '',
@@ -175,6 +197,7 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
 
       const initialData: FormData = {
         name: currentCard.name || '',
+        slug: currentCard.slug || '',
         role: currentCard.title || '',
         photo_url: currentCard.avatar_url || currentCard.photo_url || '',
         organization: currentCard.company || '',
@@ -193,6 +216,52 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
       onFormChange?.(initialData);
     }
   }, [cardId, mode, cards]);
+
+  // Check slug availability
+  useEffect(() => {
+    const checkSlug = async () => {
+      if (!formData.slug || formData.slug.length < 3) {
+        setSlugAvailable(null);
+        setSlugCheckMessage('');
+        return;
+      }
+
+      // Don't check if it's the current card's slug
+      if (mode !== 'create' && currentCard && formData.slug === currentCard.slug) {
+        setSlugAvailable(true);
+        setSlugCheckMessage('');
+        return;
+      }
+
+      setIsCheckingSlug(true);
+      try {
+        const result = await apiClient.get<{ available: boolean; slug: string }>(`/api/v1/cards/check-slug/${formData.slug}`);
+        setSlugAvailable(result.available);
+        setSlugCheckMessage(result.available ? 'Username available' : 'Username taken');
+      } catch (error) {
+        console.error('Failed to check slug:', error);
+        setSlugAvailable(false);
+      } finally {
+        setIsCheckingSlug(false);
+      }
+    };
+
+    const timer = setTimeout(checkSlug, 500);
+    return () => clearTimeout(timer);
+  }, [formData.slug, mode, currentCard]);
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newName = e.target.value;
+
+    // Auto-update slug if not manually touched
+    const updates: Partial<FormData> = { name: newName };
+    if (!touchedSlug && mode === 'create') {
+      updates.slug = newName.toLowerCase().replace(/[^a-z0-9-]/g, '');
+    }
+
+    handleFormChange(updates);
+  };
+
 
   const validateForm = (): z.infer<typeof formSchema> | null => {
     try {
@@ -325,13 +394,20 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
       let savedCard: Card;
 
       if (mode === 'create' || !currentCard) {
-        const slug = validatedData.name
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/^-+|-+$/g, '');
+        let slug = validatedData.slug;
+
+        if (!slug) {
+          slug = validatedData.name
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+        }
 
         savedCard = await apiClient.post<Card>('/api/v1/cards', { ...payload, slug });
         setSaveMessage('✓ Card created successfully');
+
+        // Trigger feedback modal for new card creation
+        onCardCreation?.(savedCard);
 
         setTimeout(() => {
           window.location.href = `/mycards?tab=card&cardId=${savedCard.id}`;
@@ -344,8 +420,14 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
 
       mutate('/api/v1/cards/user');
       onCardUpdate?.(savedCard);
-    } catch (err) {
-      setSaveMessage('✗ Failed to save changes');
+    } catch (err: any) {
+      if (err.status === 409 || err.message?.includes('Slug') || err.error_code === 'SLUG_EXISTS') {
+        setSaveMessage('✗ Username is already taken');
+        setSlugAvailable(false); // Mark as unavailable in UI
+        setErrors(prev => ({ ...prev, slug: 'Username is already taken' }));
+      } else {
+        setSaveMessage('✗ Failed to save changes');
+      }
       console.error('Error saving card:', err);
     } finally {
       setIsSaving(false);
@@ -414,10 +496,46 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onF
           <Input
             placeholder="Full Name *"
             value={formData.name}
-            onChange={(e) => handleFormChange({ name: e.target.value.replace(/[<>]/g, '') })}
+            onChange={handleNameChange}
             icon={<User className="w-5 h-5 text-muted-foreground" />}
             error={errors.name}
           />
+
+          <div className="relative">
+            <Input
+              placeholder="Username (e.g. john-doe) *"
+              value={formData.slug || ''}
+              onChange={(e) => {
+                const val = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+                handleFormChange({ slug: val });
+                setTouchedSlug(true);
+              }}
+              icon={<Globe className="w-5 h-5 text-muted-foreground" />}
+              className={
+                !isCreating
+                  ? "bg-muted text-muted-foreground border-transparent opacity-70 cursor-not-allowed"
+                  : slugAvailable === false ? "!border-destructive" : slugAvailable === true ? "!border-green-500" : ""
+              }
+              error={errors.slug || (slugAvailable === false ? 'Username is already taken' : undefined)}
+              disabled={!isCreating}
+            />
+            {/* Status indicator inside input area */}
+            {isCreating && (
+              <div className="absolute right-4 top-[18px] pointer-events-none">
+                {isCheckingSlug ? (
+                  <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                ) : slugAvailable === true ? (
+                  <Check className="w-5 h-5 text-green-500" />
+                ) : null}
+              </div>
+            )}
+            {isCreating && slugAvailable === true && (
+              <p className="text-xs text-green-600 mt-1 px-4">✓ Username available</p>
+            )}
+            {!isCreating && (
+              <p className="text-xs text-muted-foreground mt-1 px-4">Username cannot be changed after creation</p>
+            )}
+          </div>
           <Input
             placeholder="Role / Title * (e.g., Mobile App Developer, Final Year CSE Student, Product Manager)"
             value={formData.role}

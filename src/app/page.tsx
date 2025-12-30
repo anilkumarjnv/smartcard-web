@@ -146,11 +146,19 @@ const SAMPLE_CARDS = [
 
 
 import { AuthModal } from '@/components/auth/AuthModal';
+import { apiClient } from '@/lib/apiClient';
 
 export default function Home() {
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('signup');
+  const [betaStatus, setBetaStatus] = useState<{
+    isBetaMode: boolean;
+    limitReached: boolean;
+    spotsRemaining: number;
+    maxUsers: number | null;
+  } | null>(null);
+  const [betaLoading, setBetaLoading] = useState(true);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -160,12 +168,39 @@ export default function Home() {
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    checkBetaStatus();
+  }, []);
+
+  async function checkBetaStatus() {
+    try {
+      const status = await apiClient.get<{
+        isBetaMode: boolean;
+        maxUsers: number | null;
+        currentUsers: number;
+        spotsRemaining: number;
+        limitReached: boolean;
+      }>('/api/v1/beta/status');
+      setBetaStatus(status);
+    } catch (error) {
+      console.error('Failed to check beta status:', error);
+      setBetaStatus({ isBetaMode: false, limitReached: false, spotsRemaining: 0, maxUsers: null });
+    } finally {
+      setBetaLoading(false);
+    }
+  }
+
   const openLogin = () => {
     setAuthMode('login');
     setIsAuthModalOpen(true);
   };
 
   const openSignup = () => {
+    if (betaStatus?.isBetaMode && betaStatus.limitReached) {
+      // Redirect to beta-limit page instead of opening auth modal
+      window.location.href = '/beta-limit';
+      return;
+    }
     setAuthMode('signup');
     setIsAuthModalOpen(true);
   };
@@ -211,16 +246,39 @@ export default function Home() {
 
               {/* CTAs */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <button
-                  onClick={openSignup}
-                  className="btn-primary dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-100 w-full sm:w-auto"
-                >
-                  Create your profile
-                </button>
-                <Link href="#" className="text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white font-medium flex items-center justify-center gap-2 transition-colors w-full sm:w-auto py-2">
-                  View example
-                  <ArrowRight className="w-4 h-4" strokeWidth={2} />
-                </Link>
+                {betaLoading ? (
+                  <div className="w-full sm:w-auto px-8 py-3 bg-neutral-200 dark:bg-neutral-800 rounded-md animate-pulse">
+                    <span className="invisible">Loading...</span>
+                  </div>
+                ) : betaStatus?.isBetaMode && betaStatus.limitReached ? (
+                  <div className="flex flex-col gap-2">
+                    <button
+                      onClick={() => window.location.href = '/beta-limit'}
+                      className="btn-primary dark:bg-yellow-600 dark:text-white dark:hover:bg-yellow-700 w-full sm:w-auto"
+                    >
+                      Join Waitlist
+                    </button>
+                    <p className="text-sm text-yellow-700 dark:text-yellow-400 text-center">
+                      All beta spots filled
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <button
+                      onClick={openSignup}
+                      className="btn-primary dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-100 w-full sm:w-auto"
+                    >
+                      Create your profile
+                      {betaStatus?.isBetaMode && betaStatus.spotsRemaining <= 5 && !betaStatus.limitReached && (
+                        <span className="ml-2 text-xs">({betaStatus.spotsRemaining} left)</span>
+                      )}
+                    </button>
+                    <Link href="#" className="text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white font-medium flex items-center justify-center gap-2 transition-colors w-full sm:w-auto py-2">
+                      View example
+                      <ArrowRight className="w-4 h-4" strokeWidth={2} />
+                    </Link>
+                  </>
+                )}
               </div>
             </motion.div>
 
@@ -348,11 +406,28 @@ export default function Home() {
             <p className="text-lg md:text-xl text-neutral-300 dark:text-neutral-400 mb-8">
               It takes 2 minutes to look professional.
             </p>
-            <Link href="/signup">
-              <button className="bg-white text-neutral-900 hover:bg-neutral-100 px-8 py-4 rounded-md font-semibold transition-all duration-200 hover:-translate-y-0.5 active:scale-98 w-full sm:w-auto">
-                Claim your username
-              </button>
-            </Link>
+            {betaStatus?.isBetaMode && betaStatus.limitReached ? (
+              <div className="flex flex-col items-center gap-3">
+                <button
+                  onClick={() => window.location.href = '/beta-limit'}
+                  className="bg-yellow-600 text-white hover:bg-yellow-700 px-8 py-4 rounded-md font-semibold transition-all duration-200 hover:-translate-y-0.5 active:scale-98 w-full sm:w-auto"
+                >
+                  Join Waitlist
+                </button>
+                <p className="text-sm text-neutral-400">
+                  Beta testing full - Get notified when we launch
+                </p>
+              </div>
+            ) : (
+              <Link href="/signup">
+                <button className="bg-white text-neutral-900 hover:bg-neutral-100 px-8 py-4 rounded-md font-semibold transition-all duration-200 hover:-translate-y-0.5 active:scale-98 w-full sm:w-auto">
+                  Claim your username
+                  {betaStatus?.isBetaMode && betaStatus.spotsRemaining && betaStatus.spotsRemaining <= 5 && (
+                    <span className="ml-2 text-xs text-neutral-600">({betaStatus.spotsRemaining} spots left)</span>
+                  )}
+                </button>
+              </Link>
+            )}
           </motion.div>
         </div>
       </section>

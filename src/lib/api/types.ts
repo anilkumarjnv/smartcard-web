@@ -183,6 +183,30 @@ export interface NFCTag {
 }
 
 /**
+ * Feedback entity
+ */
+export interface Feedback {
+    id: string;
+    user_id: string;
+    type: 'bug' | 'feature' | 'improvement' | 'general';
+    category?: string;
+    message: string;
+    rating?: number;
+    created_at: string;
+    updated_at: string;
+}
+
+/**
+ * Create feedback DTO
+ */
+export interface CreateFeedbackDTO {
+    type: 'bug' | 'feature' | 'improvement' | 'general';
+    category?: string;
+    message: string;
+    rating?: number;
+}
+
+/**
  * User profile from Supabase Auth
  */
 export interface AuthUser {

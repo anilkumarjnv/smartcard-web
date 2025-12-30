@@ -22,8 +22,37 @@ export default function OnboardingPage() {
 
         setLoading(true);
         try {
+            // Update role via API
             await apiClient.patch('/api/v1/auth/me/role', { role: selectedRole });
 
+            // Refresh the Supabase session to get updated user metadata
+            // This is critical because the middleware checks user_metadata.role
+            const supabase = (await import('@/lib/supabaseClient')).createClient();
+
+            // Refresh session and verify the role is updated
+            const { data, error } = await supabase.auth.refreshSession();
+
+            if (error) {
+                console.error('Error refreshing session:', error);
+                throw new Error('Failed to refresh session after role update');
+            }
+
+            // Verify role is in the session (may take a moment to propagate)
+            const updatedRole = data?.session?.user?.user_metadata?.role;
+            if (!updatedRole) {
+                console.warn('Role not yet in session, waiting...');
+                // Wait a bit and try one more time
+                await new Promise(resolve => setTimeout(resolve, 500));
+                const { data: retryData } = await supabase.auth.refreshSession();
+                const retryRole = retryData?.session?.user?.user_metadata?.role;
+
+                if (!retryRole) {
+                    console.error('Role still not in session after retry');
+                    // Still navigate - role was updated in DB, session will catch up
+                }
+            }
+
+            // Navigate to mycards - middleware will check the role
             router.push('/mycards');
         } catch (error) {
             console.error('Error updating role:', error);
@@ -50,8 +79,8 @@ export default function OnboardingPage() {
                         <div
                             key={role.id}
                             onClick={() => handleRoleSelect(role.id)}
-                            className={`relative p-4 sm:p-5 md:p-6 rounded-xl sm:rounded-2xl border-2 cursor-pointer transition-all hover:border-primary/50 hover:bg-accent/50 ${selectedRole === role.id
-                                ? 'border-primary bg-primary/5 ring-2 ring-primary/20'
+                            className={`relative p-4 sm:p-5 md:p-6 rounded-xl sm:rounded-2xl border-1 cursor-pointer transition-all hover:border-primary hover:shadow-lg ${selectedRole === role.id
+                                ? 'border-primary bg-primary/10 ring-2 ring-primary/20 shadow-md'
                                 : 'border-border bg-card'
                                 }`}
                         >
@@ -61,12 +90,14 @@ export default function OnboardingPage() {
                                 </div>
                             )}
 
-                            <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center text-xl sm:text-2xl mb-3 sm:mb-4 ${role.id === 'student' ? 'bg-neutral-100 text-neutral-900' : 'bg-neutral-100 text-neutral-900'
+                            <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center text-xl sm:text-2xl mb-3 sm:mb-4 transition-colors ${role.id === 'student'
+                                ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+                                : 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400'
                                 }`}>
                                 {role.id === 'student' ? <GraduationCap /> : <Briefcase />}
                             </div>
 
-                            <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-1 sm:mb-2">{role.name}</h3>
+                            <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-1 sm:mb-2 text-foreground">{role.name}</h3>
                             <p className="text-muted-foreground text-xs sm:text-sm">{role.description}</p>
                         </div>
                     ))}

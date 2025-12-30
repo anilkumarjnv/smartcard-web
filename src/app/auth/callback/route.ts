@@ -31,6 +31,25 @@ export async function GET(request: Request) {
         const { error } = await supabase.auth.exchangeCodeForSession(code);
 
         if (!error) {
+            // Check if user has a profile (successful signup)
+            const { data: { user } } = await supabase.auth.getUser();
+
+            if (user) {
+                // Check if profile was created
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('id')
+                    .eq('id', user.id)
+                    .single();
+
+                // If no profile exists, beta limit was likely reached
+                if (!profile) {
+                    // Clean up the auth user since profile creation failed
+                    await supabase.auth.signOut();
+                    return NextResponse.redirect(`${origin}/beta-limit?reason=signup`);
+                }
+            }
+
             const forwardedHost = request.headers.get('x-forwarded-host');
             const isLocalEnv = process.env.NODE_ENV === 'development';
 

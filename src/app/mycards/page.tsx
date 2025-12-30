@@ -7,6 +7,7 @@ import { ProfileCardsGrid } from '@/components/cards/ProfileCardsGrid';
 import { CardEditorTab } from '@/components/organisms/CardEditorTab';
 import { ThemeCustomizationTab } from '@/components/organisms/ThemeCustomizationTab';
 import { ShareTab } from '@/components/organisms/ShareTab';
+import { FeedbackModal } from '@/components/organisms/FeedbackModal';
 import { CardPreview } from '@/components/CardPreview';
 import { Button } from '@/components/ui/Button';
 import { Spinner } from '@/components/ui/Spinner';
@@ -27,6 +28,7 @@ function MyCardsContent() {
     const [liveFormData, setLiveFormData] = useState<any>(null);
     const [persistedFormData, setPersistedFormData] = useState<any>(null);
     const [liveTheme, setLiveTheme] = useState<Record<string, unknown> | undefined>(undefined);
+    const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
     // Fetch user's card data
     const { data: cards, isLoading } = useSWR<CardType[]>('/api/v1/cards/user', fetcher);
@@ -59,7 +61,12 @@ function MyCardsContent() {
                         twitter: (currentCard.social_links as Record<string, string>)?.twitter || '',
                         github: (currentCard.social_links as Record<string, string>)?.github || '',
                         whatsapp: (currentCard.social_links as Record<string, string>)?.whatsapp || ''
-                    }
+                    },
+                    additional_links: cardData.custom_data?.additional_links || [],
+                    custom_highlights: cardData.custom_data?.custom_highlights || [],
+                    cta_button: cardData.custom_data?.cta_button,
+                    domain: cardData.custom_data?.domain || '',
+                    country_code: cardData.custom_data?.country_code || '+91'
                 };
                 setPersistedFormData(initialFormData);
                 setLiveFormData(initialFormData);
@@ -158,6 +165,10 @@ function MyCardsContent() {
                                         setPersistedFormData({ ...persistedFormData, _cardId: card.id });
                                     }
                                 }}
+                                onCardCreation={(card) => {
+                                    // Trigger feedback modal after successful card creation
+                                    setShowFeedbackModal(true);
+                                }}
                                 onFormChange={(formData) => {
                                     setLiveFormData(formData);
                                     if (formData) {
@@ -248,9 +259,18 @@ function MyCardsContent() {
     }
 
     return (
-        <div className="p-3 sm:p-4 md:p-6">
-            <ProfileCardsGrid cards={cards || []} />
-        </div>
+        <>
+            <div className="p-3 sm:p-4 md:p-6">
+                <ProfileCardsGrid cards={cards || []} />
+            </div>
+
+            {/* Feedback Modal */}
+            <FeedbackModal
+                isOpen={showFeedbackModal}
+                onClose={() => setShowFeedbackModal(false)}
+                trigger="after_card_creation"
+            />
+        </>
     );
 }
 

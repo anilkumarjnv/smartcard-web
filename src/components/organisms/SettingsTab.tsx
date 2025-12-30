@@ -1,12 +1,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { User, Mail, CreditCard, LogOut, Check } from 'lucide-react';
+import { User, Mail, CreditCard, LogOut, Check, MessageSquare } from 'lucide-react';
 import { Input } from '@/components/molecules/Input';
 import { Button } from '@/components/molecules/Button';
+import { FeedbackModal } from '@/components/organisms/FeedbackModal';
 import { apiClient } from '@/lib/apiClient';
 import { signOut } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
+import type { Feedback } from '@/lib/api/types';
 
 interface SettingsTabProps {
   onLogout?: () => void;
@@ -52,6 +54,9 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
   const [role, setRole] = useState<string>('');
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [feedbackHistory, setFeedbackHistory] = useState<Feedback[]>([]);
+  const [loadingFeedback, setLoadingFeedback] = useState(false);
 
   // Load user data
   useEffect(() => {
@@ -70,6 +75,19 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
     };
     loadUserData();
   }, []);
+
+  // Load feedback history
+  const loadFeedbackHistory = async () => {
+    setLoadingFeedback(true);
+    try {
+      const feedback = await apiClient.get<Feedback[]>('/api/v1/feedback');
+      setFeedbackHistory(feedback || []);
+    } catch (error) {
+      console.error('Failed to load feedback:', error);
+    } finally {
+      setLoadingFeedback(false);
+    }
+  };
 
   const handleRoleChange = async (newRole: string) => {
     if (newRole === role) return;
@@ -277,6 +295,89 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
           </div>
         </div>
 
+        <div className="border-t border-gray-200 dark:border-neutral-800 pt-6 sm:pt-8">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h4 className="text-base sm:text-lg font-semibold text-neutral-900 dark:text-white">Share Your Feedback</h4>
+              <p className="text-sm text-muted-foreground mt-1">Help us improve by reporting bugs or suggesting features</p>
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowFeedbackModal(true);
+                if (feedbackHistory.length === 0) {
+                  loadFeedbackHistory();
+                }
+              }}
+              className="flex items-center gap-2"
+            >
+              <MessageSquare className="w-4 h-4" />
+              <span className="hidden sm:inline">Give Feedback</span>
+            </Button>
+          </div>
+
+          {/* Feedback History */}
+          <div className="mt-4">
+            <button
+              onClick={loadFeedbackHistory}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors mb-3"
+            >
+              {feedbackHistory.length > 0 ? 'Refresh feedback history' : 'View your feedback history'}
+            </button>
+
+            {loadingFeedback ? (
+              <div className="p-6 text-center text-muted-foreground">
+                <div className="w-8 h-8 border-4 border-neutral-300 dark:border-neutral-700 border-t-neutral-900 dark:border-t-neutral-100 rounded-full animate-spin mx-auto mb-2"></div>
+                Loading feedback...
+              </div>
+            ) : feedbackHistory.length > 0 ? (
+              <div className="space-y-3">
+                {feedbackHistory.map((feedback) => {
+                  const typeConfig = {
+                    bug: { label: 'Bug Report', color: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400' },
+                    feature: { label: 'Feature Request', color: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400' },
+                    improvement: { label: 'Improvement', color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' },
+                    general: { label: 'General', color: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' },
+                  };
+
+                  const config = typeConfig[feedback.type];
+
+                  return (
+                    <div
+                      key={feedback.id}
+                      className="p-4 bg-muted/50 dark:bg-neutral-800/50 rounded-xl border border-border"
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <span className={`px-2.5 py-1 rounded-lg text-xs font-medium ${config.color}`}>
+                          {config.label}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(feedback.created_at).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <p className="text-sm text-foreground mt-2">{feedback.message}</p>
+                      {feedback.rating && (
+                        <div className="flex items-center gap-1 mt-2">
+                          {Array.from({ length: feedback.rating }).map((_, i) => (
+                            <svg
+                              key={i}
+                              className="w-4 h-4 fill-yellow-400 text-yellow-400"
+                              viewBox="0 0 24 24"
+                            >
+                              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                            </svg>
+                          ))}
+                          <span className="text-xs text-muted-foreground ml-1">({feedback.rating}/5)</span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : null}
+          </div>
+        </div>
+
         <div className="border-t border-gray-200 dark:border-neutral-800 pt-8">
           <Button
             variant="outline"
@@ -289,6 +390,16 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
           </Button>
         </div>
       </div>
+
+      {/* Feedback Modal */}
+      <FeedbackModal
+        isOpen={showFeedbackModal}
+        onClose={() => {
+          setShowFeedbackModal(false);
+          loadFeedbackHistory(); // Reload feedback after submission
+        }}
+        trigger="settings"
+      />
     </div >
   );
 }

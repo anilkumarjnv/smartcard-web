@@ -49,10 +49,12 @@ export async function GET(
       return NextResponse.json({ error: "No session token" }, { status: 401 });
     }
 
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+
     // Verify card exists and user has access by fetching it
     // Backend will return 404 if card doesn't exist or doesn't belong to user
     const cardResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/cards/${cardId}`,
+      `${apiUrl}/api/v1/cards/${cardId}`,
       {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -66,7 +68,7 @@ export async function GET(
 
     // Fetch real-time analytics from backend
     const analyticsResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/analytics/${cardId}`,
+      `${apiUrl}/api/v1/analytics/${cardId}`,
       {
         headers: {
           'Authorization': `Bearer ${token}`,

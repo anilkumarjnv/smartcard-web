@@ -86,15 +86,67 @@ export const updateCardSchema = z.object({
 });
 
 /**
- * Lead form validation
+ * Phone number validation (international format)
+ */
+export const phoneSchema = z
+    .string()
+    .regex(
+        /^[\d\s\-\+\(\)]+$/,
+        'Phone number can only contain digits, spaces, hyphens, plus signs, and parentheses'
+    )
+    .min(10, 'Phone number must be at least 10 digits')
+    .max(20, 'Phone number is too long')
+    .or(z.literal(''));
+
+/**
+ * Lead form validation (enhanced)
  */
 export const createLeadSchema = z.object({
     card_id: z.string().uuid('Invalid card ID'),
-    name: z.string().max(100, 'Name is too long').optional(),
-    email: emailSchema.optional(),
-    phone: z.string().max(20, 'Phone number is too long').optional(),
-    message: z.string().max(1000, 'Message is too long').optional(),
+    name: z
+        .string()
+        .min(1, 'Name is required')
+        .max(100, 'Name is too long')
+        .regex(/^[a-zA-Z\s\-'.]+$/, 'Name can only contain letters, spaces, hyphens, apostrophes, and periods'),
+    email: z
+        .string()
+        .email('Please enter a valid email address')
+        .max(254, 'Email is too long')
+        .optional()
+        .or(z.literal('')),
+    phone: phoneSchema.optional(),
+    message: z
+        .string()
+        .max(1000, 'Message is too long (max 1000 characters)')
+        .optional()
+        .or(z.literal(''))
+        .transform(val => val?.trim() || ''), // Sanitize whitespace
     source: z.string().max(50, 'Source is too long').optional(),
+}).refine(
+    data => data.email || data.phone,
+    {
+        message: 'Please provide either an email or phone number',
+        path: ['email'], // Show error on email field
+    }
+);
+
+/**
+ * Feedback validation
+ */
+export const createFeedbackSchema = z.object({
+    type: z.enum(['bug', 'feature', 'improvement', 'general'], {
+        message: 'Please select a feedback type'
+    }),
+    category: z.string().max(100, 'Category is too long').optional(),
+    message: z.string()
+        .min(10, 'Feedback must be at least 10 characters')
+        .max(2000, 'Feedback is too long (max 2000 characters)')
+        .transform(val => val.trim()),
+    rating: z.number()
+        .int('Rating must be a whole number')
+        .min(1, 'Rating must be at least 1')
+        .max(5, 'Rating must be at most 5')
+        .optional(),
 });
 
 /**
