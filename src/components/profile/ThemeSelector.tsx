@@ -2,125 +2,57 @@
 
 import { useState } from 'react';
 import { Check } from 'lucide-react';
-import { PROFILE_THEMES, type ProfileCardTheme } from '../CardPreview';
+import { PROFILE_THEMES } from '../CardPreview';
 
 interface ThemeSelectorProps {
     selectedTheme?: 'light' | 'dark' | 'accent' | 'neutral';
     onThemeChange: (theme: 'light' | 'dark' | 'accent' | 'neutral') => void;
 }
 
-/**
- * Clean theme selector UI for profile cards
- * Displays theme options in a visually appealing grid
- */
 export function ThemeSelector({ selectedTheme = 'light', onThemeChange }: ThemeSelectorProps) {
-    const [hoveredTheme, setHoveredTheme] = useState<string | null>(null);
 
-    const themeColors = {
-        light: {
-            primary: '#4F46E5',
-            background: '#FFFFFF',
-            border: '#E5E7EB',
-        },
-        dark: {
-            primary: '#FFFFFF',
-            background: '#171717',
-            border: '#404040',
-        },
-        accent: {
-            primary: '#8B5CF6',
-            background: '#FFFFFF',
-            border: '#DDD6FE',
-        },
-        neutral: {
-            primary: '#111111',
-            background: '#FFFFFF',
-            border: '#E5E5E5',
-        },
+    // Mapping themes to visual representation colors matches the Landing Page aesthetic
+    const themeVisuals: Record<string, string> = {
+        light: 'bg-white border-neutral-200 text-neutral-900',
+        dark: 'bg-neutral-950 border-neutral-800 text-white',
+        accent: 'bg-violet-600 border-violet-600 text-white',
+        neutral: 'bg-neutral-500 border-neutral-500 text-white',
     };
 
     return (
         <div className="space-y-4">
             <div>
                 <h3 className="text-lg font-semibold text-neutral-900 dark:text-white mb-2">
-                    Choose Your Theme
+                    Color Theme
                 </h3>
                 <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                    Select a theme that represents your professional brand
+                    Select a color palette for your card
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="flex flex-wrap gap-4">
                 {PROFILE_THEMES.map((theme) => {
-                    const colors = themeColors[theme.name];
+                    const visualClass = themeVisuals[theme.name];
                     const isSelected = selectedTheme === theme.name;
-                    const isHovered = hoveredTheme === theme.name;
 
                     return (
-                        <button
-                            key={theme.name}
-                            onClick={() => onThemeChange(theme.name)}
-                            onMouseEnter={() => setHoveredTheme(theme.name)}
-                            onMouseLeave={() => setHoveredTheme(null)}
-                            className={`relative p-4 rounded-xl border-2 transition-all duration-200 text-left ${isSelected
-                                ? 'border-neutral-900 dark:border-neutral-100 shadow-lg'
-                                : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-600 dark:hover:border-neutral-600'
-                                }`}
-                        >
-                            {/* Selected Indicator */}
-                            {/* {isSelected && (
-                                <div className="absolute top-3 right-3 w-6 h-6 bg-neutral-900 dark:bg-neutral-100 rounded-full flex items-center justify-center">
-                                    <Check className="w-4 h-4 text-white" strokeWidth={3} />
-                                </div>
-                            )} */}
-
-                            {/* Theme Preview */}
-                            <div className="mb-3">
-                                <div
-                                    className="h-24 rounded-lg mb-3 relative overflow-hidden"
-                                    style={{
-                                        backgroundColor: colors.background,
-                                        border: `1px solid ${colors.border}`,
-                                    }}
-                                >
-                                    {/* Mini preview of card style */}
-                                    <div className="absolute inset-0 flex flex-col">
-                                        {/* Header area with gradient */}
-                                        <div
-                                            className="h-1/2"
-                                            style={{
-                                                background: `linear-gradient(135deg, ${colors.primary}, ${colors.primary}DD)`,
-                                            }}
-                                        />
-                                        {/* Wave divider */}
-                                        <svg
-                                            viewBox="0 0 100 20"
-                                            className="w-full h-4 -mt-4"
-                                            preserveAspectRatio="none"
-                                        >
-                                            <path
-                                                d="M0,10 Q25,15 50,10 T100,10 L100,20 L0,20 Z"
-                                                fill={colors.primary}
-                                            />
-                                        </svg>
-                                        {/* Content area */}
-                                        <div className="flex-1" style={{ backgroundColor: colors.background }} />
-                                    </div>
-                                </div>
-
-                                <h4 className="font-semibold text-neutral-900 dark:text-white mb-1">
-                                    {theme.displayName}
-                                </h4>
-                                <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
-                                    {theme.description}
-                                </p>
-                            </div>
-
-                            {/* Hover effect */}
-                            {isHovered && !isSelected && (
-                                <div className="absolute inset-0 bg-neutral-900/5 dark:bg-neutral-800/20 rounded-xl pointer-events-none" />
-                            )}
-                        </button>
+                        <div key={theme.name} className="flex flex-col items-center gap-2">
+                            <button
+                                onClick={() => onThemeChange(theme.name)}
+                                className={`w-12 h-12 md:w-14 md:h-14 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${visualClass} ${isSelected
+                                        ? 'ring-2 ring-primary ring-offset-2 dark:ring-offset-neutral-900 scale-110'
+                                        : 'hover:scale-105 opacity-90 hover:opacity-100 hover:shadow-md'
+                                    }`}
+                                aria-label={`Select ${theme.displayName} theme`}
+                            >
+                                {isSelected && (
+                                    <Check className="w-5 h-5 md:w-6 md:h-6" strokeWidth={3} />
+                                )}
+                            </button>
+                            <span className={`text-xs font-medium ${isSelected ? 'text-primary' : 'text-neutral-500 dark:text-neutral-400'}`}>
+                                {theme.displayName}
+                            </span>
+                        </div>
                     );
                 })}
             </div>

@@ -9,6 +9,7 @@ import { CardPreview } from "@/components/CardPreview";
 import { HeroMockup } from "@/components/landing/HeroMockup";
 import { BeforeAfter } from "@/components/landing/BeforeAfter";
 import { FeatureGrid } from "@/components/landing/FeatureGrid";
+import { DetailedFeatures } from "@/components/landing/DetailedFeatures";
 import { UseCaseCards } from "@/components/landing/UseCaseCards";
 import { PricingSimple } from "@/components/landing/PricingSimple";
 // import { SocialProof } from "@/components/landing/SocialProof";
@@ -349,6 +350,13 @@ export default function Home() {
             </p>
           </motion.div>
           <FeatureGrid />
+        </div>
+      </section>
+
+      {/* 3.5. Deep Dive Features */}
+      <section className="py-16 md:py-24 px-4 md:px-6">
+        <div className="max-w-7xl mx-auto">
+          <DetailedFeatures />
         </div>
       </section>
 

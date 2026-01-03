@@ -16,6 +16,11 @@ import { Download } from 'lucide-react';
 // SWR fetcher
 const fetcher = (url: string) => apiClient.get(url);
 
+import { LeadsList } from '@/components/leads/LeadsList';
+
+// ... (keep existing imports up to Line 15 if needed, but remove Alert/Card if unused later, though Card is used)
+// Actually I'll rewrite the imports clean up in a cleaner way
+
 export default function LeadsPage() {
     const [leads, setLeads] = useState<Lead[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -86,148 +91,16 @@ export default function LeadsPage() {
         <Container>
             <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 sm:gap-0 mb-6 sm:mb-8 mt-6 sm:mt-8">
                 <div>
-                    <h2 className="text-base sm:text-lg font-semibold text-foreground">All Leads</h2>
-                    <p className="text-muted-foreground mt-1 text-xs sm:text-sm">View and export your captured leads</p>
+                    <h2 className="text-2xl font-bold text-neural-900 dark:text-white">All Leads</h2>
+                    <p className="text-neutral-500 dark:text-neutral-400 mt-1">View and manage your captured contacts</p>
                 </div>
                 <Button variant="secondary" onClick={handleExportCSV} disabled={leads.length === 0} className="w-full sm:w-auto">
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
+                    <Download className="w-4 h-4 mr-2" />
                     Export CSV
                 </Button>
             </div>
 
-            <Card>
-                <CardBody className="p-0">
-                    {/* Mobile Card View */}
-                    <div className="block md:hidden">
-                        {leads.length > 0 ? (
-                            <div className="divide-y divide-gray-200 dark:divide-neutral-800">
-                                {leads.map((lead) => (
-                                    <div key={lead.id} className="p-4 space-y-3">
-                                        <div className="flex items-start justify-between">
-                                            <div className="font-medium text-gray-900 dark:text-gray-100">{lead.name || 'Anonymous'}</div>
-                                            <span className="px-2 text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
-                                                {lead.source || 'Card'}
-                                            </span>
-                                        </div>
-                                        <div className="text-sm text-gray-900 dark:text-gray-100">{lead.email}</div>
-                                        {lead.phone && <div className="text-sm text-gray-500 dark:text-gray-400">{lead.phone}</div>}
-                                        {lead.message && (
-                                            <div className="text-sm text-gray-600 dark:text-gray-300 pt-2 border-t border-gray-100 dark:border-neutral-800">
-                                                {lead.message}
-                                            </div>
-                                        )}
-                                        <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-neutral-800">
-                                            <div className="text-xs text-gray-500 dark:text-gray-400">
-                                                {formatDate(lead.created_at)}
-                                            </div>
-                                            <button
-                                                onClick={() => handleSaveContact(lead)}
-                                                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-800 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
-                                            >
-                                                <Download className="w-3.5 h-3.5" />
-                                                Save Contact
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
-                                <div className="flex flex-col items-center justify-center">
-                                    <svg className="w-12 h-12 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                    </svg>
-                                    <p className="text-lg font-medium text-gray-900 dark:text-gray-100">No leads yet</p>
-                                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                        Share your card to start collecting leads.
-                                    </p>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Desktop Table View */}
-                    <div className="hidden md:block overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-800">
-                            <thead className="bg-gray-50 dark:bg-neutral-900">
-                                <tr>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Name
-                                    </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Contact
-                                    </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Message
-                                    </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Date
-                                    </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Source
-                                    </th>
-                                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Actions
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white dark:bg-neutral-950 divide-y divide-gray-200 dark:divide-neutral-800">
-                                {leads.length > 0 ? (
-                                    leads.map((lead) => (
-                                        <tr key={lead.id}>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{lead.name || 'Anonymous'}</div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900 dark:text-gray-100">{lead.email}</div>
-                                                <div className="text-sm text-gray-500 dark:text-gray-400">{lead.phone}</div>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <div className="text-sm text-gray-900 dark:text-gray-100 max-w-xs truncate">{lead.message}</div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-500 dark:text-gray-400">
-                                                    {formatDate(lead.created_at)}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
-                                                    {lead.source || 'Card'}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-right">
-                                                <button
-                                                    onClick={() => handleSaveContact(lead)}
-                                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-800 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
-                                                >
-                                                    <Download className="w-3.5 h-3.5" />
-                                                    Save Contact
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan={6} className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
-                                            <div className="flex flex-col items-center justify-center">
-                                                <svg className="w-12 h-12 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                                </svg>
-                                                <p className="text-lg font-medium text-gray-900 dark:text-gray-100">No leads yet</p>
-                                                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                                    Share your card to start collecting leads.
-                                                </p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </CardBody>
-            </Card>
+            <LeadsList leads={leads} onSaveContact={handleSaveContact} />
         </Container>
     );
 }
