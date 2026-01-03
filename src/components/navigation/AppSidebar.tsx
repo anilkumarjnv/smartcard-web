@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useTheme } from "next-themes"
-import { CreditCard, Users, Settings, HelpCircle, Menu, X, Sun, Moon, LogOut } from "lucide-react"
+import { CreditCard, Users, Settings, Menu, X, Sun, Moon, LogOut } from "lucide-react"
 import { apiClient } from "@/lib/apiClient"
 import { signOut } from "@/lib/auth"
 
@@ -23,6 +23,12 @@ export function AppSidebar() {
     const { theme, setTheme } = useTheme()
     const [user, setUser] = useState<any>(null)
     const [showUserMenu, setShowUserMenu] = useState(false)
+    const [mounted, setMounted] = useState(false)
+
+    // Wait for mount to avoid hydration mismatch with theme
+    useEffect(() => {
+        setMounted(true)
+    }, [])
 
     const closeMobileMenu = () => setIsMobileMenuOpen(false)
 
@@ -128,12 +134,16 @@ export function AppSidebar() {
                     <button
                         onClick={toggleTheme}
                         className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 text-white lg:text-black lg:dark:text-white hover:bg-sidebar-accent"
-                        title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+                        title="Toggle theme" // Fixed title to avoid hydration mismatch
                     >
-                        {theme === "dark" ? (
-                            <Sun className="w-5 h-5" />
+                        {mounted ? (
+                            theme === "dark" ? (
+                                <Sun className="w-5 h-5" />
+                            ) : (
+                                <Moon className="w-5 h-5" />
+                            )
                         ) : (
-                            <Moon className="w-5 h-5" />
+                            <div className="w-5 h-5" /> // Placeholder to prevent layout shift
                         )}
                     </button>
 
@@ -163,11 +173,10 @@ export function AppSidebar() {
                         <button
                             onClick={() => setShowUserMenu(!showUserMenu)}
                             className="mt-2 p-1 rounded-full ring-2 ring-sidebar-border hover:ring-sidebar-primary transition-all"
-                            title={user ? user.full_name || user.name || user.email?.split('@')[0] || "Profile" : "Profile"}
-                            suppressHydrationWarning
+                            title={mounted && user ? user.full_name || user.name || user.email?.split('@')[0] || "Profile" : "Profile"}
                         >
                             <div className="w-10 h-10 rounded-full bg-sidebar-accent text-sidebar-foreground flex items-center justify-center text-sm font-semibold overflow-hidden">
-                                {user?.avatar_url || user?.picture ? (
+                                {mounted && (user?.avatar_url || user?.picture) ? (
                                     <img
                                         src={user.avatar_url || user.picture}
                                         alt={user.full_name || user.name || user.email?.split('@')[0] || 'User'}
@@ -175,7 +184,7 @@ export function AppSidebar() {
                                     />
                                 ) : (
                                     <span className="text-sm font-medium">
-                                        {user ? (user.full_name || user.name || user.email?.split('@')[0] || 'U').substring(0, 2).toUpperCase() : 'U'}
+                                        {mounted && user ? (user.full_name || user.name || user.email?.split('@')[0] || 'U').substring(0, 2).toUpperCase() : 'U'}
                                     </span>
                                 )}
                             </div>

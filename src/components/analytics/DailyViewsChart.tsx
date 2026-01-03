@@ -1,16 +1,8 @@
-// src/components/analytics/DailyViewsChart.tsx
-/**
- * Daily Views Chart
- * 
- * Line chart showing views over time using Recharts.
- * Responsive container included.
- */
-
 'use client';
 
 import {
-    LineChart,
-    Line,
+    BarChart,
+    Bar,
     XAxis,
     YAxis,
     CartesianGrid,
@@ -36,51 +28,56 @@ export function DailyViewsChart({ data }: DailyViewsChartProps) {
     const hasData = chartData.length > 0;
 
     return (
-        <Card className="h-full">
-            <CardHeader>
-                <h3 className="text-lg font-medium text-gray-900">Views Over Time</h3>
+        <Card className="h-full border border-neutral-200 dark:border-neutral-800 shadow-sm">
+            <CardHeader className="border-b-0 pb-2">
+                <h3 className="text-lg font-semibold text-neutral-900 dark:text-white">Views Over Time</h3>
             </CardHeader>
             <CardBody>
                 <div className="h-[300px] w-full">
                     {hasData ? (
                         <ResponsiveContainer width="100%" height="100%">
-                            <LineChart
+                            <BarChart
                                 data={chartData}
-                                margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+                                margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
                             >
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                <CartesianGrid
+                                    strokeDasharray="3 3"
+                                    vertical={false}
+                                    stroke="#E5E7EB"
+                                    className="dark:stroke-neutral-800"
+                                />
                                 <XAxis
                                     dataKey="date"
-                                    tick={{ fontSize: 12, fill: '#6B7280' }}
+                                    tick={{ fontSize: 12, fill: '#737373' }}
                                     axisLine={false}
                                     tickLine={false}
+                                    dy={10}
                                 />
                                 <YAxis
-                                    tick={{ fontSize: 12, fill: '#6B7280' }}
+                                    tick={{ fontSize: 12, fill: '#737373' }}
                                     axisLine={false}
                                     tickLine={false}
                                     allowDecimals={false}
                                 />
                                 <Tooltip
+                                    cursor={{ fill: 'transparent' }}
                                     contentStyle={{
-                                        backgroundColor: '#fff',
-                                        border: '1px solid #E5E7EB',
+                                        backgroundColor: 'var(--tooltip-bg, #fff)',
+                                        border: '1px solid var(--tooltip-border, #E5E7EB)',
                                         borderRadius: '0.5rem',
                                         boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
                                     }}
                                 />
-                                <Line
-                                    type="monotone"
+                                <Bar
                                     dataKey="views"
-                                    stroke="#3B82F6"
-                                    strokeWidth={3}
-                                    dot={{ r: 4, fill: '#3B82F6', strokeWidth: 2, stroke: '#fff' }}
-                                    activeDot={{ r: 6 }}
+                                    fill="#6366F1" // Indigo-500
+                                    radius={[4, 4, 0, 0]}
+                                    maxBarSize={50}
                                 />
-                            </LineChart>
+                            </BarChart>
                         </ResponsiveContainer>
                     ) : (
-                        <div className="flex items-center justify-center h-full text-gray-400">
+                        <div className="flex items-center justify-center h-full text-neutral-400">
                             <div className="text-center">
                                 <p className="text-lg font-medium">No data available</p>
                                 <p className="text-sm mt-1">Views will appear here once your card is accessed</p>
