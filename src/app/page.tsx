@@ -160,6 +160,7 @@ export default function Home() {
     maxUsers: number | null;
   } | null>(null);
   const [betaLoading, setBetaLoading] = useState(true);
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -171,7 +172,17 @@ export default function Home() {
 
   useEffect(() => {
     checkBetaStatus();
+    checkUserStatus();
   }, []);
+
+  async function checkUserStatus() {
+    try {
+      const userData = await apiClient.get<any>('/api/v1/auth/me');
+      setUser(userData);
+    } catch (err) {
+      // User not logged in
+    }
+  }
 
   async function checkBetaStatus() {
     try {
@@ -233,16 +244,16 @@ export default function Home() {
               className="max-w-2xl mx-auto lg:mx-0 text-center lg:text-left"
             >
               {/* Tagline */}
-              <span className="tagline mb-4 md:mb-6 block dark:text-neutral-400 text-sm md:text-base">PROFESSIONAL IDENTITY</span>
+              <span className="tagline mb-4 md:mb-6 block dark:text-neutral-400 text-sm md:text-base">BEYOND A BUSINESS CARD</span>
 
               {/* Headline */}
               <h1 className="mb-4 md:mb-6 text-neutral-900 dark:text-white text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-tight">
-                Your professional identity, in one Card.
+                Don't just share details.<br />Capture the interest.
               </h1>
 
               {/* Subtext */}
               <p className="text-lg md:text-xl text-secondary dark:text-neutral-400 mb-6 md:mb-8 leading-relaxed">
-                Replace Scattered PDFs and links with a single, permanent Card. Your work, contact details, and portfolio links in one place.
+                The post-meeting interaction is where opportunities are lost. Cardfil ensures you're saved instantly and gives you visibility into who's actually looking.
               </p>
 
               {/* CTAs */}
@@ -266,15 +277,21 @@ export default function Home() {
                 ) : (
                   <>
                     <button
-                      onClick={openSignup}
+                      onClick={() => {
+                        if (user) {
+                          window.location.href = '/mycards';
+                        } else {
+                          openSignup();
+                        }
+                      }}
                       className="btn-primary dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-100 w-full sm:w-auto"
                     >
-                      Create your Card
-                      {betaStatus?.isBetaMode && betaStatus.spotsRemaining <= 5 && !betaStatus.limitReached && (
+                      {user ? 'Go to Dashboard' : 'Create your Card'}
+                      {!user && betaStatus?.isBetaMode && betaStatus.spotsRemaining <= 5 && !betaStatus.limitReached && (
                         <span className="ml-2 text-xs">({betaStatus.spotsRemaining} left)</span>
                       )}
                     </button>
-                    <Link href="#" className="text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white font-medium flex items-center justify-center gap-2 transition-colors w-full sm:w-auto py-2">
+                    <Link href="/demo/profile-card" className="text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white font-medium flex items-center justify-center gap-2 transition-colors w-full sm:w-auto py-2">
                       View example
                       <ArrowRight className="w-4 h-4" strokeWidth={2} />
                     </Link>
@@ -328,7 +345,7 @@ export default function Home() {
             transition={{ duration: 0.6 }}
             className="text-center mb-12 md:mb-16"
           >
-            <h2 className="mb-4 text-2xl md:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white">From scattered links to one profile</h2>
+            <h2 className="mb-4 text-2xl md:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white">Stop losing opportunities to friction</h2>
           </motion.div>
           <BeforeAfter />
         </div>
@@ -344,9 +361,9 @@ export default function Home() {
             transition={{ duration: 0.6 }}
             className="text-center mb-12 md:mb-16"
           >
-            <h2 className="mb-4 text-2xl md:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white">Designed for professional visibility</h2>
+            <h2 className="mb-4 text-2xl md:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white">Visibility beyond the handshake</h2>
             <p className="text-lg md:text-xl text-secondary dark:text-neutral-400 max-w-2xl mx-auto">
-              Everything required to represent yourself clearly and professionally.
+              Don't just hand out a card and hope. Track interest, manage leads, and showcase your best work.
             </p>
           </motion.div>
           <FeatureGrid />
@@ -370,7 +387,7 @@ export default function Home() {
             transition={{ duration: 0.6 }}
             className="text-center mb-12 md:mb-16"
           >
-            <h2 className="mb-4 text-2xl md:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white">Built for the serious.</h2>
+            <h2 className="mb-4 text-2xl md:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white">One Card. Multiple Impact.</h2>
           </motion.div>
           <UseCaseCards />
         </div>
@@ -421,10 +438,10 @@ export default function Home() {
             transition={{ duration: 0.6 }}
           >
             <h2 className="text-white mb-6 text-3xl md:text-4xl font-bold">
-              Be visible. Be credible. Be remembered.
+              Turn your visibility into value.
             </h2>
             <p className="text-lg md:text-xl text-neutral-300 dark:text-neutral-400 mb-8">
-              It takes 2 minutes to look professional.
+              Start tracking your impact today. It takes 2 minutes to look professional.
             </p>
             {betaStatus?.isBetaMode && betaStatus.limitReached ? (
               <div className="flex flex-col items-center gap-3">

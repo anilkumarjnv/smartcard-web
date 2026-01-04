@@ -72,6 +72,26 @@ export interface GrowthMetrics {
     conversionRate: number;
 }
 
+export interface FeedbackItem {
+    id: string;
+    user_id: string;
+    user_email?: string;
+    user_name?: string;
+    type: string;
+    message: string;
+    rating: number;
+    path: string;
+    created_at: string;
+    status: string;
+}
+
+export interface WaitlistEntry {
+    id: string;
+    email: string;
+    created_at: string;
+    status: string;
+}
+
 export const adminAPI = {
     /**
      * Get dashboard metrics
@@ -144,5 +164,29 @@ export const adminAPI = {
         limitReached: boolean;
     }> {
         return apiClient.get(`/api/v1/admin/beta-status`);
+    },
+
+    /**
+     * Get feedback
+     */
+    async getFeedback(params?: { limit?: number; offset?: number }): Promise<FeedbackItem[]> {
+        const query = new URLSearchParams();
+        if (params?.limit) query.append('limit', params.limit.toString());
+        if (params?.offset) query.append('offset', params.offset.toString());
+
+        const queryString = query.toString();
+        return apiClient.get<FeedbackItem[]>(`/api/v1/admin/feedback${queryString ? `?${queryString}` : ''}`);
+    },
+
+    /**
+     * Get waitlist
+     */
+    async getWaitlist(params?: { limit?: number; offset?: number }): Promise<WaitlistEntry[]> {
+        const query = new URLSearchParams();
+        if (params?.limit) query.append('limit', params.limit.toString());
+        if (params?.offset) query.append('offset', params.offset.toString());
+
+        const queryString = query.toString();
+        return apiClient.get<WaitlistEntry[]>(`/api/v1/admin/waitlist${queryString ? `?${queryString}` : ''}`);
     },
 };

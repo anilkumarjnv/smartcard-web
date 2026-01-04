@@ -7,9 +7,11 @@ import type {
     UserListItem,
     CardListItem,
     EngagementMetrics,
-    GrowthMetrics
+    GrowthMetrics,
+    FeedbackItem,
+    WaitlistEntry
 } from '@/lib/api/admin';
-import { Users, CreditCard, TrendingUp, Eye, DollarSign, Activity } from 'lucide-react';
+import { Users, CreditCard, TrendingUp, Eye, DollarSign, Activity, MessageSquare, Clock } from 'lucide-react';
 
 export default function AdminDashboard() {
     const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
@@ -24,8 +26,10 @@ export default function AdminDashboard() {
         spotsRemaining: number;
         limitReached: boolean;
     } | null>(null);
+    const [feedback, setFeedback] = useState<FeedbackItem[]>([]);
+    const [waitlist, setWaitlist] = useState<WaitlistEntry[]>([]);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'cards' | 'engagement' | 'growth'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'cards' | 'engagement' | 'growth' | 'feedback' | 'waitlist'>('overview');
     const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
@@ -35,13 +39,15 @@ export default function AdminDashboard() {
     async function loadData() {
         try {
             setLoading(true);
-            const [metricsData, usersData, cardsData, engagementData, growthData, betaData] = await Promise.all([
+            const [metricsData, usersData, cardsData, engagementData, growthData, betaData, feedbackData, waitlistData] = await Promise.all([
                 adminAPI.getMetrics(),
                 adminAPI.getUsers({ limit: 100 }),
                 adminAPI.getCards({ limit: 50 }),
                 adminAPI.getEngagement(),
                 adminAPI.getGrowth(30),
                 adminAPI.getBetaStatus(),
+                adminAPI.getFeedback({ limit: 50 }),
+                adminAPI.getWaitlist({ limit: 50 }),
             ]);
 
             setMetrics(metricsData);
@@ -50,6 +56,8 @@ export default function AdminDashboard() {
             setEngagement(engagementData);
             setGrowth(growthData);
             setBetaStatus(betaData);
+            setFeedback(feedbackData);
+            setWaitlist(waitlistData);
         } catch (error) {
             console.error('Failed to load admin data:', error);
         } finally {
@@ -88,6 +96,8 @@ export default function AdminDashboard() {
                             { id: 'cards', label: 'Cards', icon: CreditCard },
                             { id: 'engagement', label: 'Engagement', icon: Eye },
                             { id: 'growth', label: 'Growth', icon: TrendingUp },
+                            { id: 'feedback', label: 'Feedback', icon: MessageSquare },
+                            { id: 'waitlist', label: 'Waitlist', icon: Clock },
                         ].map((tab) => (
                             <button
                                 key={tab.id}
@@ -129,6 +139,14 @@ export default function AdminDashboard() {
                 {activeTab === 'growth' && (
                     <GrowthTab growth={growth} />
                 )}
+
+                {activeTab === 'feedback' && (
+                    <FeedbackTab feedback={feedback} />
+                )}
+
+                {activeTab === 'waitlist' && (
+                    <WaitlistTab waitlist={waitlist} />
+                )}
             </main>
         </div>
     );
@@ -159,10 +177,10 @@ function OverviewTab({ metrics, betaStatus }: {
             {/* Beta Status Alert (if active) */}
             {betaStatus?.isBetaMode && (
                 <div className={`rounded-lg p-4 ${betaStatus.limitReached
-                        ? 'bg-red-50 border border-red-200'
-                        : betaStatus.spotsRemaining <= 5
-                            ? 'bg-yellow-50 border border-yellow-200'
-                            : 'bg-blue-50 border border-blue-200'
+                    ? 'bg-red-50 border border-red-200'
+                    : betaStatus.spotsRemaining <= 5
+                        ? 'bg-yellow-50 border border-yellow-200'
+                        : 'bg-blue-50 border border-blue-200'
                     }`}>
                     <div className="flex items-start">
                         <div className="flex-shrink-0">
@@ -178,18 +196,18 @@ function OverviewTab({ metrics, betaStatus }: {
                         </div>
                         <div className="ml-3 flex-1">
                             <h3 className={`text-sm font-medium ${betaStatus.limitReached
-                                    ? 'text-red-800'
-                                    : betaStatus.spotsRemaining <= 5
-                                        ? 'text-yellow-800'
-                                        : 'text-blue-800'
+                                ? 'text-red-800'
+                                : betaStatus.spotsRemaining <= 5
+                                    ? 'text-yellow-800'
+                                    : 'text-blue-800'
                                 }`}>
                                 {betaStatus.limitReached ? '🔒 Beta Limit Reached' : '🚀 Beta Testing Active'}
                             </h3>
                             <div className={`mt-2 text-sm ${betaStatus.limitReached
-                                    ? 'text-red-700'
-                                    : betaStatus.spotsRemaining <= 5
-                                        ? 'text-yellow-700'
-                                        : 'text-blue-700'
+                                ? 'text-red-700'
+                                : betaStatus.spotsRemaining <= 5
+                                    ? 'text-yellow-700'
+                                    : 'text-blue-700'
                                 }`}>
                                 <p>
                                     <strong>{betaStatus.currentUsers}</strong> of <strong>{betaStatus.maxUsers}</strong> beta spots filled
@@ -440,7 +458,118 @@ function EngagementTab({ engagement }: { engagement: EngagementMetrics | null })
     );
 }
 
-// Growth Tab Component
+// Feedback Tab Component
+function FeedbackTab({ feedback }: { feedback: FeedbackItem[] }) {
+    const [selectedFeedback, setSelectedFeedback] = useState<FeedbackItem | null>(null);
+
+    return (
+        <>
+            <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+                <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                        <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Message</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rating</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                        {feedback.map((item) => (
+                            <tr
+                                key={item.id}
+                                className="hover:bg-gray-50 cursor-pointer transition-colors"
+                                onClick={() => setSelectedFeedback(item)}
+                            >
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <div>
+                                        <div className="text-sm font-medium text-gray-900">{item.user_name || 'Unknown'}</div>
+                                        <div className="text-sm text-gray-500">{item.user_email}</div>
+                                    </div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${item.type === 'bug' ? 'bg-red-100 text-red-800' :
+                                        item.type === 'feature' ? 'bg-purple-100 text-purple-800' :
+                                            'bg-blue-100 text-blue-800'
+                                        }`}>
+                                        {item.type}
+                                    </span>
+                                </td>
+                                <td className="px-6 py-4">
+                                    <div className="text-sm text-gray-900 max-w-xs truncate" title={item.message}>{item.message}</div>
+                                    <div className="text-xs text-gray-500 truncate max-w-[200px]">{item.path}</div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {Array(item.rating).fill('⭐').join('')}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {new Date(item.created_at).toLocaleDateString()}
+                                </td>
+                            </tr>
+                        ))}
+                        {feedback.length === 0 && (
+                            <tr>
+                                <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
+                                    No feedback yet
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
+
+            {selectedFeedback && (
+                <FeedbackModal
+                    feedback={selectedFeedback}
+                    onClose={() => setSelectedFeedback(null)}
+                />
+            )}
+        </>
+    );
+}
+
+// Waitlist Tab Component
+function WaitlistTab({ waitlist }: { waitlist: WaitlistEntry[] }) {
+    return (
+        <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+            <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                    <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined At</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                    {waitlist.map((entry) => (
+                        <tr key={entry.id} className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                {entry.email}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {new Date(entry.created_at).toLocaleString()}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                    {entry.status || 'Waiting'}
+                                </span>
+                            </td>
+                        </tr>
+                    ))}
+                    {waitlist.length === 0 && (
+                        <tr>
+                            <td colSpan={3} className="px-6 py-12 text-center text-gray-500">
+                                No waitlist entries yet
+                            </td>
+                        </tr>
+                    )}
+                </tbody>
+            </table>
+        </div>
+    );
+}
+
 function GrowthTab({ growth }: { growth: GrowthMetrics | null }) {
     if (!growth) return null;
 
@@ -491,6 +620,87 @@ function GrowthTab({ growth }: { growth: GrowthMetrics | null }) {
                     ))}
                 </div>
             </MetricCard>
+        </div>
+    );
+}
+
+function FeedbackModal({ feedback, onClose }: { feedback: FeedbackItem | null; onClose: () => void }) {
+    if (!feedback) return null;
+
+    return (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
+            <div className="relative bg-white rounded-lg shadow-xl max-w-2xl w-full mx-auto">
+                <div className="flex items-center justify-between p-4 border-b">
+                    <h3 className="text-xl font-semibold text-gray-900">
+                        Feedback Details
+                    </h3>
+                    <button
+                        onClick={onClose}
+                        className="text-gray-400 hover:text-gray-500 focus:outline-none"
+                    >
+                        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div className="p-6 space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-500">User</label>
+                            <div className="mt-1 text-sm text-gray-900">
+                                <div className="font-medium">{feedback.user_name || 'Unknown'}</div>
+                                <div className="text-gray-500">{feedback.user_email}</div>
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-500">Date</label>
+                            <div className="mt-1 text-sm text-gray-900">
+                                {new Date(feedback.created_at).toLocaleString()}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-500">Type</label>
+                            <div className="mt-1 text-sm text-gray-900 capitalise bg-gray-100 inline-block px-2 py-1 rounded">
+                                {feedback.type}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-500">Rating</label>
+                            <div className="mt-1 text-sm text-yellow-500">
+                                {Array(feedback.rating).fill('⭐').join('')}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-500">Path / Context</label>
+                        <div className="mt-1 text-sm text-gray-900 font-mono bg-gray-50 p-2 rounded">
+                            {feedback.path}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-500">Message</label>
+                        <div className="mt-1 text-sm text-gray-900 bg-gray-50 p-4 rounded-lg whitespace-pre-wrap">
+                            {feedback.message}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse rounded-b-lg">
+                    <button
+                        type="button"
+                        className="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                        onClick={onClose}
+                    >
+                        Close
+                    </button>
+                </div>
+            </div>
         </div>
     );
 }

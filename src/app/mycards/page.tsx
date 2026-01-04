@@ -66,7 +66,8 @@ function MyCardsContent() {
                     custom_highlights: cardData.custom_data?.custom_highlights || [],
                     cta_button: cardData.custom_data?.cta_button,
                     domain: cardData.custom_data?.domain || '',
-                    country_code: cardData.custom_data?.country_code || '+91'
+                    country_code: cardData.custom_data?.country_code || '+91',
+                    usage_intent: cardData.custom_data?.usage_intent || 'professional'
                 };
                 setPersistedFormData(initialFormData);
                 setLiveFormData(initialFormData);

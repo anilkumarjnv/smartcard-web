@@ -14,13 +14,13 @@ import {
 const features = [
     {
         id: 'leads',
-        title: 'Never miss an opportunity',
-        subtitle: 'Lead Generation',
-        description: 'Turn profile visits into connections. Let people share their contact info directly through your card, organized in one place.',
+        title: 'Bridge the post-meeting gap',
+        subtitle: 'Lead Capture Layer',
+        description: 'Don\'t let the connection die after the handshake. Capture leads instantly when they view your card, creating a lightweight visibility layer for your business.',
         highlights: [
             'One-tap contact collection',
-            'Exportable csv lists',
-            'Real-time notifications'
+            'Visitor interest signals',
+            'Real-time lead notifications'
         ],
         icon: Users,
         color: 'blue',

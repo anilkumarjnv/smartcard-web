@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Briefcase, FileDown, QrCode, EyeOff } from 'lucide-react';
+import { Briefcase, RefreshCw, QrCode, LineChart } from 'lucide-react';
 
 const features = [
     {
@@ -26,15 +26,12 @@ const features = [
         ),
     },
     {
-        icon: FileDown,
-        title: 'Smart Resume',
-        description: 'A shareable profile that updates with you.',
+        icon: RefreshCw,
+        title: 'Live Updates',
+        description: 'Real-time changes. No more obsolete business cards.',
         visual: (
             <div className="flex items-center justify-center gap-2">
-                <FileDown className="w-6 h-6 text-neutral-600 dark:text-neutral-400" strokeWidth={1.5} />
-                <div className="h-8 bg-neutral-900 dark:bg-white rounded px-4 flex items-center">
-                    <span className="text-xs text-white dark:text-neutral-900 font-medium">View Resume</span>
-                </div>
+                <div className="w-8 h-8 rounded-full border-2 border-neutral-200 dark:border-neutral-700 border-t-neutral-900 dark:border-t-white animate-spin" />
             </div>
         ),
     },
@@ -67,15 +64,16 @@ const features = [
         ),
     },
     {
-        icon: EyeOff,
-        title: 'Remove Branding',
-        description: 'This represents you, not us.',
+        icon: LineChart,
+        title: 'Visibility Insights',
+        description: 'See when people view your profile and from where.',
         visual: (
-            <div className="flex items-center justify-center gap-3">
-                <span className="text-sm text-neutral-600 dark:text-neutral-400">Platform Branding</span>
-                <div className="relative inline-block w-11 h-6 bg-neutral-900 dark:bg-white rounded-full">
-                    <div className="absolute right-1 top-1 h-4 w-4 bg-white dark:bg-neutral-900 rounded-full" />
-                </div>
+            <div className="flex items-end justify-center gap-1 h-10 pb-1">
+                <div className="w-2 bg-neutral-200 dark:bg-neutral-800 h-4 rounded-sm" />
+                <div className="w-2 bg-neutral-300 dark:bg-neutral-700 h-6 rounded-sm" />
+                <div className="w-2 bg-neutral-900 dark:bg-white h-8 rounded-sm" />
+                <div className="w-2 bg-neutral-300 dark:bg-neutral-700 h-5 rounded-sm" />
+                <div className="w-2 bg-neutral-200 dark:bg-neutral-800 h-3 rounded-sm" />
             </div>
         ),
     },
@@ -104,8 +102,8 @@ export function FeatureGrid() {
                         <p className="text-neutral-600 dark:text-neutral-400">{feature.description}</p>
                     </div>
 
-                    {/* Visual at bottom */}
-                    {/* <div className="pt-4 border-t border-neutral-100 dark:border-neutral-800">
+                    {/* Visual at bottom (Restored) */}
+                    {/* <div className="pt-4 border-t border-neutral-100 dark:border-neutral-800 flex justify-center mt-auto">
                         {feature.visual}
                     </div> */}
                 </motion.div>

@@ -39,6 +39,8 @@ export interface Card {
     is_published: boolean;
     created_at: string;
     updated_at: string;
+    usage_intent?: 'professional' | 'student' | 'business' | 'personal';
+    custom_data?: Record<string, any>;
 }
 
 /**
@@ -68,6 +70,7 @@ export interface CreateCardDTO {
     projects?: string;
     experience?: string;
     certifications?: string;
+    usage_intent?: 'professional' | 'student' | 'business' | 'personal';
 }
 
 /**
@@ -98,6 +101,7 @@ export interface UpdateCardDTO {
     projects?: string;
     experience?: string;
     certifications?: string;
+    usage_intent?: 'professional' | 'student' | 'business' | 'personal';
 }
 
 /**
