@@ -188,47 +188,7 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
           </div>
         </div>
 
-        <div className="border-t border-gray-200 dark:border-neutral-800 pt-6 sm:pt-8">
-          <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-neutral-900 dark:text-white">Role & Experience</h4>
-          <div className="p-4 sm:p-6 bg-gray-50 dark:bg-neutral-800/50 rounded-xl sm:rounded-2xl">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0 mb-4 sm:mb-6">
-              <div>
-                <p className="font-medium text-neutral-900 dark:text-white">Current Role</p>
-                <p className="text-sm text-gray-600 dark:text-neutral-400 mt-1">Determines your card layout and fields</p>
-              </div>
-              <span className={`px-4 py-2 rounded-xl text-sm font-medium ${(role || 'professional') === 'student'
-                ? 'bg-neutral-100 text-neutral-700'
-                : 'bg-neutral-100 text-neutral-700'
-                }`}>
-                {(role || 'Professional').charAt(0).toUpperCase() + (role || 'professional').slice(1)}
-              </span>
-            </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <button
-                onClick={() => handleRoleChange('student')}
-                className={`p-4 rounded-xl border-2 text-left transition-all ${role === 'student'
-                  ? 'border-neutral-900 bg-neutral-50 ring-1 ring-neutral-900 dark:bg-neutral-800 dark:border-neutral-100 dark:ring-neutral-100'
-                  : 'border-gray-200 hover:border-neutral-200 hover:bg-white dark:border-neutral-700 dark:hover:bg-neutral-900 dark:hover:border-neutral-500'
-                  }`}
-              >
-                <div className="font-semibold mb-1 text-neutral-900 dark:text-white">Student</div>
-                <div className="text-xs text-neutral-700 dark:text-neutral-300">Academic focus, projects, GPA</div>
-              </button>
-
-              <button
-                onClick={() => handleRoleChange('professional')}
-                className={`p-4 rounded-xl border-2 text-left transition-all ${role === 'professional'
-                  ? 'border-neutral-900 bg-neutral-50 ring-1 ring-neutral-900 dark:bg-neutral-800 dark:border-neutral-100 dark:ring-neutral-100'
-                  : 'border-gray-200 hover:border-neutral-200 hover:bg-white dark:border-neutral-700 dark:hover:bg-neutral-900 dark:hover:border-neutral-500'
-                  }`}
-              >
-                <div className="font-semibold mb-1 text-neutral-900 dark:text-white">Professional</div>
-                <div className="text-xs text-neutral-700 dark:text-neutral-300">Career focus, experience, portfolio</div>
-              </button>
-            </div>
-          </div>
-        </div>
 
         <div className="border-t border-gray-200 dark:border-neutral-800 pt-8">
           <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-neutral-900 dark:text-white">Subscription</h4>

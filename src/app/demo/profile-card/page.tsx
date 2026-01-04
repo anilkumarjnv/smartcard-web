@@ -1,9 +1,55 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { ProfileCard } from '@/components/profile/ProfileCard';
 import { Navbar } from '@/components/organisms/Navbar';
+import { AuthModal } from '@/components/auth/AuthModal';
+import { apiClient } from '@/lib/apiClient';
 
 export default function ProfileCardDemo() {
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+    const [authMode, setAuthMode] = useState<'login' | 'signup'>('signup');
+    const [betaStatus, setBetaStatus] = useState<{
+        isBetaMode: boolean;
+        limitReached: boolean;
+        spotsRemaining: number;
+        maxUsers: number | null;
+    } | null>(null);
+
+    useEffect(() => {
+        checkBetaStatus();
+    }, []);
+
+    async function checkBetaStatus() {
+        try {
+            const status = await apiClient.get<{
+                isBetaMode: boolean;
+                maxUsers: number | null;
+                currentUsers: number;
+                spotsRemaining: number;
+                limitReached: boolean;
+            }>('/api/v1/beta/status');
+            setBetaStatus(status);
+        } catch (error) {
+            console.error('Failed to check beta status:', error);
+            setBetaStatus({ isBetaMode: false, limitReached: false, spotsRemaining: 0, maxUsers: null });
+        }
+    }
+
+    const openLogin = () => {
+        setAuthMode('login');
+        setIsAuthModalOpen(true);
+    };
+
+    const openSignup = () => {
+        if (betaStatus?.isBetaMode && betaStatus.limitReached) {
+            window.location.href = '/beta-limit';
+            return;
+        }
+        setAuthMode('signup');
+        setIsAuthModalOpen(true);
+    };
+
     // Example user data for demo
     const exampleUser = {
         name: 'Alex Morgan',
@@ -22,9 +68,19 @@ export default function ProfileCardDemo() {
 
     return (
         <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
-            <Navbar variant="dashboard" />
+            <Navbar
+                isLandingPage={true}
+                onLoginClick={openLogin}
+                onSignupClick={openSignup}
+            />
 
-            <div className="max-w-7xl mx-auto px-6 py-12">
+            <AuthModal
+                isOpen={isAuthModalOpen}
+                onClose={() => setIsAuthModalOpen(false)}
+                defaultMode={authMode}
+            />
+
+            <div className="max-w-7xl mx-auto px-6 py-24">
                 {/* Header */}
                 <div className="text-center mb-12">
                     <h1 className="text-4xl font-bold text-neutral-900 dark:text-white mb-4">
@@ -48,7 +104,7 @@ export default function ProfileCardDemo() {
                                 Professional & trustworthy. Perfect for LinkedIn and recruiters.
                             </p>
                         </div>
-                        <ProfileCard user={exampleUser} theme="light" />
+                        <ProfileCard user={exampleUser} theme="light" disableFlip={true} disableInteractions={true} />
                     </div>
 
                     {/* Dark Theme */}
@@ -61,7 +117,7 @@ export default function ProfileCardDemo() {
                                 Premium & sophisticated. Modern and eye-catching.
                             </p>
                         </div>
-                        <ProfileCard user={exampleUser} theme="dark" />
+                        <ProfileCard user={exampleUser} theme="dark" disableFlip={true} disableInteractions={true} />
                     </div>
 
                     {/* Accent Theme */}
@@ -74,50 +130,11 @@ export default function ProfileCardDemo() {
                                 Distinctive & creative. Shows personality while staying professional.
                             </p>
                         </div>
-                        <ProfileCard user={exampleUser} theme="accent" />
+                        <ProfileCard user={exampleUser} theme="accent" disableFlip={true} disableInteractions={true} />
                     </div>
                 </div>
 
-                {/* Design Features */}
-                <div className="bg-white dark:bg-neutral-900 rounded-xl p-8 border border-neutral-200 dark:border-neutral-800">
-                    <h3 className="text-2xl font-semibold text-neutral-900 dark:text-white mb-6">
-                        Design Features
-                    </h3>
-                    <div className="grid md:grid-cols-2 gap-6">
-                        <div>
-                            <h4 className="font-semibold text-neutral-900 dark:text-white mb-2">
-                                ✓ Background Image as Hero
-                            </h4>
-                            <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                                Full-width professional photo creates immediate visual impact, not a circular avatar.
-                            </p>
-                        </div>
-                        <div>
-                            <h4 className="font-semibold text-neutral-900 dark:text-white mb-2">
-                                ✓ Shape-Based Theming
-                            </h4>
-                            <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                                Smooth wave dividers add visual personality while maintaining hierarchy.
-                            </p>
-                        </div>
-                        <div>
-                            <h4 className="font-semibold text-neutral-900 dark:text-white mb-2">
-                                ✓ Professional Structure
-                            </h4>
-                            <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                                Three clear sections: Identity header, professional details, and action links.
-                            </p>
-                        </div>
-                        <div>
-                            <h4 className="font-semibold text-neutral-900 dark:text-white mb-2">
-                                ✓ Mobile Optimized
-                            </h4>
-                            <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                                Large tap targets and responsive design for perfect QR scan landing pages.
-                            </p>
-                        </div>
-                    </div>
-                </div>
+
             </div>
         </div>
     );

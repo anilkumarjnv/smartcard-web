@@ -58,12 +58,15 @@ const formSchema = z.object({
     label: z.string().optional().transform(str => str?.replace(/[<>]/g, "").trim() || ""),
     value: z.string().optional().transform(str => str?.replace(/[<>]/g, "").trim() || ""),
   })),
+  usage_intent: z.enum(['professional', 'student', 'business', 'personal']).optional(),
 });
 
 interface FormData {
   //Section 1: Identity (Required)
   name: string;
+
   slug?: string;
+  usage_intent?: 'professional' | 'student' | 'business' | 'personal';
   role: string;
 
   // Section 2: Visual Identity (Optional)
@@ -135,7 +138,8 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onC
     primary_link: '',
     additional_links: [],
     cta_button: undefined,
-    custom_highlights: []
+    custom_highlights: [],
+    usage_intent: 'professional'
   });
 
   const [isSaving, setIsSaving] = useState(false);
@@ -178,7 +182,9 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onC
         primary_link: '',
         additional_links: [],
         cta_button: undefined,
-        custom_highlights: []
+
+        custom_highlights: [],
+        usage_intent: 'professional'
       };
       setFormData(emptyData);
       setImagePreview('');
@@ -209,7 +215,9 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onC
         primary_link: currentCard.website || (currentCard.social_links as Record<string, string>)?.linkedin || '',
         additional_links: customData.additional_links || [],
         cta_button: customData.cta_button,
-        custom_highlights: customData.custom_highlights || []
+
+        custom_highlights: customData.custom_highlights || [],
+        usage_intent: currentCard.usage_intent || customData.usage_intent || 'professional'
       };
       setFormData(initialData);
       setImagePreview(initialData.photo_url || '');
@@ -388,7 +396,8 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onC
             ? validatedData.cta_button
             : undefined,
           custom_highlights: validatedData.custom_highlights?.filter(h => h.label && h.value) || undefined
-        }
+        },
+        usage_intent: validatedData.usage_intent
       };
 
       let savedCard: Card;
@@ -500,6 +509,26 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onC
             icon={<User className="w-5 h-5 text-muted-foreground" />}
             error={errors.name}
           />
+
+
+
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-foreground ml-1">What is this card for?</label>
+            <Select
+              value={formData.usage_intent || 'professional'}
+              onValueChange={(val: any) => handleFormChange({ usage_intent: val })}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select purpose" />
+              </SelectTrigger>
+              <SelectContent className="bg-white dark:bg-neutral-900">
+                <SelectItem value="professional">Professional (Job seeker, Freelancer)</SelectItem>
+                <SelectItem value="student">Student (Academic, Internship)</SelectItem>
+                <SelectItem value="business">Business (Founder, Company)</SelectItem>
+                <SelectItem value="personal">Personal (Networking, Social)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
           <div className="relative">
             <Input

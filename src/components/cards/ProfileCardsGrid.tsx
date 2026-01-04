@@ -213,6 +213,17 @@ export function ProfileCardsGrid({ cards }: ProfileCardsGridProps) {
                                                     }`} />
                                             </button>
 
+                                            {/* Usage Intent Badge */}
+                                            {(card.usage_intent || (card.custom_data as any)?.usage_intent) && (
+                                                <div className={`absolute top-4 left-4 z-30 px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-md shadow-sm border border-white/20 capitalize ${(card.usage_intent || (card.custom_data as any)?.usage_intent) === 'student' ? 'bg-blue-500/80 text-white' :
+                                                        (card.usage_intent || (card.custom_data as any)?.usage_intent) === 'business' ? 'bg-purple-500/80 text-white' :
+                                                            (card.usage_intent || (card.custom_data as any)?.usage_intent) === 'personal' ? 'bg-green-500/80 text-white' :
+                                                                'bg-neutral-800/80 text-white'
+                                                    }`}>
+                                                    {card.usage_intent || (card.custom_data as any)?.usage_intent}
+                                                </div>
+                                            )}
+
                                             <ProfileCard
                                                 user={userProfile}
                                                 theme={theme}
