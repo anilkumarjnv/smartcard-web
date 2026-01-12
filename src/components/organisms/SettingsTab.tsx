@@ -14,41 +14,14 @@ interface SettingsTabProps {
   onLogout?: () => void;
 }
 
-const plans = [
-  {
-    name: 'The Basics',
-    price: '₹0',
-    featured: false,
-    features: [
-      'Profile photo',
-      '3 links',
-      'Default theme',
-      'QR code generation',
-    ],
-    isCurrent: true,
-  },
-  {
-    name: 'Professional',
-    price: '₹299',
-    originalPrice: '₹999',
-    period: 'lifetime',
-    badge: 'Most Popular',
-    featured: true,
-    features: [
-      'Portfolio section',
-      'Analytics dashboard',
-      'Custom QR codes',
-      'No watermark',
-      'All premium themes',
-      'Priority support',
-    ],
-    isCurrent: false,
-  },
-];
+
+
+import { PricingSection } from '@/components/landing/PricingSection';
 
 export function SettingsTab({ onLogout }: SettingsTabProps) {
   const router = useRouter();
 
+  const [currentUser, setCurrentUser] = useState<any>(null); // Store full user object
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [role, setRole] = useState<string>('');
@@ -64,6 +37,7 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
       try {
         const user = await apiClient.get<any>('/api/v1/auth/me');
         if (user) {
+          setCurrentUser(user);
           setEmail(user.email || '');
           // Backend returns flattened user object with metadata keys spread
           setName(user.name || user.full_name || '');
@@ -191,24 +165,10 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
 
 
         <div className="border-t border-gray-200 dark:border-neutral-800 pt-8">
-          <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-neutral-900 dark:text-white">Subscription</h4>
-          <div className="p-6 bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-200 dark:border-yellow-900/30 rounded-xl">
-            <div className="flex items-start gap-4">
-              <div className="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
-                <CreditCard className="w-6 h-6 text-yellow-700 dark:text-yellow-500" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-neutral-900 dark:text-white mb-1">Free Public Beta</h3>
-                <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed max-w-2xl">
-                  You are currently using the <span className="font-medium text-neutral-900 dark:text-white">Professional Plan</span> features for free as part of our beta program.
-                  Enjoy full access to analytics, custom domains (coming soon), and premium themes without any charge.
-                </p>
-                <div className="mt-4 flex items-center gap-2 text-sm text-yellow-800 dark:text-yellow-500 font-medium">
-                  <Check className="w-4 h-4" />
-                  <span>No credit card required during beta</span>
-                </div>
-              </div>
-            </div>
+          <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-neutral-900 dark:text-white">Manage Subscription</h4>
+          <div className="-mx-4 sm:-mx-6 md:-mx-8">
+            {/* Negative margin to breakout of padding if needed, or just normal div */}
+            <PricingSection user={currentUser} onLoginClick={() => { }} />
           </div>
         </div>
 

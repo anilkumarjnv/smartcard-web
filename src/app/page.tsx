@@ -12,6 +12,9 @@ import { FeatureGrid } from "@/components/landing/FeatureGrid";
 import { DetailedFeatures } from "@/components/landing/DetailedFeatures";
 import { UseCaseCards } from "@/components/landing/UseCaseCards";
 import { PricingSimple } from "@/components/landing/PricingSimple";
+import { PricingSection } from "@/components/landing/PricingSection";
+import { AuthModal } from '@/components/auth/AuthModal';
+import { apiClient } from '@/lib/apiClient';
 // import { SocialProof } from "@/components/landing/SocialProof";
 
 const SAMPLE_CARDS = [
@@ -146,8 +149,7 @@ const SAMPLE_CARDS = [
 ];
 
 
-import { AuthModal } from '@/components/auth/AuthModal';
-import { apiClient } from '@/lib/apiClient';
+
 
 export default function Home() {
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
@@ -393,32 +395,12 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 5. Pricing (Hidden for Beta) */}
+      {/* 5. Pricing Section */}
       <section className="py-16 md:py-24 px-4 md:px-6 bg-neutral-50 dark:bg-neutral-900/50">
-        <div className="max-w-7xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="max-w-3xl mx-auto"
-          >
-            <span className="inline-block py-1 px-3 rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400 text-sm font-semibold mb-6">
-              BETA ACCESS
-            </span>
-            <h2 className="mb-6 text-2xl md:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white">
-              Currently in Free Public Beta
-            </h2>
-            <p className="text-lg md:text-xl text-secondary dark:text-neutral-400 leading-relaxed">
-              We are currently in a public beta phase. All features, including premium themes and analytics, are
-              <span className="font-semibold text-neutral-900 dark:text-white"> completely free </span>
-              for early adopters.
-            </p>
-            <p className="mt-4 text-base text-secondary dark:text-neutral-500">
-              Pricing plans will be introduced later as we mature. Early users will be notified in advance.
-            </p>
-          </motion.div>
-        </div>
+        <PricingSection
+          user={user}
+          onLoginClick={openLogin}
+        />
       </section>
 
       {/* 6. Social Proof */}
