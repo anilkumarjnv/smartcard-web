@@ -8,6 +8,7 @@ import { apiClient } from '@/lib/apiClient';
 import { toast } from 'sonner';
 import { loadRazorpayScript } from '@/lib/razorpay';
 
+import { ComparisonTable } from './ComparisonTable';
 
 interface PricingSectionProps {
     user: any;
@@ -50,7 +51,7 @@ const PlanCardComponent = ({ plan, type, isCurrent, isUpgrade, buttonText, onAct
                     <span className="text-2xl text-neutral-400 line-through">₹{plan.original_price_inr}</span>
                 )}
                 <span className="text-5xl font-bold text-neutral-900 dark:text-white">
-                    ₹{plan?.price_inr !== undefined ? plan.price_inr : (type === 'FREE' ? 0 : 999)}
+                    ₹{plan?.price_inr !== undefined ? plan.price_inr : (type === 'FREE' ? 0 : 399)}
                 </span>
                 <span className="text-neutral-500 text-lg">
                     {type === 'FREE' ? '/forever' : type === 'LIFETIME' ? ' one-time' : `/${type === 'MONTHLY' ? 'mo' : 'yr'}`}
@@ -196,9 +197,9 @@ export function PricingSection({ user, onLoginClick }: PricingSectionProps) {
                     key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
                     amount: order.amount,
                     currency: order.currency,
-                    name: "SmartCard",
+                    name: "Cardfil",
                     description: "Lifetime Access",
-                    image: "https://placehold.co/400x400/171717/ffffff?text=SC",
+                    image: "https://placehold.co/400x400/171717/ffffff?text=C",
                     order_id: order.id,
                     handler: async function (response: any) {
                         try {
@@ -225,9 +226,9 @@ export function PricingSection({ user, onLoginClick }: PricingSectionProps) {
                 const options = {
                     key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
                     subscription_id: sub.id,
-                    name: "SmartCard Premium",
+                    name: "Cardfil Premium",
                     description: planType === 'MONTHLY' ? "Monthly Subscription" : "Yearly Subscription",
-                    image: "https://placehold.co/400x400/171717/ffffff?text=SC",
+                    image: "https://placehold.co/400x400/171717/ffffff?text=C",
                     handler: async function (response: any) {
                         toast.success("Subscription activated! check dashboard.");
                         window.location.reload();
@@ -419,6 +420,8 @@ export function PricingSection({ user, onLoginClick }: PricingSectionProps) {
             </div>
 
             {renderContent()}
+
+            <ComparisonTable />
 
             <p className="text-center text-xs text-neutral-400 mt-12 flex items-center justify-center gap-1">
                 <Info className="w-3 h-3" /> Secure payment via Razorpay. Backend verified.

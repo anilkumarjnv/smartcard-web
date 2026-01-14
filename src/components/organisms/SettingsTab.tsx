@@ -16,7 +16,8 @@ interface SettingsTabProps {
 
 
 
-import { PricingSection } from '@/components/landing/PricingSection';
+import { Crown } from 'lucide-react';
+import Link from 'next/link';
 
 export function SettingsTab({ onLogout }: SettingsTabProps) {
   const router = useRouter();
@@ -166,9 +167,19 @@ export function SettingsTab({ onLogout }: SettingsTabProps) {
 
         <div className="border-t border-gray-200 dark:border-neutral-800 pt-8">
           <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-neutral-900 dark:text-white">Manage Subscription</h4>
-          <div className="-mx-4 sm:-mx-6 md:-mx-8">
-            {/* Negative margin to breakout of padding if needed, or just normal div */}
-            <PricingSection user={currentUser} onLoginClick={() => { }} />
+          <div className="bg-neutral-50 dark:bg-neutral-900/50 rounded-xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4 border border-neutral-200 dark:border-neutral-800">
+            <div>
+              <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                {currentUser?.plan_type === 'FREE' ? 'You are currently on the Free plan.' : `You are currently on the ${currentUser?.plan_type || 'Custom'} plan.`}
+              </p>
+              <p className="text-xs text-neutral-500 mt-1">Upgrade or manage your billing details.</p>
+            </div>
+            <Link href="/subscription">
+              <Button variant="outline" className="flex items-center gap-2">
+                <Crown className="w-4 h-4 text-amber-500" />
+                Manage Subscription
+              </Button>
+            </Link>
           </div>
         </div>
 

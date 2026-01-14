@@ -14,6 +14,7 @@ import { Spinner } from '@/components/ui/Spinner';
 import useSWR from 'swr';
 import { apiClient } from '@/lib/apiClient';
 import type { Card as CardType } from '@/lib/api/types';
+import { useSubscription } from '@/hooks/useSubscription';
 
 const fetcher = (url: string) => apiClient.get<any>(url);
 
@@ -29,6 +30,8 @@ function MyCardsContent() {
     const [persistedFormData, setPersistedFormData] = useState<any>(null);
     const [liveTheme, setLiveTheme] = useState<Record<string, unknown> | undefined>(undefined);
     const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+
+    const { isPro } = useSubscription();
 
     // Fetch user's card data
     const { data: cards, isLoading } = useSWR<CardType[]>('/api/v1/cards/user', fetcher);
@@ -225,6 +228,7 @@ function MyCardsContent() {
                                         theme={liveTheme || cardData?.theme}
                                         isPublicView={true}
                                         disableFlip={true}
+                                        showBranding={!isPro}
                                     />
                                 ) : (
                                     <div className="flex items-center justify-center h-full text-center py-12 text-muted-foreground">

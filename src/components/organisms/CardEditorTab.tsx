@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { User, Briefcase, Building, Phone, Mail, Globe, Upload, X, Plus, Trash, Check, Loader2 } from 'lucide-react';
+import { User, Briefcase, Building, Phone, Mail, Globe, Upload, X, Plus, Trash, Check, Loader2, Lock } from 'lucide-react';
 import { Input } from '@/components/molecules/Input';
 import { Textarea } from '@/components/molecules/Textarea';
 import { Button } from '@/components/molecules/Button';
@@ -9,7 +9,8 @@ import useSWR, { mutate } from 'swr';
 import { apiClient } from '@/lib/apiClient';
 import type { Card } from '@/lib/api/types';
 import { z } from 'zod';
-
+import { useSubscription } from '@/hooks/useSubscription';
+import { UpgradeModal } from '@/components/organisms/UpgradeModal';
 
 import { countryCodes } from '@/lib/constants/countryCodes';
 import { CountrySelect } from '@/components/molecules/CountrySelect';
@@ -152,6 +153,11 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onC
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
   const [slugCheckMessage, setSlugCheckMessage] = useState('');
   const [touchedSlug, setTouchedSlug] = useState(false);
+
+  // Subscription
+  const { isPro } = useSubscription();
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [blockedFeature, setBlockedFeature] = useState('');
 
   // Initialize form data
   useEffect(() => {
@@ -331,11 +337,17 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onC
   };
 
   const addAdditionalLink = () => {
-    if (formData.additional_links.length < 3) {
-      handleFormChange({
-        additional_links: [...formData.additional_links, { label: '', url: '' }]
-      });
+    // Pro check - Additional Links are fully restricted to Pro users
+    if (!isPro) {
+      setBlockedFeature('Additional Links');
+      setShowUpgradeModal(true);
+      return;
     }
+
+    // Allow unlimited links for Pro users
+    handleFormChange({
+      additional_links: [...formData.additional_links, { label: '', url: '' }]
+    });
   };
 
   const updateAdditionalLink = (index: number, field: 'label' | 'url', value: string) => {
@@ -697,11 +709,17 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onC
         <div className="border-t border-border pt-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0 mb-3 sm:mb-4">
             <div>
-              <h4 className="text-base sm:text-lg font-semibold text-foreground">Additional Links</h4>
-              <p className="text-xs sm:text-sm text-muted-foreground">Max 3 (e.g., GitHub, Portfolio, LinkedIn)</p>
+              <div className="flex items-center gap-2">
+                <h4 className="text-base sm:text-lg font-semibold text-foreground">Additional Links</h4>
+                {!isPro && <Lock className="w-4 h-4 text-muted-foreground/70" />}
+              </div>
+              <p className="text-xs sm:text-sm text-muted-foreground">
+                {isPro ? "Add as many links as you need" : "Upgrade to add additional links"}
+              </p>
             </div>
-            {formData.additional_links.length < 3 && (
-              <Button onClick={addAdditionalLink} variant="outline" size="sm">
+            {(isPro || formData.additional_links.length < 3) && (
+              <Button onClick={addAdditionalLink} variant="outline" size="sm" className={!isPro ? "opacity-75" : ""}>
+                {/* {!isPro && <Lock className="w-3 h-3 mr-1.5" />} */}
                 <Plus className="w-4 h-4 mr-1" /> Add Link
               </Button>
             )}
@@ -849,6 +867,11 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onC
           </div>
         )}
       </div>
+      <UpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        featureName={blockedFeature}
+      />
     </div>
   );
 }

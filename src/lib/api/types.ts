@@ -41,7 +41,13 @@ export interface Card {
     updated_at: string;
     usage_intent?: 'professional' | 'student' | 'business' | 'personal';
     custom_data?: Record<string, any>;
+    // Joined Profile Fields
+    plan_type?: string;
+    is_founder?: boolean;
+    founder_since?: string;
+    founder_number?: number;
 }
+
 
 /**
  * Create card DTO
@@ -217,6 +223,10 @@ export interface AuthUser {
     id: string;
     email: string;
     role?: string;
+    plan_type?: string;
+    is_founder?: boolean;
+    founder_since?: string;
+    founder_number?: number;
     user_metadata?: {
         role?: string;
         full_name?: string;

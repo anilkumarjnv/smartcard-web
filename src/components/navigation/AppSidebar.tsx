@@ -4,16 +4,19 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useTheme } from "next-themes"
-import { CreditCard, Users, Settings, Menu, X, Sun, Moon, LogOut } from "lucide-react"
+import { CreditCard, Users, Settings, Menu, X, Sun, Moon, LogOut, Crown } from "lucide-react"
 import { apiClient } from "@/lib/apiClient"
 import { signOut } from "@/lib/auth"
 
 const navItems = [
     { href: "/mycards", icon: CreditCard, label: "Cards" },
     { href: "/leads", icon: Users, label: "Leads" },
+    { href: "/subscription", icon: Crown, label: "Subscription" },
+    { href: "/settings", icon: Settings, label: "Settings" },
 ]
 
 const bottomNavItems = [
+    { href: "/subscription", icon: Crown, label: "Subscription" },
     { href: "/settings", icon: Settings, label: "Settings" },
 ]
 
@@ -85,27 +88,15 @@ export function AppSidebar() {
             {/* Sidebar - Right on mobile/tablet, Left on large screens */}
             <aside
                 className={`
-                    fixed top-0 z-40 h-screen w-20 flex flex-col bg-sidebar border-sidebar-border
+                    fixed top-0 z-40 h-screen w-20 flex flex-col items-center bg-sidebar border-sidebar-border
                     transition-transform duration-300 ease-in-out
                     right-0 border-l lg:right-auto lg:left-0 lg:border-r lg:border-l-0
                     ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}
                 `}
             >
-                {/* Logo */}
-                <div className="flex h-16 items-center justify-center border-b border-sidebar-border">
-                    <Link
-                        href="/mycards"
-                        className="flex items-center justify-center"
-                        onClick={closeMobileMenu}
-                    >
-                        <div className="w-10 h-10 rounded-xl bg-sidebar-primary flex items-center justify-center">
-                            <CreditCard className="w-5 h-5 text-sidebar-primary-foreground" />
-                        </div>
-                    </Link>
-                </div>
-
-                {/* Main Navigation */}
-                <nav className="flex-1 flex flex-col items-center gap-2 py-4">
+                {/* Main Navigation - Centered Vertically */}
+                <nav className="flex-1 flex flex-col items-center justify-center gap-6 w-full">
+                    {/* Navigation Items */}
                     {navItems.map((item) => {
                         const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
                         return (
@@ -126,15 +117,12 @@ export function AppSidebar() {
                             </Link>
                         )
                     })}
-                </nav>
 
-                {/* Bottom Navigation */}
-                <div className="flex flex-col items-center gap-2 py-4 border-t border-sidebar-border">
                     {/* Theme Toggle Button */}
                     <button
                         onClick={toggleTheme}
                         className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 text-white lg:text-black lg:dark:text-white hover:bg-sidebar-accent"
-                        title="Toggle theme" // Fixed title to avoid hydration mismatch
+                        title="Toggle theme"
                     >
                         {mounted ? (
                             theme === "dark" ? (
@@ -143,36 +131,17 @@ export function AppSidebar() {
                                 <Moon className="w-5 h-5" />
                             )
                         ) : (
-                            <div className="w-5 h-5" /> // Placeholder to prevent layout shift
+                            <div className="w-5 h-5" />
                         )}
                     </button>
+                </nav>
 
-                    {bottomNavItems.map((item) => {
-                        const isActive = pathname === item.href
-                        return (
-                            <Link
-                                key={item.href}
-                                href={item.href}
-                                onClick={closeMobileMenu}
-                                className={`
-                                    w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200
-                                    ${isActive
-                                        ? "bg-sidebar-primary text-sidebar-primary-foreground"
-                                        : "text-white lg:text-black lg:dark:text-white hover:bg-sidebar-accent"
-                                    }
-                                `}
-                                title={item.label}
-                            >
-                                <item.icon className="w-5 h-5" />
-                            </Link>
-                        )
-                    })}
-
-                    {/* User Avatar */}
+                {/* User Avatar - Pinned to Bottom */}
+                <div className="pb-6 w-full flex justify-center">
                     <div className="relative">
                         <button
                             onClick={() => setShowUserMenu(!showUserMenu)}
-                            className="mt-2 p-1 rounded-full ring-2 ring-sidebar-border hover:ring-sidebar-primary transition-all"
+                            className="p-1 rounded-full ring-2 ring-transparent hover:ring-sidebar-primary transition-all"
                             title={mounted && user ? user.full_name || user.name || user.email?.split('@')[0] || "Profile" : "Profile"}
                         >
                             <div className="w-10 h-10 rounded-full bg-sidebar-accent text-sidebar-foreground flex items-center justify-center text-sm font-semibold overflow-hidden">
@@ -199,7 +168,7 @@ export function AppSidebar() {
                                     onClick={() => setShowUserMenu(false)}
                                 />
                                 {/* Menu */}
-                                <div className="absolute bottom-full right-0 lg:left-0 lg:right-auto mb-2 w-48 bg-card border border-border rounded-lg shadow-lg py-2 z-50">
+                                <div className="absolute bottom-full right-14 left-auto lg:left-14 lg:right-auto mb-2 w-48 bg-card border border-border rounded-lg shadow-lg py-2 z-50">
                                     <button
                                         onClick={handleSignOut}
                                         className="w-full flex items-center gap-3 px-4 py-2 hover:bg-accent transition-colors text-destructive"
