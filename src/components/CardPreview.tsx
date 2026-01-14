@@ -11,6 +11,7 @@ interface CardPreviewProps {
     disableFlip?: boolean;
     disableInteractions?: boolean;
     onSave?: () => void;
+    showBranding?: boolean;
 }
 
 export interface ProfileCardTheme {
@@ -46,7 +47,12 @@ export const PROFILE_THEMES: ProfileCardTheme[] = [
  * New CardPreview using the professional ProfileCard design
  * with background image and shape theming
  */
-export function CardPreview({ card, theme, isPublicView = false, disableFlip = false, disableInteractions = false, onSave }: CardPreviewProps) {
+export function CardPreview({ card, theme, isPublicView = false,
+    disableFlip = false,
+    disableInteractions = false,
+    onSave,
+    showBranding: propShowBranding
+}: CardPreviewProps) {
     // Determine theme from card data
     const selectedTheme = (theme?.profileTheme as 'light' | 'dark' | 'accent' | 'neutral') || 'light';
 
@@ -59,8 +65,19 @@ export function CardPreview({ card, theme, isPublicView = false, disableFlip = f
     // Access custom data which handles extra fields
     const customData = (card as any).custom_data || {};
 
-    // Helper to get field from root (live preview) or custom_data (saved card)
     const getField = (field: string) => (card as any)[field] || customData[field];
+
+    // Determine branding status
+    // IF props.showBranding is provided (propShowBranding), use it (e.g. from Editor knowing local subscription state)
+    // ELSE calculate from card.plan_type (Public view)
+    let showBranding = propShowBranding;
+    const isFounder = (card as any).is_founder || false;
+
+    if (showBranding === undefined) {
+        const planType = (card as any).plan_type;
+        const isPro = planType === 'MONTHLY' || planType === 'YEARLY' || planType === 'LIFETIME' || isFounder;
+        showBranding = !isPro;
+    }
 
     // Transform card data to ProfileCard format
     const userProfile = {
@@ -92,6 +109,8 @@ export function CardPreview({ card, theme, isPublicView = false, disableFlip = f
             disableFlip={disableFlip}
             disableInteractions={disableInteractions}
             onSave={onSave}
+            showBranding={showBranding}
+            isFounder={isFounder}
         />
         // </div>
     );

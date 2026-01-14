@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Mail, Phone, Linkedin, Globe, Download, Share2, Edit, BarChart3, QrCode, Trash2, Github, Twitter, Instagram, Facebook, Youtube, Twitch, Disc as DiscordIcon, Figma, Code2, Link as LinkIcon, Dribbble, Palette, RefreshCw } from 'lucide-react';
+import { Mail, Phone, Linkedin, Globe, Download, Share2, Edit, BarChart3, QrCode, Trash2, Github, Twitter, Instagram, Facebook, Youtube, Twitch, Disc as DiscordIcon, Figma, Code2, Link as LinkIcon, Dribbble, Palette, RefreshCw, Crown } from 'lucide-react';
 import { WaveShape } from './shapes/WaveShape';
 import { GeometricShape } from './shapes/GeometricShape';
 import { SoftArcShape } from './shapes/SoftArcShape';
@@ -42,6 +42,8 @@ interface ProfileCardProps {
     onDownloadQR?: () => void;
     onDelete?: () => void;
     onSave?: () => void;
+    showBranding?: boolean;
+    isFounder?: boolean;
 }
 
 export function ProfileCard({
@@ -55,7 +57,9 @@ export function ProfileCard({
     onAnalytics,
     onDownloadQR,
     onDelete,
-    onSave
+    onSave,
+    showBranding = false,
+    isFounder = false
 }: ProfileCardProps) {
     // ... (keep state and handlers as is)
     const [isFlipped, setIsFlipped] = useState(false);
@@ -240,11 +244,39 @@ export function ProfileCard({
                     {shape === 'slant' && <SlantShape color={currentTheme.dividerColor} />}
                 </div>
 
+                {/* Founder Badge */}
+                {isFounder && (
+                    <div
+                        className="absolute top-4 left-4 z-20 px-3 py-1 bg-gradient-to-r from-amber-400/90 to-amber-500/90 backdrop-blur-md rounded-full border border-white/20 shadow-sm pointer-events-none"
+                        title="Founding Member · Early supporter of Cardfil"
+                    >
+                        <div className="flex items-center gap-1.5">
+                            <Crown className="w-3 h-3 text-white" fill="currentColor" />
+                            <span className="text-[10px] sm:text-xs font-bold text-white tracking-wide uppercase">
+                                Founder
+                            </span>
+                        </div>
+                    </div>
+                )}
+
+                {/* Branding Badge - Free Users Only */}
+                {showBranding && (
+                    <div className="absolute top-4 right-4 md:right-4 z-20 px-3 py-1 bg-black/40 backdrop-blur-md rounded-full border border-white/10 shadow-sm pointer-events-none">
+                        <div className="flex items-center gap-1.5">
+                            <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+                            <span className="text-[10px] sm:text-xs font-bold text-white tracking-wide uppercase opacity-90">
+                                Cardfil
+                            </span>
+                        </div>
+                    </div>
+                )}
+
                 {/* Flip Button - Only on small screens */}
                 {!disableInteractions && !disableFlip && (
                     <button
                         onClick={() => setIsFlipped(!isFlipped)}
-                        className="absolute top-4 right-4 z-30 md:hidden w-10 h-10 rounded-full bg-white/90 dark:bg-black/50 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-white dark:hover:bg-black/70 transition-all"
+                        className={`absolute top-4 z-30 md:hidden w-10 h-10 rounded-full bg-white/90 dark:bg-black/50 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-white dark:hover:bg-black/70 transition-all ${showBranding ? 'right-28 sm:right-32' : 'right-4'
+                            }`}
                         aria-label="Flip card"
                     >
                         <RefreshCw className={`w-5 h-5 text-neutral-900 dark:text-white transition-transform duration-300 ${isFlipped ? 'rotate-180' : ''}`} />

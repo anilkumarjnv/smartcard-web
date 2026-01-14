@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ReactNode } from "react";
+import { Toaster } from 'sonner';
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 
 const inter = Inter({
@@ -24,6 +25,7 @@ export default function RootLayout({
       <body className={inter.className} suppressHydrationWarning>
         <ThemeProvider>
           {children}
+          <Toaster richColors position="top-center" closeButton />
         </ThemeProvider>
       </body>
     </html>

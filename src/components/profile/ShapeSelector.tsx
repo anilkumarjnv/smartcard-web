@@ -2,7 +2,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Check } from 'lucide-react';
+import { Check, Lock } from 'lucide-react';
+import { useSubscription } from '@/hooks/useSubscription';
 
 export type ProfileCardShape = 'wave' | 'geometric' | 'soft-arc' | 'layered-waves' | 'slant';
 
@@ -17,35 +18,41 @@ const SHAPE_OPTIONS = [
         displayName: 'Wave',
         description: 'Smooth, flowing transition',
         useCase: 'Classic & Professional',
+        isFree: true,
     },
     {
         name: 'geometric' as ProfileCardShape,
         displayName: 'Geometric',
         description: 'Angular, modern design',
         useCase: 'Tech & Innovation',
+        isFree: false,
     },
     {
         name: 'soft-arc' as ProfileCardShape,
         displayName: 'Soft Arc',
         description: 'Gentle curved transition',
         useCase: 'Creative & Approachable',
+        isFree: false,
     },
     {
         name: 'layered-waves' as ProfileCardShape,
         displayName: 'Layered Waves',
         description: 'Overlapping waves with depth',
         useCase: 'Dynamic & Multi-faceted',
+        isFree: false,
     },
     {
         name: 'slant' as ProfileCardShape,
         displayName: 'Slant',
         description: 'Bold diagonal cut',
         useCase: 'Straightforward & Direct',
+        isFree: false,
     },
 ];
 
 export function ShapeSelector({ selectedShape = 'wave', onShapeChange }: ShapeSelectorProps) {
     const [hoveredShape, setHoveredShape] = useState<string | null>(null);
+    const { isPro } = useSubscription();
 
     return (
         <div className="space-y-4">
@@ -61,7 +68,7 @@ export function ShapeSelector({ selectedShape = 'wave', onShapeChange }: ShapeSe
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                 {SHAPE_OPTIONS.map((shape) => {
                     const isSelected = selectedShape === shape.name;
-                    const isHovered = hoveredShape === shape.name;
+                    const isLocked = !isPro && !shape.isFree;
 
                     return (
                         <button
@@ -74,30 +81,17 @@ export function ShapeSelector({ selectedShape = 'wave', onShapeChange }: ShapeSe
                                 : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600 bg-white dark:bg-neutral-900'
                                 }`}
                         >
-                            {/* Selected Indicator */}
-                            {/* {isSelected && (
-                                <div className="absolute top-2 right-2 w-5 h-5 bg-neutral-900 dark:bg-neutral-100 rounded-full flex items-center justify-center">
-                                    <Check className="w-3 h-3 text-white dark:text-neutral-900" strokeWidth={3} />
+                            {/* Lock Icon for Pro shapes */}
+                            {isLocked && (
+                                <div className="absolute top-2 right-2 z-10 w-6 h-6 bg-neutral-900/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm">
+                                    <Lock className="w-3 h-3 text-white" />
                                 </div>
-                            )} */}
+                            )}
 
                             {/* Shape Preview */}
                             <div className="mb-0 h-16 bg-neutral-100 dark:bg-neutral-800 rounded-lg overflow-hidden relative">
                                 <ShapePreview shape={shape.name} />
                             </div>
-
-                            {/* Shape Info */}
-                            {/* <div>
-                                <h4 className="font-semibold text-neutral-900 dark:text-white text-sm mb-1">
-                                    {shape.displayName}
-                                </h4>
-                                <p className="text-xs text-neutral-600 dark:text-neutral-400 mb-1">
-                                    {shape.description}
-                                </p>
-                                <p className="text-xs text-neutral-900 dark:text-neutral-200 font-medium">
-                                    {shape.useCase}
-                                </p>
-                            </div> */}
                         </button>
                     );
                 })}

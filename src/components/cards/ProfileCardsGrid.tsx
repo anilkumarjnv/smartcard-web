@@ -7,6 +7,8 @@ import { ProfileCard } from '@/components/profile/ProfileCard';
 import type { Card as CardType } from '@/lib/api/types';
 import { apiClient } from '@/lib/apiClient';
 import { mutate } from 'swr';
+import { useSubscription } from '@/hooks/useSubscription';
+import { UpgradeModal } from '@/components/organisms/UpgradeModal';
 
 interface ProfileCardsGridProps {
     cards: CardType[];
@@ -19,6 +21,16 @@ export function ProfileCardsGrid({ cards }: ProfileCardsGridProps) {
     const [shareCardId, setShareCardId] = useState<string | null>(null);
     const [copiedId, setCopiedId] = useState<string | null>(null);
     const [flippedCards, setFlippedCards] = useState<Record<string, boolean>>({});
+
+    const { isPro, isFounder } = useSubscription();
+    const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+
+    const handleCreateClick = (e: React.MouseEvent) => {
+        if (!isPro && cards.length >= 1) {
+            e.preventDefault();
+            setShowUpgradeModal(true);
+        }
+    };
 
     const getShareUrl = (slug: string) => {
         if (typeof window === 'undefined') return '';
@@ -119,7 +131,7 @@ export function ProfileCardsGrid({ cards }: ProfileCardsGridProps) {
                         Manage your digital business cards
                     </p>
                 </div>
-                <Link href="/mycards?tab=card&mode=create">
+                <Link href="/mycards?tab=card&mode=create" onClick={handleCreateClick}>
                     <button className="px-6 py-3 bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 rounded-xl font-semibold hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors flex items-center gap-2 shadow-sm">
                         <Plus className="w-5 h-5" />
                         Create New Card
@@ -127,8 +139,27 @@ export function ProfileCardsGrid({ cards }: ProfileCardsGridProps) {
                 </Link>
             </div>
 
+            {/* Founder Appreciation Banner */}
+            {isFounder && (
+                <div className="bg-gradient-to-r from-amber-50 to-amber-100 dark:from-amber-950/20 dark:to-amber-900/10 border border-amber-200 dark:border-amber-800/30 rounded-xl p-4 shadow-sm animate-in fade-in slide-in-from-top-2">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-full">
+                            <Crown className="w-5 h-5 text-amber-600 dark:text-amber-500 fill-amber-600/20" />
+                        </div>
+                        <div>
+                            <h3 className="text-sm font-bold text-amber-800 dark:text-amber-200">
+                                You’re a founding member.
+                            </h3>
+                            <p className="text-sm text-amber-700/80 dark:text-amber-300/80">
+                                Thanks for building Cardfil with us.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Compact Pro Banner */}
-            {showProBanner && (
+            {!isPro && showProBanner && (
                 <div className="bg-gradient-to-r from-neutral-900 to-neutral-800 dark:from-neutral-800 dark:to-neutral-700 rounded-xl p-4 shadow-sm">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                         <div className="flex items-center gap-3 flex-1">
@@ -139,6 +170,7 @@ export function ProfileCardsGrid({ cards }: ProfileCardsGridProps) {
                         </div>
                         <div className="flex items-center gap-2 w-full sm:w-auto mt-2 sm:mt-0 justify-end">
                             <button
+                                onClick={() => setShowUpgradeModal(true)}
                                 className="px-4 py-2 bg-white text-neutral-900 rounded-lg text-sm font-semibold hover:bg-neutral-100 transition-colors"
                             >
                                 Upgrade
@@ -166,7 +198,7 @@ export function ProfileCardsGrid({ cards }: ProfileCardsGridProps) {
                     <p className="text-muted-foreground mb-6 max-w-md">
                         Create your first digital business card to start sharing your professional profile
                     </p>
-                    <Link href="/mycards?tab=card&mode=create">
+                    <Link href="/mycards?tab=card&mode=create" onClick={handleCreateClick}>
                         <button className="px-6 py-3 bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 rounded-xl font-semibold hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors flex items-center gap-2">
                             <Plus className="w-5 h-5" />
                             Create Your First Card
@@ -216,9 +248,9 @@ export function ProfileCardsGrid({ cards }: ProfileCardsGridProps) {
                                             {/* Usage Intent Badge */}
                                             {(card.usage_intent || (card.custom_data as any)?.usage_intent) && (
                                                 <div className={`absolute top-4 left-4 z-30 px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-md shadow-sm border border-white/20 capitalize ${(card.usage_intent || (card.custom_data as any)?.usage_intent) === 'student' ? 'bg-blue-500/80 text-white' :
-                                                        (card.usage_intent || (card.custom_data as any)?.usage_intent) === 'business' ? 'bg-purple-500/80 text-white' :
-                                                            (card.usage_intent || (card.custom_data as any)?.usage_intent) === 'personal' ? 'bg-green-500/80 text-white' :
-                                                                'bg-neutral-800/80 text-white'
+                                                    (card.usage_intent || (card.custom_data as any)?.usage_intent) === 'business' ? 'bg-purple-500/80 text-white' :
+                                                        (card.usage_intent || (card.custom_data as any)?.usage_intent) === 'personal' ? 'bg-green-500/80 text-white' :
+                                                            'bg-neutral-800/80 text-white'
                                                     }`}>
                                                     {card.usage_intent || (card.custom_data as any)?.usage_intent}
                                                 </div>
@@ -421,6 +453,12 @@ export function ProfileCardsGrid({ cards }: ProfileCardsGridProps) {
                     })}
                 </div>
             )}
+
+            <UpgradeModal
+                isOpen={showUpgradeModal}
+                onClose={() => setShowUpgradeModal(false)}
+                featureName="Unlimited Cards"
+            />
         </div>
     );
 }

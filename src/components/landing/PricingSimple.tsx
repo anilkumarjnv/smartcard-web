@@ -1,50 +1,47 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Check } from 'lucide-react';
 import Link from 'next/link';
-
-const plans = [
-    {
-        name: 'The Basics',
-        price: '₹0',
-        featured: false,
-        features: [
-            'Profile photo',
-            '3 links',
-            'Default theme',
-            'QR code generation',
-        ],
-    },
-    {
-        name: 'Professional',
-        price: '₹299',
-        originalPrice: '₹799',
-        period: 'lifetime',
-        badge: 'Most Popular',
-        featured: true,
-        features: [
-            'Portfolio section',
-            'Analytics dashboard',
-            'Custom QR codes',
-            'No watermark',
-            'All premium themes',
-            'Priority support',
-        ],
-    },
-];
+import { apiClient } from '@/lib/apiClient';
 
 export function PricingSimple() {
+    const [plans, setPlans] = useState<any[]>([]);
+
+    useEffect(() => {
+        fetchPlans();
+    }, []);
+
+    async function fetchPlans() {
+        try {
+            const data = await apiClient.get<any[]>('/api/payments/plans');
+            if (data) setPlans(data);
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    // Filter for display: Free and Featured (or Lifetime)
+    const freePlan = plans.find(p => p.code === 'FREE') || {
+        name: 'Basic plan', price_inr: 0, features: ['Profile photo', '3 links', 'Default theme', 'QR code generation']
+    };
+
+    // Choose a premium highlight. 
+    const premiumPlan = plans.find(p => p.is_featured) || plans.find(p => p.price_inr > 0);
+
+    const displayPlans = [freePlan, premiumPlan].filter(Boolean);
+
     return (
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {plans.map((plan, index) => (
+            {displayPlans.map((plan: any, index: number) => (
                 <motion.div
-                    key={plan.name}
+                    key={plan.name || index}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.6, delay: index * 0.1 }}
-                    className={`rounded-lg p-8 relative ${plan.featured
+                    className={`rounded-lg p-8 relative ${plan.is_featured || plan.price_inr > 0
                         ? 'bg-white dark:bg-neutral-900 border-2 border-neutral-900 dark:border-white shadow-lg'
                         : 'bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700'
                         }`}
@@ -64,20 +61,24 @@ export function PricingSimple() {
 
                         {/* Price */}
                         <div className="flex items-baseline gap-2">
-                            {plan.originalPrice && (
+                            {plan.original_price_inr && (
                                 <span className="text-lg text-neutral-400 dark:text-neutral-500 line-through">
-                                    {plan.originalPrice}
+                                    ₹{plan.original_price_inr}
                                 </span>
                             )}
-                            <span className="text-5xl font-bold text-neutral-900 dark:text-white">{plan.price}</span>
-                            {plan.period && (
-                                <span className="text-neutral-600 dark:text-neutral-400">/ {plan.period}</span>
+                            <span className="text-5xl font-bold text-neutral-900 dark:text-white">₹{plan.price_inr}</span>
+                            {plan.billing_cycle && plan.billing_cycle !== 'ONE_TIME' && plan.billing_cycle !== 'LIFETIME' && (
+                                <span className="text-neutral-600 dark:text-neutral-400">/ {plan.billing_cycle === 'MONTHLY' ? 'month' : 'year'}</span>
+                            )}
+                            {/* Handle Lifetime display text if needed */}
+                            {(plan.billing_cycle === 'ONE_TIME' || plan.billing_cycle === 'LIFETIME') && plan.price_inr > 0 && (
+                                <span className="text-neutral-600 dark:text-neutral-400">/ lifetime</span>
                             )}
                         </div>
 
                         {/* Features */}
                         <ul className="space-y-3">
-                            {plan.features.map((feature) => (
+                            {(plan.features || []).map((feature: string) => (
                                 <li key={feature} className="flex items-center gap-3">
                                     <Check className="w-5 h-5 text-neutral-900 dark:text-white flex-shrink-0" strokeWidth={2} />
                                     <span className="text-neutral-700 dark:text-neutral-300">{feature}</span>
@@ -88,12 +89,12 @@ export function PricingSimple() {
                         {/* CTA Button */}
                         <Link href="/signup" className="block">
                             <button
-                                className={`w-full py-3 px-6 rounded-md font-medium transition-all duration-200 ${plan.featured
+                                className={`w-full py-3 px-6 rounded-md font-medium transition-all duration-200 ${plan.is_featured || plan.price_inr > 0
                                     ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:-translate-y-0.5 active:scale-98'
                                     : 'bg-transparent border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white hover:-translate-y-0.5 active:scale-98'
                                     }`}
                             >
-                                {plan.featured ? 'Get Early Access' : 'Get Started'}
+                                {plan.is_featured ? 'Get Early Access' : 'Get Started'}
                             </button>
                         </Link>
                     </div>

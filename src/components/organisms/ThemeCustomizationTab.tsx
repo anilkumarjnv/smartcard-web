@@ -6,6 +6,8 @@ import { apiClient } from '@/lib/apiClient';
 import type { Card } from '@/lib/api/types';
 import { ThemeSelector } from '@/components/profile/ThemeSelector';
 import { ShapeSelector, type ProfileCardShape } from '@/components/profile/ShapeSelector';
+import { useSubscription } from '@/hooks/useSubscription';
+import { UpgradeModal } from '@/components/organisms/UpgradeModal';
 
 interface ThemeCustomizationTabProps {
   cardId?: string;
@@ -27,8 +29,14 @@ export function ThemeCustomizationTab({ cardId, onThemeUpdate }: ThemeCustomizat
   // Theme state using new simple format
   const [selectedTheme, setSelectedTheme] = useState<'light' | 'dark' | 'accent' | 'neutral'>('light');
   const [selectedShape, setSelectedShape] = useState<ProfileCardShape>('wave');
+  const [showBranding, setShowBranding] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+
+  // Subscription check
+  const { isPro } = useSubscription();
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [blockedFeature, setBlockedFeature] = useState('');
 
   // Initialize theme and shape from card data
   useEffect(() => {
@@ -50,6 +58,14 @@ export function ThemeCustomizationTab({ cardId, onThemeUpdate }: ThemeCustomizat
       } else {
         setSelectedShape('wave');
       }
+
+      // Initialize branding preference
+      // Default to TRUE (branding shown)
+      if (theme.showBranding !== undefined) {
+        setShowBranding(theme.showBranding as boolean);
+      } else {
+        setShowBranding(true);
+      }
     }
   }, [currentCard]);
 
@@ -59,35 +75,77 @@ export function ThemeCustomizationTab({ cardId, onThemeUpdate }: ThemeCustomizat
       onThemeUpdate({
         profileTheme: selectedTheme,
         shape: selectedShape,
+        showBranding: showBranding,
       });
     }
   }, []); // Only run once on mount
 
-  const handleThemeChange = async (theme: 'light' | 'dark' | 'accent' | 'neutral') => {
+  // Handle changes for Preview (without saving)
+  const handleThemeChange = (theme: 'light' | 'dark' | 'accent' | 'neutral') => {
     setSelectedTheme(theme);
-    await saveThemeAndShape(theme, selectedShape);
+    // Update live preview immediately
+    if (onThemeUpdate) {
+      onThemeUpdate({
+        profileTheme: theme,
+        shape: selectedShape,
+        showBranding: showBranding,
+      });
+    }
   };
 
-  const handleShapeChange = async (shape: ProfileCardShape) => {
+  const handleShapeChange = (shape: ProfileCardShape) => {
     setSelectedShape(shape);
-    await saveThemeAndShape(selectedTheme, shape);
+    // Update live preview immediately
+    if (onThemeUpdate) {
+      onThemeUpdate({
+        profileTheme: selectedTheme,
+        shape: shape,
+        showBranding: showBranding,
+      });
+    }
   };
 
-  const saveThemeAndShape = async (theme: 'light' | 'dark' | 'accent' | 'neutral', shape: ProfileCardShape) => {
-    const updatedTheme = {
-      profileTheme: theme,
-      shape: shape,
-    };
-
-    // If there's no card (create mode), just notify parent for preview
-    if (!currentCard) {
-      if (onThemeUpdate) {
-        onThemeUpdate(updatedTheme);
-      }
+  const handleBrandingChange = (enabled: boolean) => {
+    // If user is trying to turn OFF branding (enabled=false) and is NOT PRO
+    if (!enabled && !isPro) {
+      setBlockedFeature('Remove Branding');
+      setShowUpgradeModal(true);
       return;
     }
 
-    // If there's a card, save it to the backend
+    setShowBranding(enabled);
+
+    // Update live preview immediately
+    if (onThemeUpdate) {
+      onThemeUpdate({
+        profileTheme: selectedTheme,
+        shape: selectedShape,
+        showBranding: enabled,
+      });
+    }
+  };
+
+  const handleSave = async () => {
+    // Check Pro status for restricted features (Shapes)
+    if (!isPro && selectedShape !== 'wave') {
+      setBlockedFeature('Custom Shapes');
+      setShowUpgradeModal(true);
+      return;
+    }
+
+    // Prepare theme object
+    const updatedTheme = {
+      profileTheme: selectedTheme,
+      shape: selectedShape,
+      showBranding: showBranding,
+    };
+
+    // If there's no card (create mode), usually we don't need to save here 
+    // as the main form save handles it, but if this tab is standalone editing:
+    if (!currentCard) {
+      return;
+    }
+
     setIsSaving(true);
     setSaveSuccess(false);
 
@@ -103,11 +161,6 @@ export function ThemeCustomizationTab({ cardId, onThemeUpdate }: ThemeCustomizat
       // Show success message
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
-
-      // Notify parent component for live preview update
-      if (onThemeUpdate) {
-        onThemeUpdate(updatedTheme);
-      }
     } catch (err) {
       console.error('Error saving theme:', err);
     } finally {
@@ -117,8 +170,26 @@ export function ThemeCustomizationTab({ cardId, onThemeUpdate }: ThemeCustomizat
 
   return (
     <div className="bg-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-sm border border-border">
-      <h3 className="text-xl sm:text-2xl font-bold mb-2 text-foreground">Customize Theme</h3>
-      <p className="text-muted-foreground text-sm sm:text-base mb-6 sm:mb-8">Choose a professional theme for your digital profile card</p>
+      <div className="flex items-center justify-between mb-6 sm:mb-8">
+        <div>
+          <h3 className="text-xl sm:text-2xl font-bold text-foreground">Customize Theme</h3>
+          <p className="text-muted-foreground text-sm sm:text-base">Choose a professional theme for your digital profile card</p>
+        </div>
+
+        {/* Save Button */}
+        {currentCard && (
+          <button
+            onClick={handleSave}
+            disabled={isSaving}
+            className={`hidden md:flex px-6 py-2.5 rounded-xl font-medium transition-all ${isSaving
+              ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed'
+              : 'bg-primary text-primary-foreground hover:opacity-90 shadow-md hover:shadow-lg active:scale-95'
+              }`}
+          >
+            {isSaving ? 'Saving...' : 'Save Theme'}
+          </button>
+        )}
+      </div>
 
       <div className="space-y-6 sm:space-y-8">
         {/* New Theme Selector */}
@@ -136,6 +207,45 @@ export function ThemeCustomizationTab({ cardId, onThemeUpdate }: ThemeCustomizat
             onShapeChange={handleShapeChange}
           />
         </div>
+
+        {/* Branding Toggle */}
+        <div className="border-t border-border pt-6 sm:pt-8">
+          <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-foreground">Branding</h4>
+          <div className="flex items-center justify-between p-4 bg-muted dark:bg-neutral-800 rounded-2xl">
+            <div>
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-medium text-foreground">Show Cardfil Branding</p>
+                {!isPro && <div className="px-2 py-0.5 rounded text-[10px] font-bold bg-neutral-200 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300">FREE</div>}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">Remove with Pro plan</p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={showBranding}
+                onChange={(e) => handleBrandingChange(e.target.checked)}
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-gray-300 dark:bg-neutral-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-neutral-300 dark:peer-focus:ring-neutral-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-neutral-900 dark:peer-checked:bg-neutral-100 dark:peer-checked:after:bg-neutral-900 dark:peer-checked:after:border-neutral-900"></div>
+            </label>
+          </div>
+        </div>
+
+        {/* Mobile Save Button (visible only on small screens) */}
+        {currentCard && (
+          <div className="md:hidden pt-6">
+            <button
+              onClick={handleSave}
+              disabled={isSaving}
+              className={`w-full py-3 rounded-xl font-bold transition-all ${isSaving
+                ? 'bg-neutral-100 text-neutral-400'
+                : 'bg-primary text-primary-foreground shadow-lg'
+                }`}
+            >
+              {isSaving ? 'Saving...' : 'Save Theme Changes'}
+            </button>
+          </div>
+        )}
 
         {/* Theme Features */}
         <div className="border-t border-border pt-6 sm:pt-8">
@@ -189,6 +299,12 @@ export function ThemeCustomizationTab({ cardId, onThemeUpdate }: ThemeCustomizat
           </div>
         )}
       </div>
+
+      <UpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        featureName={blockedFeature}
+      />
     </div>
   );
 }

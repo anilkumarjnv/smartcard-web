@@ -7,6 +7,8 @@ import { QRCodeDisplay } from '@/components/molecules/QRCodeDisplay';
 import useSWR from 'swr';
 import { apiClient } from '@/lib/apiClient';
 import type { Card } from '@/lib/api/types';
+import { useSubscription } from '@/hooks/useSubscription';
+import { UpgradeModal } from '@/components/organisms/UpgradeModal';
 
 const fetcher = (url: string) => apiClient.get<any>(url);
 
@@ -26,6 +28,9 @@ export function ShareTab({ cardId }: ShareTabProps) {
 
   const [copied, setCopied] = useState(false);
   const [showBranding, setShowBranding] = useState(true);
+
+  const { isPro } = useSubscription();
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   const [isDownloadingQR, setIsDownloadingQR] = useState(false);
 
@@ -156,7 +161,7 @@ export function ShareTab({ cardId }: ShareTabProps) {
             </div>
           </div>
 
-          <div className="border-t border-border pt-6">
+          {/* <div className="border-t border-border pt-6">
             <div className="flex items-center justify-between p-4 bg-muted dark:bg-neutral-800 rounded-2xl">
               <div>
                 <p className="text-sm font-medium text-foreground">Show Cardfil Branding</p>
@@ -172,17 +177,29 @@ export function ShareTab({ cardId }: ShareTabProps) {
                 <div className="w-11 h-6 bg-gray-300 dark:bg-neutral-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-neutral-300 dark:peer-focus:ring-neutral-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-neutral-900 dark:peer-checked:bg-neutral-100 dark:peer-checked:after:bg-neutral-900 dark:peer-checked:after:border-neutral-900"></div>
               </label>
             </div>
-          </div>
+          </div> */}
 
-          <div className="bg-gradient-to-br from-accent/10 to-accent/5 rounded-2xl p-6 border border-accent/20">
-            <h4 className="text-lg font-semibold mb-2 text-foreground">Track Your Card Performance</h4>
-            <p className="text-muted-foreground mb-4">
-              See who views your card, track link clicks, and get detailed analytics with Pro.
-            </p>
-            <button className="px-6 py-2 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-xl hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-colors font-medium">
-              Upgrade to Pro
-            </button>
-          </div>
+          {/* Pro Analytics Upsell - Only for Free Users */}
+          {!isPro && (
+            <div className="bg-gradient-to-br from-accent/10 to-accent/5 rounded-2xl p-6 border border-accent/20">
+              <h4 className="text-lg font-semibold mb-2 text-foreground">Track Your Card Performance</h4>
+              <p className="text-muted-foreground mb-4">
+                See who views your card, track link clicks, and get detailed analytics with Pro.
+              </p>
+              <button
+                onClick={() => setShowUpgradeModal(true)}
+                className="px-6 py-2 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-xl hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-colors font-medium"
+              >
+                Upgrade to Pro
+              </button>
+            </div>
+          )}
+
+          <UpgradeModal
+            isOpen={showUpgradeModal}
+            onClose={() => setShowUpgradeModal(false)}
+            featureName="Advanced Analytics"
+          />
         </div>
       )}
     </div>
