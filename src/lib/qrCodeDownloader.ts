@@ -32,7 +32,7 @@ export async function downloadModernQRCode(
         try {
             // Create a wrapper that will hold the QRCode ref
             const QRWrapper = () => {
-                const qrRef = React.useRef<QRCode | null>(null);
+                const qrRef = React.useRef<InstanceType<typeof QRCode> | null>(null);
 
                 React.useEffect(() => {
                     // Wait a bit for the canvas to render
