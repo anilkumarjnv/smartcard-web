@@ -2,10 +2,11 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/molecules/Button';
 import { apiClient } from '@/lib/apiClient';
 import { signOut } from '@/lib/auth';
-import { LogOut, User as UserIcon, Moon, Sun } from 'lucide-react';
+import { LogOut, User as UserIcon, Moon, Sun, Loader2 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
 interface NavbarProps {
@@ -18,8 +19,11 @@ interface NavbarProps {
 export function Navbar({ variant = 'default', isLandingPage = false, onLoginClick, onSignupClick }: NavbarProps) {
   const [user, setUser] = useState<any>(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [isLoginLoading, setIsLoginLoading] = useState(false);
+  const [isSignupLoading, setIsSignupLoading] = useState(false);
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
@@ -30,9 +34,12 @@ export function Navbar({ variant = 'default', isLandingPage = false, onLoginClic
       try {
         const userData = await apiClient.get<any>('/api/v1/auth/me');
         setUser(userData);
-      } catch (err) {
-        // User not logged in or error
-        console.error('Failed to load user in Navbar', err);
+      } catch (err: any) {
+        // Silently ignore auth errors - expected for unauthenticated users
+        // Only log unexpected errors
+        if (err?.status !== 401 && err?.message !== 'Authentication required') {
+          console.error('Failed to load user in Navbar', err);
+        }
       }
     };
     loadUser();
@@ -209,11 +216,17 @@ export function Navbar({ variant = 'default', isLandingPage = false, onLoginClic
                   Login
                 </button>
               ) : (
-                <Link href="/login">
-                  <button className="px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white transition-colors">
-                    Login
-                  </button>
-                </Link>
+                <button
+                  onClick={() => {
+                    setIsLoginLoading(true);
+                    router.push('/login');
+                  }}
+                  disabled={isLoginLoading}
+                  className="px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white transition-colors disabled:opacity-50 flex items-center gap-2"
+                >
+                  {isLoginLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+                  {isLoginLoading ? 'Loading...' : 'Login'}
+                </button>
               )}
 
               {onSignupClick ? (
@@ -224,11 +237,17 @@ export function Navbar({ variant = 'default', isLandingPage = false, onLoginClic
                   Get Started
                 </button>
               ) : (
-                <Link href="/signup">
-                  <button className="px-4 py-2 text-sm font-medium bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-colors">
-                    Get Started
-                  </button>
-                </Link>
+                <button
+                  onClick={() => {
+                    setIsSignupLoading(true);
+                    router.push('/signup');
+                  }}
+                  disabled={isSignupLoading}
+                  className="px-4 py-2 text-sm font-medium bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-colors disabled:opacity-50 flex items-center gap-2"
+                >
+                  {isSignupLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+                  {isSignupLoading ? 'Loading...' : 'Get Started'}
+                </button>
               )}
             </>
           )}

@@ -2,12 +2,28 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Mail, Phone, Linkedin, Globe, Download, Share2, Edit, BarChart3, QrCode, Trash2, Github, Twitter, Instagram, Facebook, Youtube, Twitch, Disc as DiscordIcon, Figma, Code2, Link as LinkIcon, Dribbble, Palette, RefreshCw, Crown } from 'lucide-react';
+import { Mail, Phone, Linkedin, Globe, Download, Share2, Edit, BarChart3, QrCode, Trash2, Github, Twitter, Instagram, Facebook, Youtube, Twitch, Disc as DiscordIcon, Figma, Code2, Link as LinkIcon, Dribbble, Palette, RefreshCw, Crown, Loader2 } from 'lucide-react';
 import { WaveShape } from './shapes/WaveShape';
 import { GeometricShape } from './shapes/GeometricShape';
 import { SoftArcShape } from './shapes/SoftArcShape';
 import { LayeredWavesShape } from './shapes/LayeredWavesShape';
 import { SlantShape } from './shapes/SlantShape';
+
+// Helper function to ensure URLs have https:// prefix
+const ensureHttps = (url: string | undefined): string => {
+    if (!url) return '';
+    const trimmed = url.trim();
+    // Already has a protocol
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://') ||
+        trimmed.startsWith('mailto:') || trimmed.startsWith('tel:')) {
+        return trimmed;
+    }
+    // Add https:// for URLs that look like domains
+    if (trimmed.includes('.') && !trimmed.includes(' ')) {
+        return `https://${trimmed}`;
+    }
+    return trimmed;
+};
 
 interface ContactInfo {
     email: string;
@@ -63,47 +79,63 @@ export function ProfileCard({
 }: ProfileCardProps) {
     // ... (keep state and handlers as is)
     const [isFlipped, setIsFlipped] = useState(false);
+    const [isEditLoading, setIsEditLoading] = useState(false);
+    const [isAnalyticsLoading, setIsAnalyticsLoading] = useState(false);
+    const [isDownloadLoading, setIsDownloadLoading] = useState(false);
+    const [isDeleteLoading, setIsDeleteLoading] = useState(false);
     const router = useRouter();
 
     const interactionClass = disableInteractions ? 'pointer-events-none' : '';
 
     // Action handlers - use provided callbacks or default navigation
-    const handleEdit = () => {
+    const handleEdit = async () => {
         if (disableInteractions) return;
         if (onEdit) {
             onEdit();
         } else if (cardId) {
+            setIsEditLoading(true);
+            // Small delay so user sees the loading state
+            await new Promise(resolve => setTimeout(resolve, 300));
             router.push(`/mycards?tab=card&cardId=${cardId}`);
         }
     };
 
-    const handleAnalytics = () => {
+    const handleAnalytics = async () => {
         if (disableInteractions) return;
         if (onAnalytics) {
             onAnalytics();
         } else if (cardId) {
+            setIsAnalyticsLoading(true);
+            // Small delay so user sees the loading state
+            await new Promise(resolve => setTimeout(resolve, 300));
             router.push(`/mycards/analytics/${cardId}`);
         }
     };
 
-    const handleDownloadQR = () => {
+    const handleDownloadQR = async () => {
         if (disableInteractions) return;
+        setIsDownloadLoading(true);
         if (onDownloadQR) {
-            onDownloadQR();
+            await onDownloadQR();
         } else {
-            // Default QR download logic can be added here
+            // Default QR download logic
+            await new Promise(resolve => setTimeout(resolve, 500));
             console.log('Download QR code for card:', cardId);
         }
+        setIsDownloadLoading(false);
     };
 
-    const handleDelete = () => {
+    const handleDelete = async () => {
         if (disableInteractions) return;
+        setIsDeleteLoading(true);
         if (onDelete) {
-            onDelete();
+            await onDelete();
         } else {
-            // Default delete logic can be added here
+            // Default delete logic
+            await new Promise(resolve => setTimeout(resolve, 300));
             console.log('Delete card:', cardId);
         }
+        setIsDeleteLoading(false);
     };
 
     const runOnSave = () => {
@@ -320,7 +352,7 @@ export function ProfileCard({
                 {user.cta_button && user.cta_button.text && (
                     <div className="mb-4 sm:mb-6">
                         <a
-                            href={user.cta_button.link}
+                            href={ensureHttps(user.cta_button.link)}
                             target="_blank"
                             rel="noopener noreferrer"
                             className={`flex items-center justify-center w-full py-3 px-6 rounded-xl font-bold ${currentTheme.buttonTextColor} shadow-md transition-transform active:scale-95 ${interactionClass}`}
@@ -359,7 +391,7 @@ export function ProfileCard({
 
                     {user.contact.linkedin && (
                         <a
-                            href={user.contact.linkedin}
+                            href={ensureHttps(user.contact.linkedin)}
                             target="_blank"
                             rel="noopener noreferrer"
                             className={`flex items-center gap-3 px-3 py-3 rounded-lg border ${currentTheme.border} ${currentTheme.hover} transition-colors ${interactionClass}`}
@@ -373,7 +405,7 @@ export function ProfileCard({
 
                     {user.contact.website && (
                         <a
-                            href={user.contact.website}
+                            href={ensureHttps(user.contact.website)}
                             target="_blank"
                             rel="noopener noreferrer"
                             className={`flex items-center gap-3 px-3 py-3 rounded-lg border ${currentTheme.border} ${currentTheme.hover} transition-colors ${interactionClass}`}
@@ -389,7 +421,7 @@ export function ProfileCard({
                     {user.additional_links?.map((link, idx) => (
                         <a
                             key={idx}
-                            href={link.url}
+                            href={ensureHttps(link.url)}
                             target="_blank"
                             rel="noopener noreferrer"
                             className={`flex items-center gap-3 px-3 py-3 rounded-lg border ${currentTheme.border} ${currentTheme.hover} transition-colors ${interactionClass}`}
@@ -471,41 +503,61 @@ export function ProfileCard({
                             <div className="grid grid-cols-2 gap-4">
                                 <button
                                     onClick={handleEdit}
-                                    className={`flex flex-col items-center justify-center gap-3 px-6 py-8 rounded-xl border-2 ${currentTheme.border} ${currentTheme.hover} transition-all duration-200 hover:scale-105 hover:shadow-md`}
+                                    disabled={isEditLoading}
+                                    className={`flex flex-col items-center justify-center gap-3 px-6 py-8 rounded-xl border-2 ${currentTheme.border} ${currentTheme.hover} transition-all duration-200 hover:scale-105 hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100`}
                                 >
-                                    <Edit className={`w-8 h-8 ${currentTheme.accent}`} strokeWidth={2} />
+                                    {isEditLoading ? (
+                                        <Loader2 className={`w-8 h-8 ${currentTheme.accent} animate-spin`} strokeWidth={2} />
+                                    ) : (
+                                        <Edit className={`w-8 h-8 ${currentTheme.accent}`} strokeWidth={2} />
+                                    )}
                                     <span className={`text-sm font-semibold ${currentTheme.text}`}>
-                                        Edit Card
+                                        {isEditLoading ? 'Loading...' : 'Edit Card'}
                                     </span>
                                 </button>
 
                                 <button
                                     onClick={handleAnalytics}
-                                    className={`flex flex-col items-center justify-center gap-3 px-6 py-8 rounded-xl border-2 ${currentTheme.border} ${currentTheme.hover} transition-all duration-200 hover:scale-105 hover:shadow-md`}
+                                    disabled={isAnalyticsLoading}
+                                    className={`flex flex-col items-center justify-center gap-3 px-6 py-8 rounded-xl border-2 ${currentTheme.border} ${currentTheme.hover} transition-all duration-200 hover:scale-105 hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100`}
                                 >
-                                    <BarChart3 className={`w-8 h-8 ${currentTheme.accent}`} strokeWidth={2} />
+                                    {isAnalyticsLoading ? (
+                                        <Loader2 className={`w-8 h-8 ${currentTheme.accent} animate-spin`} strokeWidth={2} />
+                                    ) : (
+                                        <BarChart3 className={`w-8 h-8 ${currentTheme.accent}`} strokeWidth={2} />
+                                    )}
                                     <span className={`text-sm font-semibold ${currentTheme.text}`}>
-                                        Analytics
+                                        {isAnalyticsLoading ? 'Loading...' : 'Analytics'}
                                     </span>
                                 </button>
 
                                 <button
                                     onClick={handleDownloadQR}
-                                    className={`flex flex-col items-center justify-center gap-3 px-6 py-8 rounded-xl border-2 ${currentTheme.border} ${currentTheme.hover} transition-all duration-200 hover:scale-105 hover:shadow-md`}
+                                    disabled={isDownloadLoading}
+                                    className={`flex flex-col items-center justify-center gap-3 px-6 py-8 rounded-xl border-2 ${currentTheme.border} ${currentTheme.hover} transition-all duration-200 hover:scale-105 hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100`}
                                 >
-                                    <QrCode className={`w-8 h-8 ${currentTheme.accent}`} strokeWidth={2} />
+                                    {isDownloadLoading ? (
+                                        <Loader2 className={`w-8 h-8 ${currentTheme.accent} animate-spin`} strokeWidth={2} />
+                                    ) : (
+                                        <QrCode className={`w-8 h-8 ${currentTheme.accent}`} strokeWidth={2} />
+                                    )}
                                     <span className={`text-sm font-semibold ${currentTheme.text}`}>
-                                        Download QR
+                                        {isDownloadLoading ? 'Downloading...' : 'Download QR'}
                                     </span>
                                 </button>
 
                                 <button
                                     onClick={handleDelete}
-                                    className={`flex flex-col items-center justify-center gap-3 px-6 py-8 rounded-xl border-2 ${currentTheme.border} ${currentTheme.hover} transition-all duration-200 hover:scale-105 hover:shadow-md`}
+                                    disabled={isDeleteLoading}
+                                    className={`flex flex-col items-center justify-center gap-3 px-6 py-8 rounded-xl border-2 ${currentTheme.border} ${currentTheme.hover} transition-all duration-200 hover:scale-105 hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100`}
                                 >
-                                    <Trash2 className={`w-8 h-8 text-red-500`} strokeWidth={2} />
+                                    {isDeleteLoading ? (
+                                        <Loader2 className="w-8 h-8 text-red-500 animate-spin" strokeWidth={2} />
+                                    ) : (
+                                        <Trash2 className="w-8 h-8 text-red-500" strokeWidth={2} />
+                                    )}
                                     <span className={`text-sm font-semibold ${currentTheme.text}`}>
-                                        Delete Card
+                                        {isDeleteLoading ? 'Deleting...' : 'Delete Card'}
                                     </span>
                                 </button>
                             </div>

@@ -23,6 +23,60 @@ const sanitizedString = z.string()
 
 const urlSchema = z.string().url().safeParse(''); // Helper
 
+// Helper function to auto-format CTA link based on input pattern
+const formatCtaLink = (value: string): string => {
+  if (!value) return '';
+  const trimmed = value.trim();
+
+  // Already has a valid protocol
+  if (trimmed.startsWith('mailto:') || trimmed.startsWith('tel:') ||
+    trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed;
+  }
+
+  // Detect email pattern (contains @ and looks like email)
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (emailRegex.test(trimmed)) {
+    return `mailto:${trimmed}`;
+  }
+
+  // Detect phone pattern (starts with + or is mostly digits)
+  const digitsOnly = trimmed.replace(/[^0-9]/g, '');
+  const startsWithPlus = trimmed.startsWith('+');
+  const isPhonePattern = (startsWithPlus && digitsOnly.length >= 7) ||
+    (digitsOnly.length >= 7 && digitsOnly.length <= 15 && /^[\d\s\-+()]+$/.test(trimmed));
+  if (isPhonePattern) {
+    // Format as tel: with only + and digits
+    const cleanPhone = startsWithPlus ? `+${digitsOnly}` : digitsOnly;
+    return `tel:${cleanPhone}`;
+  }
+
+  // If it looks like a URL without protocol, add https://
+  if (trimmed.includes('.') && !trimmed.includes(' ')) {
+    return `https://${trimmed}`;
+  }
+
+  return trimmed;
+};
+
+// Helper function to auto-format website URLs (adds https:// if missing)
+const formatWebUrl = (value: string): string => {
+  if (!value) return '';
+  const trimmed = value.trim();
+
+  // Already has a protocol
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed;
+  }
+
+  // If it looks like a URL (contains . and no spaces), add https://
+  if (trimmed.includes('.') && !trimmed.includes(' ')) {
+    return `https://${trimmed}`;
+  }
+
+  return trimmed;
+};
+
 const slugSchema = z.string()
   .transform((str) => str.toLowerCase().replace(/[^a-z0-9-]/g, ''))
   .pipe(z.string().min(3, 'Username must be at least 3 characters').regex(/^[a-z0-9-]+$/, 'Only lowercase letters, numbers, and hyphens'));
@@ -40,20 +94,28 @@ const formSchema = z.object({
     .pipe(z.string().max(50, 'Domain must be 50 characters or less').optional()),
   summary: z.string().optional()
     .transform(str => str?.replace(/[<>]/g, "").trim())
-    .pipe(z.string().max(200, 'Summary must be 200 characters or less').optional()),
+    .pipe(z.string().max(500, 'Summary must be 500 characters or less').optional()),
   email: z.string().min(1, 'Email is required').email('Invalid email address'),
   country_code: z.string().min(1, 'Country code is required'),
   phone: z.string().optional()
     .transform(str => str?.replace(/\D/g, ""))
     .refine(val => !val || val.length === 10, 'Phone number must be exactly 10 digits'),
-  primary_link: z.string().min(1, 'Primary link is required').url('Invalid URL (include https://)'),
+  primary_link: z.string().min(1, 'Primary link is required').transform(formatWebUrl).pipe(z.string().url('Invalid URL')),
   additional_links: z.array(z.object({
     label: z.string().optional().transform(str => str?.replace(/[<>]/g, "").trim() || ""),
-    url: z.string().optional().refine((val) => !val || z.string().url().safeParse(val).success, "Invalid URL"),
+    url: z.string().optional().transform(val => val ? formatWebUrl(val) : '').refine((val) => !val || z.string().url().safeParse(val).success, "Invalid URL"),
   })),
   cta_button: z.object({
     text: z.string().optional().transform(str => str?.replace(/[<>]/g, "").trim() || ""),
-    link: z.string().optional().refine((val) => !val || z.string().url().safeParse(val).success, "Invalid URL"),
+    link: z.string().optional()
+      .transform(val => val ? formatCtaLink(val) : '')
+      .refine((val) => {
+        if (!val) return true;
+        // Accept mailto:, tel:, and standard URLs
+        if (val.startsWith('mailto:')) return val.includes('@');
+        if (val.startsWith('tel:')) return val.replace(/[^0-9+]/g, '').length >= 7;
+        return z.string().url().safeParse(val).success;
+      }, "Invalid link format"),
   }).optional(),
   custom_highlights: z.array(z.object({
     label: z.string().optional().transform(str => str?.replace(/[<>]/g, "").trim() || ""),
@@ -77,7 +139,7 @@ interface FormData {
   organization?: string;
   domain?: string;
 
-  // Section 4: Professional Summary (Optional, max 200 chars)
+  // Section 4: Professional Summary (Optional, max 500 chars)
   summary?: string;
 
   // Section 5: Contact & Reach (Required)
@@ -648,17 +710,17 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onC
         <div className="border-t border-border pt-6">
           <div className="flex items-baseline justify-between mb-2">
             <label className="text-sm font-medium text-foreground">Professional Summary</label>
-            <span className="text-xs text-muted-foreground">{(formData.summary || '').length}/200</span>
+            <span className="text-xs text-muted-foreground">{(formData.summary || '').length}/500</span>
           </div>
           <Textarea
             placeholder="Final year computer science student focused on mobile app development and fintech products."
             value={formData.summary || ''}
-            onChange={(e) => handleFormChange({ summary: e.target.value.replace(/[<>]/g, '').slice(0, 200) })}
+            onChange={(e) => handleFormChange({ summary: e.target.value.replace(/[<>]/g, '').slice(0, 500) })}
             rows={3}
             className={errors.summary ? 'border-destructive' : ''}
           />
           {errors.summary && <p className="mt-2 text-xs sm:text-sm text-destructive">{errors.summary}</p>}
-          <p className="mt-2 text-xs sm:text-sm text-muted-foreground">Single paragraph, max 200 characters. No emojis.</p>
+          <p className="mt-2 text-xs sm:text-sm text-muted-foreground">Single paragraph, max 500 characters. No emojis.</p>
         </div>
 
         {/* SECTION 5: Contact & Reach */}
@@ -788,14 +850,25 @@ export function CardEditorTab({ cardId, mode, initialFormData, onCardUpdate, onC
             })}
           />
           <Input
-            type="url"
-            placeholder="Action Link (URL or mailto:your@email.com)"
+            type="text"
+            placeholder="URL, Email, or Phone Number"
             value={formData.cta_button?.link || ''}
             onChange={(e) => handleFormChange({
               cta_button: { text: formData.cta_button?.text || '', link: e.target.value } as any
             })}
+            onBlur={(e) => {
+              const formatted = formatCtaLink(e.target.value);
+              if (formatted !== e.target.value) {
+                handleFormChange({
+                  cta_button: { text: formData.cta_button?.text || '', link: formatted } as any
+                });
+              }
+            }}
             error={errors.cta_link}
           />
+          <p className="text-xs text-muted-foreground mt-1 px-1">
+            Enter a URL, email address, or phone number — we&apos;ll format it automatically
+          </p>
         </div>
 
         {/* SECTION 8: Custom Highlights */}

@@ -35,7 +35,7 @@ export function CountrySelect({ value, onChange }: CountrySelectProps) {
                     variant="outline"
                     role="combobox"
                     aria-expanded={open}
-                    className="w-[140px] justify-between rounded-2xl border-border bg-card hover:bg-muted text-foreground font-normal"
+                    className="w-[140px] justify-between rounded-2xl border-border bg-card hover:bg-muted text-foreground hover:text-black dark:hover:text-white font-normal"
                 >
                     {value
                         ? countryCodes.find((country) => country.code === value)?.code

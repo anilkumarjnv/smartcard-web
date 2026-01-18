@@ -9,6 +9,7 @@ import { apiClient } from '@/lib/apiClient';
 import { mutate } from 'swr';
 import { useSubscription } from '@/hooks/useSubscription';
 import { UpgradeModal } from '@/components/organisms/UpgradeModal';
+import { downloadModernQRCode } from '@/lib/qrCodeDownloader';
 
 interface ProfileCardsGridProps {
     cards: CardType[];
@@ -63,27 +64,10 @@ export function ProfileCardsGrid({ cards }: ProfileCardsGridProps) {
     const handleDownloadQR = async (card: CardType) => {
         try {
             const profileUrl = getShareUrl(card.slug);
-            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(profileUrl)}`;
+            const filename = `cardfil-${card.slug || 'qr'}.png`;
 
-            // Fetch the image as a blob to avoid CORS issues
-            const response = await fetch(qrUrl);
-            const blob = await response.blob();
-
-            // Create a local object URL
-            const blobUrl = URL.createObjectURL(blob);
-
-            // Create download link
-            const link = document.createElement('a');
-            link.href = blobUrl;
-            link.download = `cardfil-${card.slug || 'qr'}.png`;
-
-            // Trigger download
-            document.body.appendChild(link);
-            link.click();
-
-            // Cleanup
-            document.body.removeChild(link);
-            URL.revokeObjectURL(blobUrl);
+            // Use modern styled QR code downloader
+            await downloadModernQRCode(profileUrl, filename, 'modern', 400);
         } catch (error) {
             console.error('Failed to download QR code:', error);
             alert('Failed to download QR code. Please try again.');
