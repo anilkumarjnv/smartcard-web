@@ -77,7 +77,7 @@ export function AppHeader() {
                                 )}
                             </div>
                         </div>
-                        <div className="w-10 h-10 rounded-full bg-muted overflow-hidden border border-border">
+                        <div className="hidden sm:flex w-10 h-10 rounded-full bg-muted overflow-hidden border border-border">
                             {mounted && ((user as any)?.avatar_url || (user as any)?.picture) ? (
                                 <img
                                     src={(user as any)?.avatar_url || (user as any)?.picture}

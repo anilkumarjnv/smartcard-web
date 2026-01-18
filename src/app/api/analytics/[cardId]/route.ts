@@ -87,13 +87,13 @@ export async function GET(
     const analyticsData = await analyticsResponse.json();
 
     // Transform backend response to match frontend expectations
-    // Backend returns: { totalViews, uniqueViews, daily: [{day, views}], referrers: [{referrer, count}], recent: [...] }
+    // Backend returns: { total_views, unique_views, daily: [{day, count}], referrers: [{referrer, count}], recent: [...] }
     const transformedData = {
-      total_views: analyticsData.totalViews || 0,
-      unique_views: analyticsData.uniqueViews || 0,
+      total_views: analyticsData.total_views || analyticsData.totalViews || 0,
+      unique_views: analyticsData.unique_views || analyticsData.uniqueViews || 0,
       daily: (analyticsData.daily || []).map((item: any) => ({
         day: item.day,
-        count: item.views || item.count || 0  // Backend uses 'views', frontend expects 'count'
+        count: item.views || item.count || 0  // Backend uses 'views' or 'count'
       })),
       referrers: analyticsData.referrers || [],
       recent: analyticsData.recent || []

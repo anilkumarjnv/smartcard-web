@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Copy, Download, Share2, Check, Eye } from 'lucide-react';
 import { Button } from '@/components/molecules/Button';
-import { QRCodeDisplay } from '@/components/molecules/QRCodeDisplay';
+import { QRCodeDisplay, QRCodeDisplayRef, qrThemes } from '@/components/molecules/QRCodeDisplay';
 import useSWR from 'swr';
 import { apiClient } from '@/lib/apiClient';
 import type { Card } from '@/lib/api/types';
@@ -28,11 +28,13 @@ export function ShareTab({ cardId }: ShareTabProps) {
 
   const [copied, setCopied] = useState(false);
   const [showBranding, setShowBranding] = useState(true);
+  const [qrTheme, setQrTheme] = useState<keyof typeof qrThemes>('modern');
 
   const { isPro } = useSubscription();
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   const [isDownloadingQR, setIsDownloadingQR] = useState(false);
+  const qrRef = useRef<QRCodeDisplayRef>(null);
 
   // Generate the profile URL based on the card slug
   const profileUrl = currentCard
@@ -50,35 +52,18 @@ export function ShareTab({ cardId }: ShareTabProps) {
   const handleDownloadQR = async () => {
     setIsDownloadingQR(true);
     try {
-      // Generate QR code URL
-      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(profileUrl)}`;
-
-      // Fetch the image as a blob to avoid CORS issues
-      const response = await fetch(qrUrl);
-      const blob = await response.blob();
-
-      // Create a local object URL
-      const blobUrl = URL.createObjectURL(blob);
-
-      // Create download link
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = `cardfil-${currentCard?.slug || 'qr'}.png`;
-
-      // Trigger download
-      document.body.appendChild(link);
-      link.click();
-
-      // Cleanup
-      document.body.removeChild(link);
-      URL.revokeObjectURL(blobUrl);
+      // Use the component's native download method for better quality
+      if (qrRef.current) {
+        qrRef.current.downloadQR(`cardfil-${currentCard?.slug || 'qr'}.png`);
+      }
     } catch (error) {
       console.error('Failed to download QR code:', error);
       alert('Failed to download QR code. Please try again.');
     } finally {
-      setIsDownloadingQR(false);
+      setTimeout(() => setIsDownloadingQR(false), 500);
     }
   };
+
 
   const handleShare = async () => {
     if (typeof navigator !== 'undefined' && navigator.share) {
@@ -145,8 +130,15 @@ export function ShareTab({ cardId }: ShareTabProps) {
 
           <div className="border-t border-border pt-4 sm:pt-6">
             <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-foreground">QR Code</h4>
-            <div className="max-w-xs mx-auto">
-              <QRCodeDisplay url={profileUrl} />
+            <div className="max-w-sm mx-auto">
+              <QRCodeDisplay
+                ref={qrRef}
+                url={profileUrl}
+                size={220}
+                theme={qrTheme}
+                showThemeSelector={true}
+                onThemeChange={setQrTheme}
+              />
               <Button
                 onClick={handleDownloadQR}
                 variant="outline"

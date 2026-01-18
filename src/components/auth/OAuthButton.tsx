@@ -26,12 +26,13 @@ export function OAuthButton({ provider, redirectTo = '/mycards' }: OAuthButtonPr
             if (error) {
                 console.error('OAuth error:', error);
                 alert(`Failed to sign in with ${provider}`);
+                setLoading(false); // Only reset on error
             }
+            // Don't reset loading on success - page will redirect
         } catch (err) {
             console.error('OAuth error:', err);
             alert(`Failed to sign in with ${provider}`);
-        } finally {
-            setLoading(false);
+            setLoading(false); // Only reset on error
         }
     };
 
