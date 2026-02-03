@@ -4,6 +4,31 @@ import { motion } from 'framer-motion';
 import { Briefcase, RefreshCw, QrCode, LineChart } from 'lucide-react';
 
 const features = [
+
+    {
+        icon: LineChart,
+        title: 'Visibility Insights',
+        description: 'See when people view your profile and from where.',
+        visual: (
+            <div className="flex items-end justify-center gap-1 h-10 pb-1">
+                <div className="w-2 bg-neutral-200 dark:bg-neutral-800 h-4 rounded-sm" />
+                <div className="w-2 bg-neutral-300 dark:bg-neutral-700 h-6 rounded-sm" />
+                <div className="w-2 bg-neutral-900 dark:bg-white h-8 rounded-sm" />
+                <div className="w-2 bg-neutral-300 dark:bg-neutral-700 h-5 rounded-sm" />
+                <div className="w-2 bg-neutral-200 dark:bg-neutral-800 h-3 rounded-sm" />
+            </div>
+        ),
+    },
+    {
+        icon: RefreshCw,
+        title: 'Live Updates',
+        description: 'Real-time changes. No more obsolete business cards.',
+        visual: (
+            <div className="flex items-center justify-center gap-2">
+                <div className="w-8 h-8 rounded-full border-2 border-neutral-200 dark:border-neutral-700 border-t-neutral-900 dark:border-t-white animate-spin" />
+            </div>
+        ),
+    },
     {
         icon: Briefcase,
         title: 'Mini Portfolio',
@@ -25,16 +50,7 @@ const features = [
             </div>
         ),
     },
-    {
-        icon: RefreshCw,
-        title: 'Live Updates',
-        description: 'Real-time changes. No more obsolete business cards.',
-        visual: (
-            <div className="flex items-center justify-center gap-2">
-                <div className="w-8 h-8 rounded-full border-2 border-neutral-200 dark:border-neutral-700 border-t-neutral-900 dark:border-t-white animate-spin" />
-            </div>
-        ),
-    },
+
     {
         icon: QrCode,
         title: 'Instant QR',
@@ -63,20 +79,7 @@ const features = [
             </div>
         ),
     },
-    {
-        icon: LineChart,
-        title: 'Visibility Insights',
-        description: 'See when people view your profile and from where.',
-        visual: (
-            <div className="flex items-end justify-center gap-1 h-10 pb-1">
-                <div className="w-2 bg-neutral-200 dark:bg-neutral-800 h-4 rounded-sm" />
-                <div className="w-2 bg-neutral-300 dark:bg-neutral-700 h-6 rounded-sm" />
-                <div className="w-2 bg-neutral-900 dark:bg-white h-8 rounded-sm" />
-                <div className="w-2 bg-neutral-300 dark:bg-neutral-700 h-5 rounded-sm" />
-                <div className="w-2 bg-neutral-200 dark:bg-neutral-800 h-3 rounded-sm" />
-            </div>
-        ),
-    },
+
 ];
 
 export function FeatureGrid() {

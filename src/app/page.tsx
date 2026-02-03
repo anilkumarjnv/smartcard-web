@@ -234,8 +234,13 @@ export default function Home() {
         defaultMode={authMode}
       />
 
+      {/* SEO-optimized H1 - visually hidden but accessible to search engines */}
+      <h1 className="sr-only">
+        Digital business card to track views, leads, and engagement | Cardfil
+      </h1>
+
       {/* 1. Hero Section - "Quiet Confidence" */}
-      <section className="pt-24 pb-12 md:pt-32 md:pb-24 px-4 md:px-6 overflow-hidden">
+      <section className="pt-24 pb-12 md:pt-32 md:pb-24 px-4 md:px-6 overflow-hidden" aria-labelledby="hero-heading">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             {/* Text Content */}
@@ -248,14 +253,14 @@ export default function Home() {
               {/* Tagline */}
               <span className="tagline mb-4 md:mb-6 block dark:text-neutral-400 text-sm md:text-base">BEYOND A BUSINESS CARD</span>
 
-              {/* Headline */}
-              <h1 className="mb-4 md:mb-6 text-neutral-900 dark:text-white text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-tight">
+              {/* Visual Headline - H2 for proper semantic hierarchy */}
+              <h2 id="hero-heading" className="mb-4 md:mb-6 text-neutral-900 dark:text-white text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-tight">
                 Don't just share details.<br />Capture the interest.
-              </h1>
+              </h2>
 
               {/* Subtext */}
               <p className="text-lg md:text-xl text-secondary dark:text-neutral-400 mb-6 md:mb-8 leading-relaxed">
-                The post-meeting interaction is where opportunities are lost. Cardfil ensures you're saved instantly and gives you visibility into who's actually looking.
+                A digital card that helps you stay remembered, track interest, and convert connections.
               </p>
 
               {/* CTAs */}
@@ -289,9 +294,9 @@ export default function Home() {
                       className="btn-primary dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-100 w-full sm:w-auto"
                     >
                       {user ? 'Go to Dashboard' : 'Create your Card'}
-                      {!user && betaStatus?.isBetaMode && betaStatus.spotsRemaining <= 5 && !betaStatus.limitReached && (
+                      {/* {!user && betaStatus?.isBetaMode && betaStatus.spotsRemaining <= 5 && !betaStatus.limitReached && (
                         <span className="ml-2 text-xs">({betaStatus.spotsRemaining} left)</span>
-                      )}
+                      )} */}
                     </button>
                     <Link href="/demo/profile-card" className="text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white font-medium flex items-center justify-center gap-2 transition-colors w-full sm:w-auto py-2">
                       View example
@@ -364,8 +369,11 @@ export default function Home() {
             className="text-center mb-12 md:mb-16"
           >
             <h2 className="mb-4 text-2xl md:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white">Visibility beyond the handshake</h2>
-            <p className="text-lg md:text-xl text-secondary dark:text-neutral-400 max-w-2xl mx-auto">
+            {/* <p className="text-lg md:text-xl text-secondary dark:text-neutral-400 max-w-2xl mx-auto">
               Don't just hand out a card and hope. Track interest, manage leads, and showcase your best work.
+            </p> */}
+            <p className="text-lg md:text-xl text-secondary dark:text-neutral-400 max-w-2xl mx-auto">
+              When someone opens your card, you’ll know — even after the meeting ends.
             </p>
           </motion.div>
           <FeatureGrid />
@@ -390,6 +398,7 @@ export default function Home() {
             className="text-center mb-12 md:mb-16"
           >
             <h2 className="mb-4 text-2xl md:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white">One Card. Multiple Impact.</h2>
+            <p>Whether you’re a student, freelancer, or founder — the goal is the same: make your first impression count.</p>
           </motion.div>
           <UseCaseCards />
         </div>
@@ -440,10 +449,10 @@ export default function Home() {
             ) : (
               <Link href="/signup">
                 <button className="bg-white text-neutral-900 hover:bg-neutral-100 px-8 py-4 rounded-md font-semibold transition-all duration-200 hover:-translate-y-0.5 active:scale-98 w-full sm:w-auto">
-                  Claim your username
-                  {betaStatus?.isBetaMode && betaStatus.spotsRemaining && betaStatus.spotsRemaining <= 5 && (
+                  Create your card in 2 minutes
+                  {/* {betaStatus?.isBetaMode && betaStatus.spotsRemaining && betaStatus.spotsRemaining <= 5 && (
                     <span className="ml-2 text-xs text-neutral-600">({betaStatus.spotsRemaining} spots left)</span>
-                  )}
+                  )} */}
                 </button>
               </Link>
             )}
