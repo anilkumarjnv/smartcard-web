@@ -1,0 +1,18 @@
+# Cardfil - robots.txt
+# Allow all search engine crawlers
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://cardfil.com/sitemap.xml
+
+# Disallow admin and private paths
+Disallow: /admin
+Disallow: /api/
+Disallow: /mycards/
+Disallow: /settings/
+Disallow: /leads/
+Disallow: /auth/
+Disallow: /subscription/
+Disallow: /env-check

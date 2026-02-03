@@ -420,8 +420,11 @@ export function PricingSection({ user, onLoginClick }: PricingSectionProps) {
             </div>
 
             {renderContent()}
-
+            <p className="text-center text-xs text-neutral-400 mt-12 flex items-center justify-center gap-1">
+                Free helps you share. Pro helps you convert.
+            </p>
             <ComparisonTable />
+
 
             <p className="text-center text-xs text-neutral-400 mt-12 flex items-center justify-center gap-1">
                 <Info className="w-3 h-3" /> Secure payment via Razorpay. Backend verified.

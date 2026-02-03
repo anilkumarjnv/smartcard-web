@@ -14,10 +14,11 @@ import {
 const features = [
     {
         id: 'leads',
-        title: 'Bridge the post-meeting gap',
+        title: 'Turn silent views into real follow-ups',
         subtitle: 'Lead Capture Layer',
         description: 'Don\'t let the connection die after the handshake. Capture leads instantly when they view your card, creating a lightweight visibility layer for your business.',
         highlights: [
+
             'One-tap contact collection',
             'Visitor interest signals',
             'Real-time lead notifications'
@@ -28,10 +29,11 @@ const features = [
     },
     {
         id: 'analytics',
-        title: 'Understand your impact',
+        title: 'Stop guessing who’s interested. Know it',
         subtitle: 'Advanced Analytics',
         description: 'Get deep insights into who\'s viewing your card, which links they click, and how your network is growing over time.',
         highlights: [
+
             'Daily view trends',
             'Link click tracking',
             'Geographic insights'
@@ -46,6 +48,7 @@ const features = [
         subtitle: 'Deep Customization',
         description: 'Don\'t settle for generic. Customize every aspect of your card from themes and colors to button shapes and fonts.',
         highlights: [
+            'Because first impressions shape credibility.',
             'Premium dark/light themes',
             'Custom shape dividers',
             'Personal branding friendly'

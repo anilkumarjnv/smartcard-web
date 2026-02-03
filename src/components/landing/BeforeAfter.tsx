@@ -71,7 +71,7 @@ export function BeforeAfter() {
                     </div>
 
                     <p className="text-center text-neutral-700 dark:text-neutral-300 font-medium">
-                        Everything about you, in one place.
+                        So people actually remember you — and you know who’s interested.
                     </p>
                 </div>
             </motion.div>
