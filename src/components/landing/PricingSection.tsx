@@ -247,13 +247,14 @@ export function PricingSection({ user, onLoginClick }: PricingSectionProps) {
         }
     };
 
-    const isLifetimeAvailable = !lifetimeStatus?.isSoldOut && (lifetimeStatus?.remaining ?? 0) > 0;
-
     // Plans Data
     const lifetimePlan = plans.find(p => (p.billing_cycle === 'ONE_TIME' || p.code.includes('LIFETIME')) && p.code !== 'FREE');
     const freePlan = plans.find(p => p.code === 'FREE') || { name: 'Basic Plan', price_inr: 0, features: [] };
     const monthlyPlan = plans.find(p => p.billing_cycle === 'MONTHLY' && p.code !== 'FREE');
     const yearlyPlan = plans.find(p => p.billing_cycle === 'YEARLY' && p.code !== 'FREE');
+
+    // Beta limit removed - lifetime is always available if the plan exists
+    const isLifetimeAvailable = !!lifetimePlan;
 
 
 
@@ -319,27 +320,66 @@ export function PricingSection({ user, onLoginClick }: PricingSectionProps) {
         // "when user is not subscribed... show basic plan (Current)"
 
         if (isLifetimeAvailable) {
-            // Lifetime Exclusive View
+            // 3-Column Pricing: Monthly | Lifetime (Featured) | Yearly
             return (
-                <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto items-stretch">
-                    <PlanCardComponent
-                        plan={freePlan}
-                        type="FREE"
-                        isCurrent={true}
-                        isUpgrade={false}
-                        loading={loading}
-                        lifetimeStatus={lifetimeStatus}
-                    />
-                    <PlanCardComponent
-                        plan={lifetimePlan}
-                        type="LIFETIME"
-                        isCurrent={false}
-                        isUpgrade={true}
-                        buttonText="Get Lifetime Access"
-                        onAction={() => handlePayment('LIFETIME')}
-                        loading={loading}
-                        lifetimeStatus={lifetimeStatus}
-                    />
+                <div>
+                    {/* Value Comparison Banner */}
+                    <div className="text-center mb-8">
+                        <div className="inline-flex items-center gap-2 bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 border border-yellow-200 dark:border-yellow-800 rounded-full px-4 py-2">
+                            <span className="text-sm text-yellow-800 dark:text-yellow-200">
+                                💡 <strong>Lifetime = 4 months of Monthly pricing.</strong> Pay once, own forever.
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto items-stretch">
+                        {/* Monthly Plan */}
+                        <PlanCardComponent
+                            plan={monthlyPlan}
+                            type="MONTHLY"
+                            isCurrent={false}
+                            isUpgrade={false}
+                            buttonText="Start Monthly"
+                            onAction={() => handlePayment('MONTHLY', monthlyPlan?.code)}
+                            loading={loading}
+                            lifetimeStatus={lifetimeStatus}
+                        />
+
+                        {/* Lifetime Plan - Center & Featured */}
+                        <PlanCardComponent
+                            plan={lifetimePlan}
+                            type="LIFETIME"
+                            isCurrent={false}
+                            isUpgrade={true}
+                            buttonText="Get Lifetime Access"
+                            onAction={() => handlePayment('LIFETIME')}
+                            loading={loading}
+                            lifetimeStatus={lifetimeStatus}
+                        />
+
+                        {/* Yearly Plan */}
+                        <PlanCardComponent
+                            plan={yearlyPlan}
+                            type="YEARLY"
+                            isCurrent={false}
+                            isUpgrade={false}
+                            buttonText="Start Yearly"
+                            onAction={() => handlePayment('YEARLY', yearlyPlan?.code)}
+                            loading={loading}
+                            lifetimeStatus={lifetimeStatus}
+                        />
+                    </div>
+
+                    {/* Comparison Note */}
+                    <div className="text-center mt-8 text-sm text-neutral-500 dark:text-neutral-400">
+                        <p>
+                            Monthly: ₹{monthlyPlan?.price_inr || 49}/mo × 12 = <span className="line-through">₹{(monthlyPlan?.price_inr || 49) * 12}/yr</span>
+                            {' • '}
+                            Yearly: ₹{yearlyPlan?.price_inr || 399}/yr
+                            {' • '}
+                            <strong className="text-neutral-900 dark:text-white">Lifetime: ₹{lifetimePlan?.price_inr || 199} once</strong>
+                        </p>
+                    </div>
                 </div>
             );
         } else {
@@ -408,13 +448,13 @@ export function PricingSection({ user, onLoginClick }: PricingSectionProps) {
             <div className="text-center mb-12">
                 <h2 className="text-4xl font-bold mb-4 text-neutral-900 dark:text-white tracking-tight">
                     {userPlanType === 'LIFETIME' ? "Welcome to the Club" :
-                        isLifetimeAvailable && userPlanType === 'FREE' ? "Exclusive Early Access" : "Simple, Transparent Pricing"}
+                        isLifetimeAvailable && userPlanType === 'FREE' ? "Choose Your Plan" : "Simple, Transparent Pricing"}
                 </h2>
                 <p className="text-lg text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto">
                     {userPlanType === 'LIFETIME' ? "You have lifetime access to all features." :
                         userPlanType === 'YEARLY' || userPlanType === 'MONTHLY' ? "Manage your subscription below." :
                             isLifetimeAvailable
-                                ? "Join the founders club. Pay once, own it forever. Limited spots available."
+                                ? "Start with what works for you. Lifetime access available for a limited time."
                                 : "Choose the plan that fits your needs. Upgrade anytime."}
                 </p>
             </div>
