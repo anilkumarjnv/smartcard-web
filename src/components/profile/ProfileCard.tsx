@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Mail, Phone, Linkedin, Globe, Download, Share2, Edit, BarChart3, QrCode, Trash2, Github, Twitter, Instagram, Facebook, Youtube, Twitch, Disc as DiscordIcon, Figma, Code2, Link as LinkIcon, Dribbble, Palette, RefreshCw, Crown, Loader2 } from 'lucide-react';
+import { Mail, Phone, Linkedin, Globe, Download, Share2, Edit, BarChart3, QrCode, Trash2, Github, Twitter, Instagram, Facebook, Youtube, Twitch, Disc as DiscordIcon, Figma, Code2, Link as LinkIcon, Dribbble, Palette, RefreshCw, Crown, Loader2, Check } from 'lucide-react';
 import { WaveShape } from './shapes/WaveShape';
 import { GeometricShape } from './shapes/GeometricShape';
 import { SoftArcShape } from './shapes/SoftArcShape';
@@ -83,7 +83,37 @@ export function ProfileCard({
     const [isAnalyticsLoading, setIsAnalyticsLoading] = useState(false);
     const [isDownloadLoading, setIsDownloadLoading] = useState(false);
     const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+    const [shareStatus, setShareStatus] = useState<'idle' | 'copied'>('idle');
     const router = useRouter();
+
+    // Handle share functionality for public card
+    const handleShare = async () => {
+        if (disableInteractions) return;
+
+        const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+        const shareData = {
+            title: `${user.name} - Digital Business Card`,
+            text: `Check out ${user.name}'s digital business card!`,
+            url: shareUrl,
+        };
+
+        try {
+            // Use native Web Share API if available
+            if (typeof navigator !== 'undefined' && navigator.share) {
+                await navigator.share(shareData);
+            } else {
+                // Fallback to copy to clipboard
+                if (typeof navigator !== 'undefined' && navigator.clipboard) {
+                    await navigator.clipboard.writeText(shareUrl);
+                    setShareStatus('copied');
+                    setTimeout(() => setShareStatus('idle'), 2000);
+                }
+            }
+        } catch (error) {
+            // User cancelled share or error occurred
+            console.log('Share cancelled or failed');
+        }
+    };
 
     const interactionClass = disableInteractions ? 'pointer-events-none' : '';
 
@@ -446,11 +476,16 @@ export function ProfileCard({
                         </span>
                     </button>
                     <button
+                        onClick={handleShare}
                         className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border ${currentTheme.border} ${currentTheme.hover} transition-colors ${interactionClass}`}
                     >
-                        <Share2 className={`w-4 h-4 ${currentTheme.accent}`} strokeWidth={2} />
-                        <span className={`text-sm font-medium ${currentTheme.text}`}>
-                            Share
+                        {shareStatus === 'copied' ? (
+                            <Check className="w-4 h-4 text-green-500" strokeWidth={2} />
+                        ) : (
+                            <Share2 className={`w-4 h-4 ${currentTheme.accent}`} strokeWidth={2} />
+                        )}
+                        <span className={`text-sm font-medium ${shareStatus === 'copied' ? 'text-green-500' : currentTheme.text}`}>
+                            {shareStatus === 'copied' ? 'Copied!' : 'Share'}
                         </span>
                     </button>
                 </div>
