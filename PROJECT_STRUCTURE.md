@@ -300,15 +300,15 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 ## Project Features
 
-- ✅ Next.js 16 App Router
-- ✅ TypeScript with strict mode
-- ✅ Tailwind CSS v4
-- ✅ Supabase integration (client & server)
-- ✅ Dark mode support
-- ✅ Responsive design
-- ✅ ESLint configuration
-- ✅ Font optimization
-- ✅ Image optimization
+-  Next.js 16 App Router
+-  TypeScript with strict mode
+-  Tailwind CSS v4
+-  Supabase integration (client & server)
+-  Dark mode support
+-  Responsive design
+-  ESLint configuration
+-  Font optimization
+-  Image optimization
 
 ## Next Steps
 

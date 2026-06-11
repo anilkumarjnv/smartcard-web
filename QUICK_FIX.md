@@ -1,4 +1,4 @@
-# ⚠️ QUICK FIX: Backend Server Not Running
+#  QUICK FIX: Backend Server Not Running
 
 ## Problem
 The dashboard shows "Failed to load dashboard" because the backend API server is not running on port 8080.
@@ -94,10 +94,10 @@ Both should be running simultaneously!
 ## Still Having Issues?
 
 Check:
-1. ✅ Backend running on port 8080
-2. ✅ Frontend running on port 3000
-3. ✅ Supabase credentials in .env files
-4. ✅ No port conflicts
+1.  Backend running on port 8080
+2.  Frontend running on port 3000
+3.  Supabase credentials in .env files
+4.  No port conflicts
 
 If you see CORS errors, make sure `FRONTEND_ORIGIN=http://localhost:3000` is in your backend `.env` file.
 

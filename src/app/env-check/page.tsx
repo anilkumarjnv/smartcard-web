@@ -30,7 +30,7 @@ export default function EnvCheckPage() {
                         wordBreak: 'break-all',
                         fontWeight: 'bold'
                     }}>
-                        {apiUrl || '❌ NOT SET'}
+                        {apiUrl || ' NOT SET'}
                     </p>
                 </div>
 
@@ -44,13 +44,13 @@ export default function EnvCheckPage() {
                         wordBreak: 'break-all',
                         fontWeight: 'bold'
                     }}>
-                        {supabaseUrl || '❌ NOT SET'}
+                        {supabaseUrl || ' NOT SET'}
                     </p>
                 </div>
             </div>
 
             <div style={{ background: '#fff3e0', padding: '20px', borderRadius: '8px', marginTop: '20px', border: '2px solid #ff9800' }}>
-                <h2>⚠️ Important Notes:</h2>
+                <h2> Important Notes:</h2>
                 <ul style={{ lineHeight: '1.8' }}>
                     <li><strong>Testing Location:</strong> Are you testing on <strong>Vercel</strong> or <strong>localhost</strong>?</li>
                     <li>If testing on <strong>localhost</strong> (npm run dev), it uses your <strong>local .env file</strong></li>
@@ -60,7 +60,7 @@ export default function EnvCheckPage() {
             </div>
 
             <div style={{ background: '#e8f5e9', padding: '20px', borderRadius: '8px', marginTop: '20px' }}>
-                <h2>✅ Expected Values on Vercel:</h2>
+                <h2> Expected Values on Vercel:</h2>
                 <p><strong>NEXT_PUBLIC_API_URL:</strong> https://smartcard-backend-aoek.onrender.com</p>
                 <p><strong>NEXT_PUBLIC_SUPABASE_URL:</strong> https://klvauwiovcfhsrajwqlx.supabase.co</p>
             </div>

@@ -2,7 +2,7 @@
 
 Production-ready Next.js frontend for SmartCard, built with TypeScript, Tailwind CSS, and Supabase.
 
-## 🚀 Quick Start
+##  Quick Start
 
 1.  **Install dependencies:**
     ```bash
