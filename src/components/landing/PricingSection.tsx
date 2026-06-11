@@ -185,7 +185,7 @@ export function PricingSection({ user, onLoginClick }: PricingSectionProps) {
             }
 
             if (!process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID) {
-                console.error("❌ Missing Razorpay Key ID");
+                console.error(" Missing Razorpay Key ID");
                 toast.error("Configuration Error: Payment Key Missing");
                 setLoading(null);
                 return;
@@ -208,7 +208,7 @@ export function PricingSection({ user, onLoginClick }: PricingSectionProps) {
                                 razorpay_payment_id: response.razorpay_payment_id,
                                 razorpay_signature: response.razorpay_signature
                             });
-                            toast.success("Lifetime access activated! 🎉");
+                            toast.success("Lifetime access activated! ");
                             window.location.reload();
                         } catch (err) {
                             toast.error("Payment verification failed");

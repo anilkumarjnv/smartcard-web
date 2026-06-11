@@ -43,7 +43,7 @@ export function BetaBanner() {
                 </span>
             ) : (
                 <span>
-                    🚀 Beta Testing - {betaStatus.spotsRemaining} of {betaStatus.maxUsers} spots remaining
+                     Beta Testing - {betaStatus.spotsRemaining} of {betaStatus.maxUsers} spots remaining
                 </span>
             )}
         </div>

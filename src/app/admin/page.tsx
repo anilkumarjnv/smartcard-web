@@ -201,7 +201,7 @@ function OverviewTab({ metrics, betaStatus }: {
                                     ? 'text-yellow-800'
                                     : 'text-blue-800'
                                 }`}>
-                                {betaStatus.limitReached ? '🔒 Beta Limit Reached' : '🚀 Beta Testing Active'}
+                                {betaStatus.limitReached ? '🔒 Beta Limit Reached' : ' Beta Testing Active'}
                             </h3>
                             <div className={`mt-2 text-sm ${betaStatus.limitReached
                                 ? 'text-red-700'
